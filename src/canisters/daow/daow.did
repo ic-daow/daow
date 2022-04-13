@@ -1,3 +1,25 @@
+
+type UserError = variant {
+    UserNotFound : text;
+    UserAlreadyExisted : text;
+    UserAlreadyDisabled : text;
+};
+
+type UserRegisterCommand = record {
+    email: text;
+    name: text;
+    memo: opt text;
+};
+
+type RegisterResponse = variant {
+    registered : record { id : text; };
+    user_already_exists: record { id : text; };
+    user_already_disabled: record { id : text; };
+    internal_error;
+}
+
 service : {
     "greet": (text) -> (text) query;
+
+    "register_user": (UserRegisterCommand) -> (RegisterResponse);
 }
