@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "dfx": "0.9.3",
+  "canisters": {
+    "daow": {
+      "type": "rust",
+      "package": "daow",
+      "candid": "src/daow/daow.did"
+    },
+    "daow_assets": {
+      "type": "assets",
+      "source": [
+        "src/daow_assets/assets"
+      ],
+      "dependencies": [
+        "daow"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  }
+}
