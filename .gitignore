@@ -12,6 +12,7 @@
 
 # rust
 target/
+**Cargo.lock
 
 # frontend code
 node_modules/

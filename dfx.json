@@ -1,20 +1,15 @@
 {
   "version": 1,
-  "dfx": "0.9.3",
+ 
   "canisters": {
     "daow": {
-      "type": "rust",
-      "package": "daow",
-      "candid": "src/daow/daow.did"
-    },
-    "daow_assets": {
-      "type": "assets",
-      "source": [
-        "src/daow_assets/assets"
+      "type": "custom",
+      "wasm": "target/wasm32-unknown-unknown/release/daow_opt.wasm",
+      "build": [
+        "cargo build --target wasm32-unknown-unknown --package  daow --release",
+        "ic-cdk-optimizer target/wasm32-unknown-unknown/release/daow.wasm -o target/wasm32-unknown-unknown/release/daow_opt.wasm"
       ],
-      "dependencies": [
-        "daow"
-      ]
+      "candid": "src/canisters/daow/daow.did"
     }
   },
   "defaults": {
