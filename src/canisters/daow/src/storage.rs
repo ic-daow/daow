@@ -1,4 +1,6 @@
 
+#![allow(dead_code)]
+
 // use super::UserNumber;
 use ic_cdk::api::{
     stable::{stable64_grow, stable64_read, stable64_size, stable64_write},

@@ -1,14 +1,14 @@
 
-use candid::{CandidType, Deserialize};
+use candid::{CandidType, Deserialize, Principal};
 
 #[derive(Debug, CandidType, Deserialize)]
-pub enum RegisterResponse {
+pub enum RegisterResult {
     #[serde(rename = "registered")]
-    Registered { id: String },
+    Registered { owner: Principal },
     #[serde(rename = "user_already_exists")]
-    UserAlreadyExists { id: String },
+    UserAlreadyExists,
     #[serde(rename = "user_already_disabled")]
-    UserAlreadyDisabled { id: String },
+    UserAlreadyDisabled { owner: Principal },
     #[serde(rename = "internal_error")]
     InternalError,
 }
