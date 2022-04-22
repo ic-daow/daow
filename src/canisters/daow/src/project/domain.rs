@@ -157,14 +157,18 @@ impl ProjectCreateCommand {
     }
 }
 
+pub trait MergeProject {
+    fn merge_profile(self, profile: &mut ProjectProfile);
+}
+
 #[derive(Debug, Clone, CandidType, Deserialize)]
 pub struct ProjectApplyDescriptionCommand {
     pub id: u64,
     pub description: String,
 }
 
-impl ProjectApplyDescriptionCommand {
-    pub fn merge_profile(self, profile: &mut ProjectProfile) {
+impl MergeProject for ProjectApplyDescriptionCommand {
+    fn merge_profile(self, profile: &mut ProjectProfile) {
         assert!(self.id == profile.id);
         
        profile.description = self.description
@@ -177,8 +181,8 @@ pub struct ProjectApplyRoadmapCommand {
     pub roadmap: Blob,
 }
 
-impl ProjectApplyRoadmapCommand {
-    pub fn merge_profile(self, profile: &mut ProjectProfile) {
+impl MergeProject for ProjectApplyRoadmapCommand {
+    fn merge_profile(self, profile: &mut ProjectProfile) {
         assert!(self.id == profile.id);
         
        profile.roadmap = self.roadmap;
@@ -191,8 +195,8 @@ pub struct ProjectApplyTokenomicsCommand {
     pub tokenomics: Tokenomics,
 }
 
-impl ProjectApplyTokenomicsCommand {
-    pub fn merge_profile(self, profile: &mut ProjectProfile) {
+impl MergeProject for ProjectApplyTokenomicsCommand {
+    fn merge_profile(self, profile: &mut ProjectProfile) {
         assert!(self.id == profile.id);
         
        profile.tokenomics = self.tokenomics;
@@ -205,8 +209,8 @@ pub struct ProjectApplyTeamCommand {
     pub team: Team,
 }
 
-impl ProjectApplyTeamCommand {
-    pub fn merge_profile(self, profile: &mut ProjectProfile) {
+impl MergeProject for ProjectApplyTeamCommand {
+    fn merge_profile(self, profile: &mut ProjectProfile) {
         assert!(self.id == profile.id);
         
        profile.team = self.team;
@@ -219,8 +223,8 @@ pub struct ProjectApplyTrustByCommand {
     pub trust_by: TrustBy,
 }
 
-impl ProjectApplyTrustByCommand {
-    pub fn merge_profile(self, profile: &mut ProjectProfile) {
+impl MergeProject for ProjectApplyTrustByCommand {
+    fn merge_profile(self, profile: &mut ProjectProfile) {
         assert!(self.id == profile.id);
         
        profile.trust_by = self.trust_by;
@@ -233,8 +237,8 @@ pub struct ProjectApplyCapitalDetailCommand {
     pub capital_detail: CapitalDetail,
 }
 
-impl ProjectApplyCapitalDetailCommand {
-    pub fn merge_profile(self, profile: &mut ProjectProfile) {
+impl MergeProject for ProjectApplyCapitalDetailCommand {
+    fn merge_profile(self, profile: &mut ProjectProfile) {
         assert!(self.id == profile.id);
         
        profile.capital_detail = self.capital_detail;

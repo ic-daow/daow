@@ -45,10 +45,10 @@ fn pre_upgrade() {
     CONTEXT.with(|c| {
         let context = c.borrow();
         let id = context.id;
-        let users = Vec::from_iter(context.users
+        let users = Vec::from_iter(context.user_service.users
             .iter()
             .map(|(_k, v)| (v.clone())));
-        let projects = Vec::from_iter(context.projects
+        let projects = Vec::from_iter(context.project_service.projects
             .iter()
             .map(|(_k, v)| (v.clone())));
 
