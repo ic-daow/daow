@@ -1,0 +1,62 @@
+
+type UserRegisterCommand = record {
+    email: text;
+    name: text;
+    memo: opt text;
+};
+
+type RegisterResult = variant {
+    registered : record { owner : principal; };
+    user_already_exists;
+    user_already_disabled : record { owner: principal };
+    internal_error;
+};
+
+type UserProfile = record {
+    id : nat64;
+    owner : principal;
+    email : text;
+    name : text;
+    memo : opt text;
+    status : UserStatus;
+    created_at : nat64;
+};
+
+type UserStatus = variant {
+    Enable;
+    Disable;
+};
+
+type ProjectCreateCommand = record {
+    title: text;
+    logo: vec nat8;
+    information: text;
+    owner_info: text;
+    wallet_addr: text;
+    contact_info: vec text;
+    links: vec text;
+    tags: vec text;
+    memo: opt text;
+};
+
+type ProjectCreatedError = variant {
+    UserNotFound;
+    ProjectAlreadyExists;
+};
+
+type ProjectCreatedResult = variant {
+    Ok: nat64;
+    Err: ProjectCreatedError;
+};
+
+service : {
+ 
+    "greet": (text) -> (text) query;
+
+    "register_user": (UserRegisterCommand) -> (RegisterResult);
+
+    "get_user" : (text) -> (opt UserProfile);
+    "get_self" : () -> (opt UserProfile);
+
+    "create_project": (ProjectCreateCommand) -> (ProjectCreatedResult);
+}

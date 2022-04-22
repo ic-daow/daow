@@ -1,0 +1,22 @@
+{
+  "name": "@daow/binding",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@dfinity/agent": "^0.11.1",
+    "@dfinity/candid": "^0.11.1",
+    "@dfinity/principal": "^0.11.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.20.0",
+    "@typescript-eslint/parser": "^5.20.0",
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
+  }
+}
