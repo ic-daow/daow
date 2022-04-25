@@ -43,3 +43,5 @@ export interface _SERVICE {
   'greet' : ActorMethod<[string], string>,
   'register_user' : ActorMethod<[UserRegisterCommand], RegisterResult>,
 }
+import type { IDL } from '@dfinity/candid';
+export const idlFactory: IDL;

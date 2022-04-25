@@ -1,86 +1,112 @@
-import { ActorSubclass } from '@dfinity/agent'
+import { BaseActor, ICreateActorOptions } from './actor'
 import {
   _SERVICE,
-  // @ts-ignore
   idlFactory,
   ProjectCreateCommand,
   ProjectCreatedResult,
   RegisterResult,
   UserProfile,
   UserRegisterCommand,
-} from './canister/daow.did'
-import { castPrincipalToString, createActor, fromOption, ICPrincipal } from './utils'
-
-type IDaowActor = ActorSubclass<_SERVICE>
+} from './actor/daow.did'
+import { castPrincipalToString, fromOption, ICPrincipal } from './utils'
 
 /**
- * create daow actor
+ * 创建dao参数
  */
-export const createDaowActor = async (canisterId: string): Promise<IDaowActor> => await createActor(canisterId, idlFactory)
-
 export interface ICreateProjectArg {
 }
 
-const toCreateProjectCommand = (from: ICreateProjectArg): ProjectCreateCommand => ({})
-
+/**
+ * dao
+ */
 export interface ICreateProjectResult {
 }
 
-const fromProjectCreatedResult = (from: ProjectCreatedResult): ICreateProjectResult => ({})
-
 /**
- * create project
- */
-export const createProject = (actor: IDaowActor) => async (arg: ICreateProjectArg) => {
-  const result = await actor.create_project(toCreateProjectCommand(arg))
-  return fromProjectCreatedResult(result)
-}
-
-/**
- * user
+ * 注册账户参数
  */
 export interface IRegisterUserArg {
 }
 
-const toUserRegisterCommand = (from: IRegisterUserArg): UserRegisterCommand => ({})
-
+/**
+ * 注册账户返回值
+ */
 export interface IRegisterUserResult {
 }
 
-const fromRegisterResult = (from: RegisterResult): IRegisterUserResult => ({})
-
 /**
- * register user
+ * 用户对象
  */
-export const registerUser = (actor: IDaowActor) => async (arg: IRegisterUserArg) => {
-  const result = await actor.register_user(toUserRegisterCommand(arg))
-  return fromRegisterResult(result)
-}
-
 export interface IUserProfile {
 }
 
-const fromUserProfile = (from: UserProfile): IUserProfile => ({})
+export class DaowActor extends BaseActor<_SERVICE> {
+  /**
+   * 创建actor
+   */
+  public async create(cid: string, options?: ICreateActorOptions) {
+    await this._create(cid, idlFactory, options)
+    return this
+  }
 
-/**
- * get self
- */
-export const getSelf = (actor: IDaowActor) => async () => {
-  const _result = await actor.get_self()
-  const result = fromOption(_result)
-  return result ? fromUserProfile(result) : null
+  /**
+   * create project
+   */
+  public async createProject(arg: ICreateProjectArg) {
+    const result = await this.getActor().create_project(this.toCreateProjectCommand(arg))
+    return this.fromProjectCreatedResult(result)
+  }
+
+  /**
+   * register user
+   */
+  public async registerUser(arg: IRegisterUserArg) {
+    const result = await this.getActor().register_user(this.toUserRegisterCommand(arg))
+    return this.fromRegisterResult(result)
+  }
+
+  /**
+   * get self
+   */
+  public async getSelf() {
+    const _result = await this.getActor().get_self()
+    const result = fromOption(_result)
+    return result ? this.fromUserProfile(result) : null
+  }
+
+  /**
+   * get user
+   */
+  public async getUser(principal: string | ICPrincipal) {
+    const _result = await this.getActor().get_user(castPrincipalToString(principal))
+    const result = fromOption(_result)
+    return result ? this.fromUserProfile(result) : null
+  }
+
+  /**
+   * greet
+   */
+  public async greet(input: string) {
+    return this.getActor().greet(input)
+  }
+
+  private toCreateProjectCommand(from: ICreateProjectArg): ProjectCreateCommand {
+    return {}
+  }
+
+  private fromProjectCreatedResult(from: ProjectCreatedResult): ICreateProjectResult {
+    return {}
+  }
+
+  private toUserRegisterCommand(from: IRegisterUserArg): UserRegisterCommand {
+    return {}
+  }
+
+  private fromRegisterResult(from: RegisterResult): IRegisterUserResult {
+    return {}
+  }
+
+  private fromUserProfile(from: UserProfile): IUserProfile {
+    return {}
+  }
 }
-
-/**
- * get user
- */
-export const getUser = (actor: IDaowActor) => async (principal: string | ICPrincipal) => {
-  const _result = await actor.get_user(castPrincipalToString(principal))
-  const result = fromOption(_result)
-  return result ? fromUserProfile(result) : null
-}
-
-/**
- * greet
- */
-export const greet = (actor: IDaowActor) => async (input: string) => actor.greet(input)
