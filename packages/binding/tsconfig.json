@@ -6,9 +6,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "allowJs": true,
+    "outDir": "lib"
   },
-  "exclude": [
-    "lib/actor/*.did*"
+  "include": [
+    "src/**/*"
   ]
 }

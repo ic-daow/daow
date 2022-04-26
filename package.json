@@ -1,0 +1,6 @@
+{
+  "name": "daow",
+  "workspaces": [
+    "packages/binding"
+  ]
+}

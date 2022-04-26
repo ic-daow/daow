@@ -5,7 +5,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let did_path = env::args().nth(1).unwrap();
     let did_path = path::Path::new(did_path.as_str());
 
-    let base_path = "src/binding/lib/actor";
+    let base_path = env::args().nth(2).unwrap_or("packages/binding/src/actor".to_string());
     let file_name = did_path.file_name().unwrap();
     let file_name = file_name.to_str().unwrap();
 
