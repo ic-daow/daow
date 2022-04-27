@@ -4,10 +4,14 @@ use ic_cdk_macros::*;
 
 
 use crate::CONTEXT;
-use super::{domain::*, response::{ProjectCreatedResult, ProjectCreatedError}};
+use super::{
+    domain::*, 
+    command::*,
+    error:: ProjectError,
+};
 
 #[update]
-fn create_project(cmd: ProjectCreateCommand) -> ProjectCreatedResult {
+fn create_project(cmd: ProjectCreateCommand) -> Result<ProjectId, ProjectError> {
     CONTEXT.with(|c| {      
         let mut ctx = c.borrow_mut();
         let id = ctx.id;
@@ -16,39 +20,65 @@ fn create_project(cmd: ProjectCreateCommand) -> ProjectCreatedResult {
         match ctx.project_service.create_project(cmd, id, caller, now) {
             Some(id) => {
                 ctx.id += 1;
-                ProjectCreatedResult::Ok(id)
+                Ok(id)
             },
-            None => ProjectCreatedResult::Err(ProjectCreatedError::ProjectAlreadyExists),
+            None => Err(ProjectError::ProjectAlreadyExists),
         }
     })
 }
 
 #[update]
-fn apply_project_description(cmd: ProjectApplyDescriptionCommand) -> bool {
-    CONTEXT.with(|c| c.borrow_mut().project_service.apply_project_desc(cmd))
+fn apply_project_description(cmd: ProjectApplyDescriptionCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
 }
 
 #[update]
-fn apply_project_roadmap(cmd: ProjectApplyRoadmapCommand) -> bool {
-    CONTEXT.with(|c| c.borrow_mut().project_service.apply_project_roadmap(cmd))
+fn apply_project_roadmap(cmd: ProjectApplyRoadmapCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
 }
 
 #[update]
-fn apply_project_tokenomics(cmd: ProjectApplyTokenomicsCommand) -> bool {
-    CONTEXT.with(|c| c.borrow_mut().project_service.apply_project_tokenomics(cmd))
+fn apply_project_tokenomics(cmd: ProjectApplyTokenomicsCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
 }
 
 #[update]
-fn apply_project_trust_by(cmd: ProjectApplyTrustByCommand) -> bool {
-    CONTEXT.with(|c| c.borrow_mut().project_service.apply_project_trust_by(cmd))
+fn apply_project_trust_by(cmd: ProjectApplyTrustByCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
 }
 
 #[update]
-fn apply_project_team(cmd: ProjectApplyTeamCommand) -> bool {
-    CONTEXT.with(|c| c.borrow_mut().project_service.apply_project_team(cmd))
+fn apply_project_team(cmd: ProjectApplyTeamCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
 }
 
 #[update]
-fn apply_project_capital_detail(cmd: ProjectApplyCapitalDetailCommand) -> bool {
-    CONTEXT.with(|c| c.borrow_mut().project_service.apply_project_capital_detail(cmd))
+fn apply_project_capital_detail(cmd: ProjectApplyCapitalDetailCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
+}
+
+#[update]
+fn edit_project(cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
+    merge_project_profile(cmd)
+}
+
+#[update]
+fn delete_project(id: ProjectId) -> Result<bool, ProjectError> {
+    CONTEXT.with(|c| {      
+        c.borrow_mut().project_service.delete_project(id).map(|_| true).ok_or(ProjectError::ProjectNotFound)
+    })
+}
+
+fn merge_project_profile(cmd: impl MergeProject) -> Result<bool, ProjectError> {
+    CONTEXT.with(|c| c.borrow_mut().project_service.merge_profile(cmd)).ok_or(ProjectError::ProjectNotFound)
+}
+
+#[query]
+fn get_project(id: ProjectId) -> Result<ProjectProfile, ProjectError> {
+    CONTEXT.with(|c| c.borrow().project_service.get_project(id)).ok_or(ProjectError::ProjectNotFound)
+}
+
+#[query]
+fn page_projects(query_args: ProjectPageQuery) -> Result<ProjectPage, ProjectError> {
+    CONTEXT.with(|c| Ok(c.borrow().project_service.page_projects(query_args)))
 }

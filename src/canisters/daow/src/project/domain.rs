@@ -1,8 +1,6 @@
 
 use candid::{CandidType, Deserialize, Principal};
 
-use crate::constant::EMPTY_STR;
-
 pub type ProjectId = u64;
 
 pub type Timestamp = u64;
@@ -49,7 +47,7 @@ pub struct ProjectProfile {
     pub contact_info: Vec<String>,
     pub links: Vec<String>,
     pub tags: Vec<String>,
-    pub memo: Option<String>,
+    pub memo: String,
     pub progress: ProgressStage,
     pub status: ProjectStatus,
     pub created_at: Timestamp,
@@ -117,130 +115,16 @@ impl Default for ReleaseMethod {
     }
 }
 
-#[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectCreateCommand {
-    pub name: String,
-    // pub logo: Blob,
-    // pub information: String,
-    // pub owner_info: String,
-    // pub wallet_addr: String,
-    // pub contact_info: Vec<String>,
-    // pub links: Vec<String>,
-    // pub tags: Vec<String>,
-    // pub memo: Option<String>,
-}
-
-impl ProjectCreateCommand {
-    pub fn build_profile(self, id: ProjectId, owner: Principal, status: ProjectStatus, created_at: u64, updated_at: u64) -> ProjectProfile {
-        ProjectProfile {
-            id,
-            name: self.name,
-            logo: vec![],
-            description: EMPTY_STR.into(),
-            roadmap: vec![],
-            tokenomics: Tokenomics::default(),
-            team: Team::default(),
-            trust_by: TrustBy::default(),
-            capital_detail: CapitalDetail::default(),
-            owner,
-            owner_info: EMPTY_STR.into(),
-            wallet_addr: EMPTY_STR.into(),
-            contact_info: vec![],
-            links: vec![],
-            tags: vec![],
-            memo: None,
-            progress: ProgressStage::Unopen,
-            status,
-            created_at,
-            updated_at,
-        }
-    }
-}
-
+/// Can merge partial property to ProjectProfile
 pub trait MergeProject {
+    fn id(&self) -> ProjectId;
     fn merge_profile(self, profile: &mut ProjectProfile);
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectApplyDescriptionCommand {
-    pub id: u64,
-    pub description: String,
-}
-
-impl MergeProject for ProjectApplyDescriptionCommand {
-    fn merge_profile(self, profile: &mut ProjectProfile) {
-        assert!(self.id == profile.id);
-        
-       profile.description = self.description
-    }
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectApplyRoadmapCommand {
-    pub id: u64,
-    pub roadmap: Blob,
-}
-
-impl MergeProject for ProjectApplyRoadmapCommand {
-    fn merge_profile(self, profile: &mut ProjectProfile) {
-        assert!(self.id == profile.id);
-        
-       profile.roadmap = self.roadmap;
-    }
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectApplyTokenomicsCommand {
-    pub id: u64,
-    pub tokenomics: Tokenomics,
-}
-
-impl MergeProject for ProjectApplyTokenomicsCommand {
-    fn merge_profile(self, profile: &mut ProjectProfile) {
-        assert!(self.id == profile.id);
-        
-       profile.tokenomics = self.tokenomics;
-    }
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectApplyTeamCommand {
-    pub id: u64,
-    pub team: Team,
-}
-
-impl MergeProject for ProjectApplyTeamCommand {
-    fn merge_profile(self, profile: &mut ProjectProfile) {
-        assert!(self.id == profile.id);
-        
-       profile.team = self.team;
-    }
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectApplyTrustByCommand {
-    pub id: u64,
-    pub trust_by: TrustBy,
-}
-
-impl MergeProject for ProjectApplyTrustByCommand {
-    fn merge_profile(self, profile: &mut ProjectProfile) {
-        assert!(self.id == profile.id);
-        
-       profile.trust_by = self.trust_by;
-    }
-}
-
-#[derive(Debug, Clone, CandidType, Deserialize)]
-pub struct ProjectApplyCapitalDetailCommand {
-    pub id: u64,
-    pub capital_detail: CapitalDetail,
-}
-
-impl MergeProject for ProjectApplyCapitalDetailCommand {
-    fn merge_profile(self, profile: &mut ProjectProfile) {
-        assert!(self.id == profile.id);
-        
-       profile.capital_detail = self.capital_detail;
-    }
+pub struct ProjectPage {
+    pub data: Vec<ProjectProfile>,
+    pub page_size: usize,
+    pub page_num: usize,
+    pub total_count: usize,
 }

@@ -2,14 +2,23 @@
 type UserRegisterCommand = record {
     email: text;
     name: text;
-    memo: opt text;
+    memo: text;
 };
 
-type RegisterResult = variant {
-    registered : record { owner : principal; };
-    user_already_exists;
-    user_already_disabled : record { owner: principal };
-    internal_error;
+type RegisterUserResult = variant {
+    Ok: text;
+    Err: UserError;
+};
+
+type UserResult = variant {
+    Ok: UserProfile;
+    Err: UserError;
+};
+
+type UserError = variant {
+    UserNotFound;
+    UserAlreadyExists;
+    UserAlreadyDisable;
 };
 
 type UserProfile = record {
@@ -17,7 +26,11 @@ type UserProfile = record {
     owner : principal;
     email : text;
     name : text;
-    memo : opt text;
+    avatar_id: nat64;
+    avatar_uri: text;
+    biography: text;
+    interests: vec text;
+    memo : text;
     status : UserStatus;
     created_at : nat64;
 };
@@ -27,36 +40,193 @@ type UserStatus = variant {
     Disable;
 };
 
-type ProjectCreateCommand = record {
-    title: text;
-    logo: vec nat8;
-    information: text;
-    owner_info: text;
+type UserEditCommand = record {
+    email: text;
+    name: text;
+    avatar_id: nat64;
+    avatar_uri: text;
+    biography: text;
+    interests: vec text;
+    memo: text;
+    status: UserStatus;
+};
+
+type BoolUserResult = variant {
+    Ok: bool;
+    Err: UserError;
+};
+
+type ProjectProfile = record {
+    id: nat64;
+    name : text;
+    logo : vec nat8;
+    description : text;
+    roadmap : vec nat8;
+    tokenomics : Tokenomics;
+    team : Team;
+    trust_by : TrustBy;
+    capital_detail : CapitalDetail;
+    owner : principal;
+    owner_info : text;
     wallet_addr: text;
     contact_info: vec text;
     links: vec text;
     tags: vec text;
-    memo: opt text;
+    memo: text;
+    progress : ProgressStage;
+    status : ProjectStatus;
+    created_at : nat64;
+    updated_at : nat64;
 };
 
-type ProjectCreatedError = variant {
-    UserNotFound;
-    ProjectAlreadyExists;
+type Tokenomics = record {
+    token : text;
+    did :  text;
+    symbol : text;
+    total_supply : nat64;
+    distribution : vec Distribution;
+};
+
+type Distribution = record {
+    team : text;
+    marketing : text;
+};
+
+type Team = record {
+    name : text;
+    position : text;
+    twitter : opt text;
+    picture : vec nat8;
+};
+
+type TrustBy = record {
+    name : text;
+    link : text;
+    logo : vec nat8;
+};
+
+type CapitalDetail = record {
+    raise : Raise;
+    price_per_icp : nat8;
+    release : ReleaseRule;
+};
+
+type Raise = record {
+    currency : text;
+    amount : nat64;
+};
+
+type ReleaseRule = record {
+    method : ReleaseMethod;
+    amount_per_day : nat64;
+    start_date : nat64;
+};
+
+type ReleaseMethod = variant {
+    Linear;
+};
+
+type ProgressStage = variant {
+    Unopen;
+    InProgress;
+    Completed;
+};
+
+type ProjectStatus = variant {
+    Pending;
+    Enable;
+    Disable;
+};
+
+type ProjectCreateCommand = record {
+    name: text;
+    
+};
+
+type ProjectIdCommand = record {
+    id: nat64;
 };
 
 type ProjectCreatedResult = variant {
     Ok: nat64;
-    Err: ProjectCreatedError;
+    Err: ProjectError;
 };
+
+type ProjectEditCommand = record {
+    id : nat64;
+    name : text;
+    logo : vec nat8;
+    description : text;
+    roadmap : vec nat8;
+    tokenomics : Tokenomics;
+    team : Team;
+    trust_by : TrustBy;
+    capital_detail : CapitalDetail;
+    owner : principal;
+    owner_info : text;
+    wallet_addr: text;
+    contact_info: vec text;
+    links: vec text;
+    tags: vec text;
+    memo: text;
+};
+
+
+type BoolProjectResult = variant {
+    Ok: bool;
+    Err: ProjectError;
+};
+
+type CreateProjectResult = variant {
+    Ok: nat64;
+    Err: ProjectError;
+};
+
+type ProjectResult = variant {
+    Ok: ProjectProfile;
+    Err: ProjectError;
+};
+
+type ProjectError = variant {
+    ProjectAlreadyExists;
+    ProjectNotFound;
+    ProjectAlreadyCompleted;
+    UserNotFound;
+};
+
+type ProjectPage = record {
+   data: vec ProjectProfile;
+   page_num: nat64;
+   page_size: nat64;
+   total_count: nat64
+};
+
+type ProjectPageQuery = record {
+    page_size: nat64;
+    page_num: nat64;
+    querystring: text;
+};
+
+type ProjectPageResult = variant {
+    Ok: ProjectPage;
+    Err: ProjectError;
+};
+
 
 service : {
  
     "greet": (text) -> (text) query;
 
-    "register_user": (UserRegisterCommand) -> (RegisterResult);
-
-    "get_user" : (text) -> (opt UserProfile);
-    "get_self" : () -> (opt UserProfile);
+    "register_user": (UserRegisterCommand) -> (RegisterUserResult);
+    "edit_user" : (UserEditCommand) -> (BoolUserResult);
+    "enable_user" : (principal) -> (BoolUserResult);
+    "disable_user" : (principal) -> (BoolUserResult);
+    "get_user" : (text) -> (BoolUserResult);
+    "get_self" : () -> (UserResult);
 
     "create_project": (ProjectCreateCommand) -> (ProjectCreatedResult);
+    "edit_project" : (ProjectEditCommand) -> (BoolProjectResult);
+    "delete_projet" : (ProjectIdCommand) -> (BoolProjectResult);
+    "get_project" : (ProjectIdCommand) -> (ProjectResult);
+    "page_project" : (ProjectPageQuery) -> (ProjectPageResult);
 }

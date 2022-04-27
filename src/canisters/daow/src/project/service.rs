@@ -3,18 +3,22 @@ use std::collections::BTreeMap;
 
 use candid::Principal;
 
-use super::domain::{
-    ProjectProfile, 
-    ProjectCreateCommand, 
-    ProjectStatus, 
-    ProjectApplyDescriptionCommand, 
-    ProjectApplyRoadmapCommand, 
-    ProjectApplyTokenomicsCommand, 
-    ProjectApplyTeamCommand, 
-    ProjectApplyTrustByCommand, 
-    ProjectApplyCapitalDetailCommand, 
-    Timestamp,
-    MergeProject,
+use super::{
+    command::{       
+        ProjectCreateCommand,       
+        ProjectApplyDescriptionCommand, 
+        ProjectApplyRoadmapCommand, 
+        ProjectApplyTokenomicsCommand, 
+        ProjectApplyTeamCommand, 
+        ProjectApplyTrustByCommand, 
+        ProjectApplyCapitalDetailCommand, ProjectPageQuery, 
+    },
+    domain::{
+        MergeProject,
+        ProjectProfile, 
+        ProjectStatus, 
+        Timestamp, ProjectId, ProjectPage,   
+    },
 };
 
 #[derive(Debug, Default)]
@@ -47,63 +51,35 @@ impl ProjectService {
         self.projects.get(&id).cloned()
     }
 
-    pub fn apply_project_desc(&mut self, cmd: ProjectApplyDescriptionCommand) -> bool {
-        match self.projects.get_mut(&cmd.id) {
-            Some(p) => {
-                cmd.merge_profile(p);
-                true
-            },
-            None => true
-        }
+    pub fn merge_profile(&mut self, cmd: impl MergeProject) -> Option<bool> {
+        self.projects
+            .get_mut(&cmd.id())
+            .map(|p| { 
+                cmd.merge_profile(p); 
+                true 
+            })
     }
 
-    pub fn apply_project_roadmap(&mut self, cmd: ProjectApplyRoadmapCommand) -> bool {
-        match self.projects.get_mut(&cmd.id) {
-            Some(p) => {
-                cmd.merge_profile(p);
-                true
-            },
-            None => true
-        }
+    pub fn delete_project(&mut self, id: u64) -> Option<ProjectProfile> {
+        self.projects.remove(&id)
     }
 
-    pub fn apply_project_tokenomics(&mut self, cmd: ProjectApplyTokenomicsCommand) -> bool {
-        match self.projects.get_mut(&cmd.id) {
-            Some(p) => {
-                cmd.merge_profile(p);
-                true
-            },
-            None => true
-        }
-    }
+    pub fn page_projects(&self, query_args: ProjectPageQuery) -> ProjectPage {
+        let data: Vec<ProjectProfile> = self.projects
+            .iter()
+            .filter(|(_, q)| q.name.contains(&query_args.querystring))
+            .skip(query_args.page_num * query_args.page_size)
+            .take(query_args.page_size)
+            .map(|(_, q)| q.clone())
+            .collect();
 
-    pub fn apply_project_team(&mut self, cmd: ProjectApplyTeamCommand) -> bool {
-        match self.projects.get_mut(&cmd.id) {
-            Some(p) => {
-                cmd.merge_profile(p);
-                true
-            },
-            None => true
-        }
-    }
-
-    pub fn apply_project_trust_by(&mut self, cmd: ProjectApplyTrustByCommand) -> bool {
-        match self.projects.get_mut(&cmd.id) {
-            Some(p) => {
-                cmd.merge_profile(p);
-                true
-            },
-            None => true
-        }
-    }
-
-    pub fn apply_project_capital_detail(&mut self, cmd: ProjectApplyCapitalDetailCommand) -> bool {
-        match self.projects.get_mut(&cmd.id) {
-            Some(p) => {
-                cmd.merge_profile(p);
-                true
-            },
-            None => true
+        let total_count = self.projects.len();
+        
+        ProjectPage {
+            data,
+            page_size: query_args.page_size,
+            page_num: query_args.page_num,
+            total_count,
         }
     }
 }
@@ -112,7 +88,7 @@ impl ProjectService {
 mod tests {
     use candid::Principal;
 
-    use crate::{project::domain::{ProjectCreateCommand, ProjectApplyDescriptionCommand}, env::TestEnvironment};
+    use crate::{project::command::{ProjectCreateCommand, ProjectApplyDescriptionCommand}, env::TestEnvironment};
 
     use crate::DaoContext;
 
@@ -140,8 +116,8 @@ mod tests {
         assert!(res1.is_some());
 
         let cmd2 = ProjectApplyDescriptionCommand { id: res1.unwrap(), description: "Desc".into() };
-        let res2 = context.project_service.apply_project_desc(cmd2);
-        assert!(res2);
+        let res2 = context.project_service.merge_profile(cmd2);
+        assert!(res2.is_some());
         
         assert_eq!(context.project_service.get_project(res1.unwrap()).unwrap().description, "Desc".to_string());
     }

@@ -1,19 +1,18 @@
 
 use ic_cdk_macros::{query, update};
-use ic_cdk::{caller, api::time};
 use candid::Principal;
 
 use super::{
     domain::*,
-    response::{
-        RegisterResult,
-    },
+    error::UserError,
 };
 
 use crate::CONTEXT;
+use crate::common::guard::user_owner_guard;
+
 
 #[update] 
-fn register_user(cmd: UserRegisterCommand) -> RegisterResult {
+fn register_user(cmd: UserRegisterCommand) -> Result<String, UserError> {
     CONTEXT.with(|c| {
         let mut ctx = c.borrow_mut();
         let id = ctx.id;
@@ -22,24 +21,48 @@ fn register_user(cmd: UserRegisterCommand) -> RegisterResult {
         match ctx.user_service.register_user(cmd, id, caller, now) {
             Some(p) => {
                 ctx.id += 1;    // 注册成功，id + 1
-                RegisterResult::Registered { owner: p }
+                Ok(p.to_string())
             },
-            None => RegisterResult::UserAlreadyExists,
+            None => Err(UserError::UserAlreadyExists),
         }
     })
 }
 
-#[query]
-fn get_user(principal: String) -> Option<UserProfile> {
-    Principal::from_text(principal).ok().and_then(|p| 
-        CONTEXT.with(|c| c.borrow().user_service.get_user(p))
-    )
+#[update(guard = "user_owner_guard")]
+fn edit_user(cmd: UserEditCommand) -> Result<bool, UserError> {
+    CONTEXT.with(|c| {
+        let mut ctx = c.borrow_mut();
+        let principal = ctx.env.caller();
+        ctx.user_service.edit_user(cmd, principal).ok_or(UserError::UserNotFound)
+    })
+}
+
+#[update]
+fn enable_user(principal: Principal) -> Result<bool, UserError> {
+    CONTEXT.with(|c| {
+        c.borrow_mut().user_service.enable_user(principal).ok_or(UserError::UserNotFound)
+    })
+}
+
+#[update]
+fn disable_user(principal: Principal) -> Result<bool, UserError> {
+    CONTEXT.with(|c| {
+        c.borrow_mut().user_service.disable_user(principal).ok_or(UserError::UserNotFound)
+    })
 }
 
 #[query]
-fn get_self() -> Option<UserProfile> {
+fn get_user(principal: String) -> Result<UserProfile, UserError> {
+    Principal::from_text(principal).ok().and_then(|p| 
+        CONTEXT.with(|c| c.borrow().user_service.get_user(p))
+    ).ok_or(UserError::UserNotFound)
+}
+
+#[query]
+fn get_self() -> Result<UserProfile, UserError> {
     CONTEXT.with(|c| {
         let context = c.borrow();
-        context.user_service.get_user(context.env.caller())      
+        let caller = context.env.caller();
+        context.user_service.get_user(caller).ok_or(UserError::UserNotFound)  
     })
 }
