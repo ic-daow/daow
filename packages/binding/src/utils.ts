@@ -14,6 +14,10 @@ export function castPrincipalToString(principal: string | ICPrincipal) {
   return principal instanceof Principal ? principal.toText() : principal
 }
 
+export function castToPrincipal(principal: string | ICPrincipal) {
+  return typeof principal === 'string' ? Principal.fromText(principal) : principal
+}
+
 /**
  * option
  */
@@ -34,13 +38,12 @@ export function fromResult<Ok, Err, IOk = Ok, IError = Err>(
   result: ICResult<Ok, Err>,
   convertOk?: (ok: Ok) => IOk,
   convertErr?: (err: Err) => IError,
-): IResult<IOk, IError> {
+): IOk {
   if ('Ok' in result) {
     // @ts-ignore
-    return { data: convertOk ? convertOk(result.Ok) : result.Ok }
+    return convertOk ? convertOk(result.Ok) : result.Ok
   } else {
     // 'Err' in result
-    // @ts-ignore
-    return { error: convertErr ? convertErr(result.Err) : result.Err }
+    throw convertErr ? convertErr(result.Err) : result.Err
   }
 }
