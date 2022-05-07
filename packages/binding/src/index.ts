@@ -1,1 +1,1 @@
-export { DaowActor } from './daow'
+export * from './daow'
