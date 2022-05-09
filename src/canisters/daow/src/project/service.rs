@@ -11,7 +11,7 @@ use super::{
         ProjectApplyTokenomicsCommand, 
         ProjectApplyTeamCommand, 
         ProjectApplyTrustByCommand, 
-        ProjectApplyCapitalDetailCommand, ProjectPageQuery, 
+        ProjectApplyCapitalDetailCommand, ProjectPageQuery, ProjectListQuery, 
     },
     domain::{
         MergeProject,
@@ -81,6 +81,14 @@ impl ProjectService {
             page_num: query_args.page_num,
             total_count,
         }
+    }
+
+    pub fn list_projects(&self, query_args: ProjectListQuery) -> Vec<ProjectProfile> {
+        self.projects
+            .iter()
+            .filter(|(_k, v)| query_args.status.parse::<ProjectStatus>().unwrap() == v.status)
+            .map(|(_k, v)| v.clone())
+            .collect()
     }
 }
 

@@ -24,8 +24,10 @@ impl ProjectCreateCommand {
             id,
             name: self.name,
             logo: vec![],
+            logo_id: 0,
             description: EMPTY_STR.into(),
             roadmap: vec![],
+            roadmap_id: 0,
             tokenomics: Tokenomics::default(),
             team: Team::default(),
             trust_by: TrustBy::default(),
@@ -151,12 +153,19 @@ impl MergeProject for ProjectApplyCapitalDetailCommand {
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize)]
+pub struct ProjectIdCommand {
+    pub id: u64
+}
+
+#[derive(Debug, Clone, CandidType, Deserialize)]
 pub struct ProjectEditCommand {
     pub id: ProjectId,
     pub name: String,
     pub logo: Blob,
+    pub logo_id: u64,
     pub description: String,
     pub roadmap: Blob,
+    pub roadmap_id: u64,
     pub tokenomics: Tokenomics,
     pub team: Team,
     pub trust_by: TrustBy,
@@ -180,8 +189,10 @@ impl MergeProject for ProjectEditCommand {
         
         profile.name = self.name;
         profile.logo = self.logo;
+        profile.logo_id = self.logo_id;
         profile.description = self.description;
         profile.roadmap = self.roadmap;
+        profile.roadmap_id = self.roadmap_id;
         profile.tokenomics = self.tokenomics;
         profile.team = self.team;
         profile.trust_by = self.trust_by;
@@ -201,5 +212,11 @@ pub struct ProjectPageQuery {
     pub page_size: usize,
     pub page_num: usize,
     pub querystring: String,
+}
+
+
+#[derive(Debug, Clone, CandidType, Deserialize)]
+pub struct ProjectListQuery {
+    pub status: String,
 }
 

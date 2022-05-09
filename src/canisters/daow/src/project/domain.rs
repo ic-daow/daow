@@ -1,4 +1,6 @@
 
+use std::{str::FromStr, string::ParseError};
+
 use candid::{CandidType, Deserialize, Principal};
 
 pub type ProjectId = u64;
@@ -16,7 +18,7 @@ pub enum ProgressStage {
 }
 
 // DAO project status
-#[derive(Debug, Clone, CandidType, Deserialize)]
+#[derive(Debug, Clone, CandidType, Deserialize, PartialEq, Eq)]
 pub enum ProjectStatus {
     Pending,    // 待审核
     Enable,     // 已启用
@@ -29,14 +31,28 @@ impl Default for ProjectStatus {
     }
 }
 
+impl FromStr for ProjectStatus {
+    type Err = ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "pending" => Ok(Self::Pending),
+            "enable" => Ok(Self::Enable),
+            _ => Ok(Self::Disable)
+        }
+    }
+}
+
 // DAO project data structure
 #[derive(Debug, Clone, CandidType, Deserialize)]
 pub struct ProjectProfile {
     pub id: ProjectId,
     pub name: String,
     pub logo: Blob,
+    pub logo_id: u64,
     pub description: String,
     pub roadmap: Blob,
+    pub roadmap_id: u64,
     pub tokenomics: Tokenomics,
     pub team: Team,
     pub trust_by: TrustBy,
@@ -74,7 +90,8 @@ pub struct Team {
     name: String,
     position: String,
     twitter: Option<String>,
-    picutre: Blob,
+    picture: Blob,
+    picture_id: u64,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
@@ -82,12 +99,13 @@ pub struct TrustBy {
     name: String,
     link: String,
     logo: Blob,
+    logo_id: u64,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct CapitalDetail {
     raise: Raise,
-    price_per_icp: u8,
+    price_per_icp: u64,
     release: ReleaseRule,
 }
 
@@ -106,12 +124,12 @@ pub struct ReleaseRule {
 
 #[derive(Debug, Clone, CandidType, Deserialize)]
 pub enum ReleaseMethod {
-    Liner,
+    Linear,
 }
 
 impl Default for ReleaseMethod {
     fn default() -> Self {
-        Self::Liner
+        Self::Linear
     }
 }
 

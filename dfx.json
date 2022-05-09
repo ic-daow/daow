@@ -10,6 +10,10 @@
         "bash ./scripts/build_binding.sh"
       ],
       "candid": "src/canisters/daow/daow.did"
+    },
+    "photo": {
+      "main": "src/photo/Main.mo",
+      "type": "motoko"
     }
   },
   "defaults": {

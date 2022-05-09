@@ -63,9 +63,9 @@ fn edit_project(cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
 }
 
 #[update]
-fn delete_project(id: ProjectId) -> Result<bool, ProjectError> {
+fn delete_project(cmd: ProjectIdCommand) -> Result<bool, ProjectError> {
     CONTEXT.with(|c| {      
-        c.borrow_mut().project_service.delete_project(id).map(|_| true).ok_or(ProjectError::ProjectNotFound)
+        c.borrow_mut().project_service.delete_project(cmd.id).map(|_| true).ok_or(ProjectError::ProjectNotFound)
     })
 }
 
@@ -74,11 +74,16 @@ fn merge_project_profile(cmd: impl MergeProject) -> Result<bool, ProjectError> {
 }
 
 #[query]
-fn get_project(id: ProjectId) -> Result<ProjectProfile, ProjectError> {
-    CONTEXT.with(|c| c.borrow().project_service.get_project(id)).ok_or(ProjectError::ProjectNotFound)
+fn get_project(cmd: ProjectIdCommand) -> Result<ProjectProfile, ProjectError> {
+    CONTEXT.with(|c| c.borrow().project_service.get_project(cmd.id)).ok_or(ProjectError::ProjectNotFound)
 }
 
 #[query]
 fn page_projects(query_args: ProjectPageQuery) -> Result<ProjectPage, ProjectError> {
     CONTEXT.with(|c| Ok(c.borrow().project_service.page_projects(query_args)))
+}
+
+#[query]
+fn list_projects(q: ProjectListQuery) -> Vec<ProjectProfile> {
+    CONTEXT.with(|c| c.borrow().project_service.list_projects(q))
 }

@@ -60,8 +60,10 @@ type ProjectProfile = record {
     id: nat64;
     name : text;
     logo : vec nat8;
+    logo_id : nat64;
     description : text;
     roadmap : vec nat8;
+    roadmap_id : nat64;
     tokenomics : Tokenomics;
     team : Team;
     trust_by : TrustBy;
@@ -97,17 +99,19 @@ type Team = record {
     position : text;
     twitter : opt text;
     picture : vec nat8;
+    picture_id : nat64;
 };
 
 type TrustBy = record {
     name : text;
     link : text;
     logo : vec nat8;
+    logo_id : nat64;
 };
 
 type CapitalDetail = record {
     raise : Raise;
-    price_per_icp : nat8;
+    price_per_icp : nat64;
     release : ReleaseRule;
 };
 
@@ -156,8 +160,10 @@ type ProjectEditCommand = record {
     id : nat64;
     name : text;
     logo : vec nat8;
+    logo_id : nat64;
     description : text;
     roadmap : vec nat8;
+    roadmap_id : nat64;
     tokenomics : Tokenomics;
     team : Team;
     trust_by : TrustBy;
@@ -212,6 +218,12 @@ type ProjectPageResult = variant {
     Err: ProjectError;
 };
 
+type ProjectProfiles = vec ProjectProfile;
+
+type ProjectListQuery = record {
+    status: text;
+};
+
 
 service : {
  
@@ -229,4 +241,5 @@ service : {
     "delete_projet" : (ProjectIdCommand) -> (BoolProjectResult);
     "get_project" : (ProjectIdCommand) -> (ProjectResult);
     "page_project" : (ProjectPageQuery) -> (ProjectPageResult);
+    "list_projects" : (ProjectListQuery) -> (ProjectProfiles);
 }
