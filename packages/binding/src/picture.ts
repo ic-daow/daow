@@ -60,22 +60,22 @@ interface IPicture {
 }
 
 interface IPictureData {
-  fileType: string
-  content: number[]
+  type: string
+  buffer: number[] | File | Blob
 }
 
 interface IBulkPictureData {
   data: Array<{
     id: number
-    data: IPictureData
+    picture: IPictureData
   }>
 }
 
 interface ICreatePictureArg {
   name: string
   description: string
+  picture: IPictureData
   owner: string
-  file: IPictureData
 }
 
 interface ICreatePictureResult {
@@ -95,7 +95,12 @@ export class PictureActor extends BaseActor<_SERVICE> {
    * create picture
    */
   public async createPicture(arg: ICreatePictureArg): Promise<ICreatePictureResult> {
-    const result = await this.getActor().savePic(arg.file, arg.name, arg.description, arg.owner)
+    const result = await this.getActor().savePic(
+      await this.toPicture(arg.picture),
+      arg.name,
+      arg.description,
+      arg.owner,
+    )
     return fromResult<PictureId, PictureError, ICreatePictureResult, PictureErrors>(
       result,
       (result) => ({ id: Number(result) }),
@@ -132,7 +137,7 @@ export class PictureActor extends BaseActor<_SERVICE> {
           name: result2.picName,
           description: result2.description,
           status: fromPictureStatus(result2.status),
-          data: result2.pic,
+          data: this.fromPicture(result2.pic),
           owner: result2.owner,
           createdBy: result2.createdBy,
           createdAt: Number(result2.createdAt),
@@ -154,7 +159,7 @@ export class PictureActor extends BaseActor<_SERVICE> {
         if (result2 === undefined) {
           throw PictureErrors.NotFound
         }
-        return result2
+        return this.fromPicture(result2)
       },
       (err) => fromPictureError(err),
     )
@@ -168,9 +173,31 @@ export class PictureActor extends BaseActor<_SERVICE> {
     return fromResult<Array<[PictureId, Picture]>, PictureError, IBulkPictureData, PictureErrors>(
       result,
       (result1) => {
-        return { data: result1.map(([id, pic]) => ({ id: Number(id), data: pic })) }
+        return {
+          data: result1.map(([id, pic]) => ({
+            id: Number(id),
+            picture: this.fromPicture(pic),
+          })),
+        }
       },
       (err) => fromPictureError(err),
     )
+  }
+
+  private fromPicture(file: Picture): IPictureData {
+    return { type: file.fileType, buffer: file.content }
+  }
+
+  private async toPicture(file: IPictureData): Promise<Picture> {
+    let content
+    if (file.buffer instanceof File || file.buffer instanceof Blob) {
+      const buffer = await file.buffer.arrayBuffer()
+      content = [...new Uint8Array(buffer)]
+    } else if (Array.isArray(file.buffer)) {
+      content = file.buffer
+    } else {
+      throw new Error('unimplemented')
+    }
+    return { fileType: file.type, content }
   }
 }
