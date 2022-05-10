@@ -84,6 +84,6 @@ fn page_projects(query_args: ProjectPageQuery) -> Result<ProjectPage, ProjectErr
 }
 
 #[query]
-fn list_projects(q: ProjectListQuery) -> Vec<ProjectProfile> {
-    CONTEXT.with(|c| c.borrow().project_service.list_projects(q))
+fn list_projects(q: ProjectListQuery) -> Result<Vec<ProjectProfile>, ProjectError> {
+    CONTEXT.with(|c| Ok(c.borrow().project_service.list_projects(q)))
 }

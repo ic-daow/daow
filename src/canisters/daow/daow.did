@@ -224,6 +224,11 @@ type ProjectListQuery = record {
     status: text;
 };
 
+type ProjectListResult = variant {
+    Ok: ProjectProfiles;
+    Err: ProjectError;
+};
+
 
 service : {
  
@@ -241,5 +246,5 @@ service : {
     "delete_projet" : (ProjectIdCommand) -> (BoolProjectResult);
     "get_project" : (ProjectIdCommand) -> (ProjectResult);
     "page_project" : (ProjectPageQuery) -> (ProjectPageResult);
-    "list_projects" : (ProjectListQuery) -> (ProjectProfiles);
+    "list_projects" : (ProjectListQuery) -> (ProjectListResult);
 }
