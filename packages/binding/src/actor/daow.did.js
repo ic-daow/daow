@@ -35,6 +35,7 @@ export const idlFactory = ({ IDL }) => {
   const Team = IDL.Record({
     'twitter' : IDL.Opt(IDL.Text),
     'name' : IDL.Text,
+    'picture_id' : IDL.Nat64,
     'picture' : IDL.Vec(IDL.Nat8),
     'position' : IDL.Text,
   });
@@ -48,12 +49,13 @@ export const idlFactory = ({ IDL }) => {
   const CapitalDetail = IDL.Record({
     'release' : ReleaseRule,
     'raise' : Raise,
-    'price_per_icp' : IDL.Nat8,
+    'price_per_icp' : IDL.Nat64,
   });
   const TrustBy = IDL.Record({
     'link' : IDL.Text,
     'logo' : IDL.Vec(IDL.Nat8),
     'name' : IDL.Text,
+    'logo_id' : IDL.Nat64,
   });
   const ProjectEditCommand = IDL.Record({
     'id' : IDL.Nat64,
@@ -68,9 +70,11 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'capital_detail' : CapitalDetail,
     'links' : IDL.Vec(IDL.Text),
+    'logo_id' : IDL.Nat64,
     'contact_info' : IDL.Vec(IDL.Text),
     'wallet_addr' : IDL.Text,
     'trust_by' : TrustBy,
+    'roadmap_id' : IDL.Nat64,
     'owner_info' : IDL.Text,
   });
   const UserStatus = IDL.Variant({ 'Enable' : IDL.Null, 'Disable' : IDL.Null });
@@ -110,10 +114,12 @@ export const idlFactory = ({ IDL }) => {
     'capital_detail' : CapitalDetail,
     'created_at' : IDL.Nat64,
     'links' : IDL.Vec(IDL.Text),
+    'logo_id' : IDL.Nat64,
     'progress' : ProgressStage,
     'contact_info' : IDL.Vec(IDL.Text),
     'wallet_addr' : IDL.Text,
     'trust_by' : TrustBy,
+    'roadmap_id' : IDL.Nat64,
     'owner_info' : IDL.Text,
   });
   const ProjectResult = IDL.Variant({
@@ -134,6 +140,8 @@ export const idlFactory = ({ IDL }) => {
     'avatar_id' : IDL.Nat64,
   });
   const UserResult = IDL.Variant({ 'Ok' : UserProfile, 'Err' : UserError });
+  const ProjectListQuery = IDL.Record({ 'status' : IDL.Text });
+  const ProjectProfiles = IDL.Vec(ProjectProfile);
   const ProjectPageQuery = IDL.Record({
     'page_size' : IDL.Nat64,
     'querystring' : IDL.Text,
@@ -173,6 +181,7 @@ export const idlFactory = ({ IDL }) => {
     'get_self' : IDL.Func([], [UserResult], []),
     'get_user' : IDL.Func([IDL.Text], [BoolUserResult], []),
     'greet' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+    'list_projects' : IDL.Func([ProjectListQuery], [ProjectProfiles], []),
     'page_project' : IDL.Func([ProjectPageQuery], [ProjectPageResult], []),
     'register_user' : IDL.Func([UserRegisterCommand], [RegisterUserResult], []),
   });

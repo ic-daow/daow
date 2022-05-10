@@ -10,6 +10,7 @@ import {
   ProjectEditCommand,
   ProjectError,
   ProjectIdCommand,
+  ProjectListQuery,
   ProjectPage,
   ProjectPageQuery,
   ProjectPageResult,
@@ -53,6 +54,7 @@ export interface IDistribution {
 export interface ITeam {
   name: string
   position: string
+  picture_id: number
   picture: number[]
   twitter?: string
 }
@@ -106,6 +108,7 @@ export interface ICapitalDetail {
 export interface ITrustBy {
   name: string
   link: string
+  logo_id: number
   logo: number[]
 }
 
@@ -116,7 +119,9 @@ export interface IModifyProjectArg {
   owner: string
   owner_info: string
   wallet_addr: string
+  logo_id: number
   logo: number[]
+  roadmap_id: number
   roadmap: number[]
   tags: string[]
   links: string[]
@@ -138,6 +143,14 @@ export interface IPagedProjectResult {
   page: number
   size: number
   total: number
+  data: IProject[]
+}
+
+export interface IListProjectArg {
+  status: ProjectStatus
+}
+
+export interface IListProjectResult {
   data: IProject[]
 }
 
@@ -186,11 +199,13 @@ export interface IProject {
   progress: ProgressStages
   wallet_addr: string
   owner_info: string
+  logo_id: number
   logo: number[]
   memo: string
   tags: string[]
   links: string[]
   contact_info: string[]
+  roadmap_id: number
   roadmap: number[]
   tokenomics: ITokenomics
   team: ITeam
@@ -315,7 +330,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * 创建actor
    */
-  public async create(cid: string, options?: ICreateActorOptions) {
+  public async create(cid: string, options?: ICreateActorOptions): Promise<DaowActor> {
     await this._create(cid, idlFactory, options)
     return this
   }
@@ -323,7 +338,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * create project
    */
-  public async createProject(arg: ICreateProjectArg) {
+  public async createProject(arg: ICreateProjectArg): Promise<ICreateProjectResult> {
     const result = await this.getActor().create_project(this.toCreateProjectCommand(arg))
     return this.fromProjectCreatedResult(result)
   }
@@ -331,7 +346,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * delete project
    */
-  public async deleteProject(projectId: number) {
+  public async deleteProject(projectId: number): Promise<IProjectResult> {
     const result = await this.getActor().delete_projet(this.toProjectIdCommand(projectId))
     return this.fromBoolProjectResult(result)
   }
@@ -339,7 +354,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * modify project
    */
-  public async modifyProject(project: IModifyProjectArg) {
+  public async modifyProject(project: IModifyProjectArg): Promise<IProjectResult> {
     const result = await this.getActor().edit_project(this.toProjectEditCommand(project))
     return this.fromBoolProjectResult(result)
   }
@@ -347,7 +362,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * get project
    */
-  public async getProject(projectId: number) {
+  public async getProject(projectId: number): Promise<IProject> {
     const result = await this.getActor().get_project(this.toProjectIdCommand(projectId))
     return this.fromProjectResult(result)
   }
@@ -355,15 +370,23 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * get paged project
    */
-  public async getPagedProject(arg: IPagedProjectArg) {
+  public async getPagedProject(arg: IPagedProjectArg): Promise<IPagedProjectResult> {
     const result = await this.getActor().page_project(this.toProjectPageQuery(arg))
     return this.fromProjectPageResult(result)
   }
 
   /**
+   * get list project
+   */
+  public async getListProject(arg: IListProjectArg): Promise<IListProjectResult> {
+    const result = await this.getActor().list_projects(this.toProjectListQuery(arg))
+    return { data: result.map((res) => this.fromProjectProfile(res)) }
+  }
+
+  /**
    * create user
    */
-  public async createUser(arg: ICreateUserArg) {
+  public async createUser(arg: ICreateUserArg): Promise<ICreateUserResult> {
     const result = await this.getActor().register_user(this.toUserRegisterCommand(arg))
     return this.fromRegisterUserResult(result)
   }
@@ -371,7 +394,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * modify user
    */
-  public async modifyUser(arg: IModifyUserArg) {
+  public async modifyUser(arg: IModifyUserArg): Promise<IUserResult> {
     const result = await this.getActor().edit_user(this.toUserEditCommand(arg))
     return this.fromBoolUserResult(result)
   }
@@ -379,7 +402,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * enable user
    */
-  public async enableUser(userId: string | ICPrincipal) {
+  public async enableUser(userId: string | ICPrincipal): Promise<IUserResult> {
     const result = await this.getActor().enable_user(castToPrincipal(userId))
     return this.fromBoolUserResult(result)
   }
@@ -387,7 +410,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * disable user
    */
-  public async disableUser(userId: string | ICPrincipal) {
+  public async disableUser(userId: string | ICPrincipal): Promise<IUserResult> {
     const result = await this.getActor().disable_user(castToPrincipal(userId))
     return this.fromBoolUserResult(result)
   }
@@ -395,7 +418,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * get user
    */
-  public async getUser(principal: string | ICPrincipal) {
+  public async getUser(principal: string | ICPrincipal): Promise<IUserResult> {
     const result = await this.getActor().get_user(castPrincipalToString(principal))
     return this.fromBoolUserResult(result)
   }
@@ -403,7 +426,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * get self
    */
-  public async getSelf() {
+  public async getSelf(): Promise<IUser> {
     const result = await this.getActor().get_self()
     return this.fromUserResult(result)
   }
@@ -411,7 +434,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * greet
    */
-  public async greet(input: string) {
+  public async greet(input: string): Promise<string> {
     return this.getActor().greet(input)
   }
 
@@ -433,6 +456,12 @@ export class DaowActor extends BaseActor<_SERVICE> {
     return {
       ...from,
       id: BigInt(from.id),
+      logo_id: BigInt(from.logo_id),
+      roadmap_id: BigInt(from.roadmap_id),
+      trust_by: {
+        ...from.trust_by,
+        logo_id: BigInt(from.trust_by.logo_id),
+      },
       tokenomics: {
         ...from.tokenomics,
         total_supply: BigInt(from.tokenomics.total_supply),
@@ -440,10 +469,12 @@ export class DaowActor extends BaseActor<_SERVICE> {
       owner: castToPrincipal(from.owner),
       team: {
         ...from.team,
+        picture_id: BigInt(from.team.picture_id),
         twitter: toOption(from.team.twitter),
       },
       capital_detail: {
         ...from.capital_detail,
+        price_per_icp: BigInt(from.capital_detail.price_per_icp),
         release: {
           ...from.capital_detail.release,
           method: toReleaseMethod(from.capital_detail.release.method),
@@ -466,6 +497,12 @@ export class DaowActor extends BaseActor<_SERVICE> {
     }
   }
 
+  private toProjectListQuery(from: IListProjectArg): ProjectListQuery {
+    return {
+      status: from.status.toLowerCase(),
+    }
+  }
+
   private fromProjectProfile(from: ProjectProfile): IProject {
     return {
       ...from,
@@ -473,16 +510,24 @@ export class DaowActor extends BaseActor<_SERVICE> {
       status: fromProjectStatus(from.status),
       owner: castPrincipalToString(from.owner),
       progress: fromProgressStage(from.progress),
+      logo_id: Number(from.logo_id),
+      roadmap_id: Number(from.roadmap_id),
+      trust_by: {
+        ...from.trust_by,
+        logo_id: Number(from.trust_by.logo_id),
+      },
       tokenomics: {
         ...from.tokenomics,
         total_supply: Number(from.tokenomics.total_supply),
       },
       team: {
         ...from.team,
+        picture_id: Number(from.team.picture_id),
         twitter: fromOption(from.team.twitter),
       },
       capital_detail: {
         ...from.capital_detail,
+        price_per_icp: Number(from.capital_detail.price_per_icp),
         release: {
           ...from.capital_detail.release,
           method: fromReleaseMethod(from.capital_detail.release.method),

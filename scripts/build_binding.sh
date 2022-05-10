@@ -2,7 +2,10 @@
 
 set -Eeuo pipefail
 
-dids=(./src/canisters/daow/daow.did)
+dids=(
+  src/canisters/daow/daow.did
+  .dfx/local/canisters/photo/photo.did
+)
 
 function build_binding() {
     set -x

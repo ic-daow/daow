@@ -6,8 +6,7 @@
       "wasm": "target/wasm32-unknown-unknown/release/daow_opt.wasm",
       "build": [
         "cargo build --target wasm32-unknown-unknown --package  daow --release",
-        "ic-cdk-optimizer target/wasm32-unknown-unknown/release/daow.wasm -o target/wasm32-unknown-unknown/release/daow_opt.wasm",
-        "bash ./scripts/build_binding.sh"
+        "ic-cdk-optimizer target/wasm32-unknown-unknown/release/daow.wasm -o target/wasm32-unknown-unknown/release/daow_opt.wasm"
       ],
       "candid": "src/canisters/daow/daow.did"
     },

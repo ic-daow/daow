@@ -8,7 +8,7 @@ export type BoolUserResult = { 'Ok' : boolean } |
 export interface CapitalDetail {
   'release' : ReleaseRule,
   'raise' : Raise,
-  'price_per_icp' : number,
+  'price_per_icp' : bigint,
 }
 export type CreateProjectResult = { 'Ok' : bigint } |
   { 'Err' : ProjectError };
@@ -32,9 +32,11 @@ export interface ProjectEditCommand {
   'description' : string,
   'capital_detail' : CapitalDetail,
   'links' : Array<string>,
+  'logo_id' : bigint,
   'contact_info' : Array<string>,
   'wallet_addr' : string,
   'trust_by' : TrustBy,
+  'roadmap_id' : bigint,
   'owner_info' : string,
 }
 export type ProjectError = { 'ProjectAlreadyExists' : null } |
@@ -42,6 +44,7 @@ export type ProjectError = { 'ProjectAlreadyExists' : null } |
   { 'ProjectNotFound' : null } |
   { 'UserNotFound' : null };
 export interface ProjectIdCommand { 'id' : bigint }
+export interface ProjectListQuery { 'status' : string }
 export interface ProjectPage {
   'page_size' : bigint,
   'data' : Array<ProjectProfile>,
@@ -71,12 +74,15 @@ export interface ProjectProfile {
   'capital_detail' : CapitalDetail,
   'created_at' : bigint,
   'links' : Array<string>,
+  'logo_id' : bigint,
   'progress' : ProgressStage,
   'contact_info' : Array<string>,
   'wallet_addr' : string,
   'trust_by' : TrustBy,
+  'roadmap_id' : bigint,
   'owner_info' : string,
 }
+export type ProjectProfiles = Array<ProjectProfile>;
 export type ProjectResult = { 'Ok' : ProjectProfile } |
   { 'Err' : ProjectError };
 export type ProjectStatus = { 'Enable' : null } |
@@ -94,6 +100,7 @@ export interface ReleaseRule {
 export interface Team {
   'twitter' : [] | [string],
   'name' : string,
+  'picture_id' : bigint,
   'picture' : Array<number>,
   'position' : string,
 }
@@ -108,6 +115,7 @@ export interface TrustBy {
   'link' : string,
   'logo' : Array<number>,
   'name' : string,
+  'logo_id' : bigint,
 }
 export interface UserEditCommand {
   'status' : UserStatus,
@@ -155,6 +163,7 @@ export interface _SERVICE {
   'get_self' : ActorMethod<[], UserResult>,
   'get_user' : ActorMethod<[string], BoolUserResult>,
   'greet' : ActorMethod<[string], string>,
+  'list_projects' : ActorMethod<[ProjectListQuery], ProjectProfiles>,
   'page_project' : ActorMethod<[ProjectPageQuery], ProjectPageResult>,
   'register_user' : ActorMethod<[UserRegisterCommand], RegisterUserResult>,
 }
