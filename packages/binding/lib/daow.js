@@ -182,7 +182,7 @@ class DaowActor extends actor_1.BaseActor {
      */
     async getListProject(arg) {
         const result = await this.getActor().list_projects(this.toProjectListQuery(arg));
-        return { data: result.map((res) => this.fromProjectProfile(res)) };
+        return (0, utils_1.fromResult)(result, (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }), (err) => fromProjectError(err));
     }
     /**
      * create user

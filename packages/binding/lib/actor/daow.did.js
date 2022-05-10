@@ -145,6 +145,10 @@ const idlFactory = ({ IDL }) => {
     const UserResult = IDL.Variant({ 'Ok': UserProfile, 'Err': UserError });
     const ProjectListQuery = IDL.Record({ 'status': IDL.Text });
     const ProjectProfiles = IDL.Vec(ProjectProfile);
+    const ProjectListResult = IDL.Variant({
+        'Ok': ProjectProfiles,
+        'Err': ProjectError,
+    });
     const ProjectPageQuery = IDL.Record({
         'page_size': IDL.Nat64,
         'querystring': IDL.Text,
@@ -180,7 +184,7 @@ const idlFactory = ({ IDL }) => {
         'get_self': IDL.Func([], [UserResult], []),
         'get_user': IDL.Func([IDL.Text], [BoolUserResult], []),
         'greet': IDL.Func([IDL.Text], [IDL.Text], ['query']),
-        'list_projects': IDL.Func([ProjectListQuery], [ProjectProfiles], []),
+        'list_projects': IDL.Func([ProjectListQuery], [ProjectListResult], []),
         'page_project': IDL.Func([ProjectPageQuery], [ProjectPageResult], []),
         'register_user': IDL.Func([UserRegisterCommand], [RegisterUserResult], []),
     });

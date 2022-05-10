@@ -45,6 +45,8 @@ export type ProjectError = { 'ProjectAlreadyExists' : null } |
   { 'UserNotFound' : null };
 export interface ProjectIdCommand { 'id' : bigint }
 export interface ProjectListQuery { 'status' : string }
+export type ProjectListResult = { 'Ok' : ProjectProfiles } |
+  { 'Err' : ProjectError };
 export interface ProjectPage {
   'page_size' : bigint,
   'data' : Array<ProjectProfile>,
@@ -163,7 +165,7 @@ export interface _SERVICE {
   'get_self' : ActorMethod<[], UserResult>,
   'get_user' : ActorMethod<[string], BoolUserResult>,
   'greet' : ActorMethod<[string], string>,
-  'list_projects' : ActorMethod<[ProjectListQuery], ProjectProfiles>,
+  'list_projects' : ActorMethod<[ProjectListQuery], ProjectListResult>,
   'page_project' : ActorMethod<[ProjectPageQuery], ProjectPageResult>,
   'register_user' : ActorMethod<[UserRegisterCommand], RegisterUserResult>,
 }

@@ -15,6 +15,7 @@ import {
   ProjectPageQuery,
   ProjectPageResult,
   ProjectProfile,
+  ProjectProfiles,
   ProjectResult,
   ProjectStatus as _ProjectStatus,
   RegisterUserResult,
@@ -380,7 +381,11 @@ export class DaowActor extends BaseActor<_SERVICE> {
    */
   public async getListProject(arg: IListProjectArg): Promise<IListProjectResult> {
     const result = await this.getActor().list_projects(this.toProjectListQuery(arg))
-    return { data: result.map((res) => this.fromProjectProfile(res)) }
+    return fromResult<ProjectProfiles, ProjectError, IListProjectResult, ProjectErrors>(
+      result,
+      (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }),
+      (err) => fromProjectError(err),
+    )
   }
 
   /**
