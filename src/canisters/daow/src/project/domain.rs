@@ -70,6 +70,13 @@ pub struct ProjectProfile {
     pub updated_at: Timestamp,
 }
 
+impl ProjectProfile {
+    pub fn valid_name(name: &str) -> bool {
+        let len = name.chars().count();
+        len >= 3 && len <= 50
+    }
+}
+
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct Tokenomics {
     token: String,

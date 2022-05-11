@@ -6,19 +6,16 @@ use candid::Principal;
 use super::{
     command::{       
         ProjectCreateCommand,       
-        ProjectApplyDescriptionCommand, 
-        ProjectApplyRoadmapCommand, 
-        ProjectApplyTokenomicsCommand, 
-        ProjectApplyTeamCommand, 
-        ProjectApplyTrustByCommand, 
-        ProjectApplyCapitalDetailCommand, ProjectPageQuery, ProjectListQuery, 
+        ProjectPageQuery, 
+        ProjectListQuery, ProjectEditCommand, 
     },
     domain::{
         MergeProject,
         ProjectProfile, 
         ProjectStatus, 
-        Timestamp, ProjectId, ProjectPage,   
-    },
+        Timestamp,
+        ProjectPage,   
+    }, error::ProjectError,
 };
 
 #[derive(Debug, Default)]
@@ -28,27 +25,41 @@ pub struct ProjectService {
 
 impl ProjectService {
 
-    pub fn create_project(&mut self, cmd: ProjectCreateCommand, id: u64, caller: Principal, now: Timestamp) -> Option<u64> {
+    pub fn create_project(&mut self, cmd: ProjectCreateCommand, id: u64, caller: Principal, now: Timestamp) -> Result<u64, ProjectError> {
         match self.projects.get(&id) {
-            Some(_) => None,
+            Some(_) => Err(ProjectError::ProjectAlreadyExists),
             None => {
-                self.projects.insert(
-                    id,
-                    cmd.build_profile(
-                        id,
-                        caller,
-                        ProjectStatus::Pending,
-                        now,
-                        now,
-                    )
-                );
-                Some(id)
+                match self.projects.iter().find(|(_, p)| p.name == cmd.name) {
+                    Some(_) => Err(ProjectError::ProjectAlreadyExists),
+                    None => {
+                        self.projects.insert(
+                            id,
+                            cmd.build_profile(
+                                id,
+                                caller,
+                                ProjectStatus::Pending,
+                                now,
+                                now,
+                            )
+                        );
+                        Ok(id)
+                    }
+                }
+                
             }
         }
     }
 
     pub fn get_project(&self, id: u64) -> Option<ProjectProfile> {
         self.projects.get(&id).cloned()
+    }
+
+    pub fn edit_project(&mut self, cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
+        self.projects
+            .iter_mut()
+            .find(|(_, p)| p.name != cmd.name)
+            .map(|(_, p)| { cmd.merge_profile(p); true })
+            .ok_or(ProjectError::ProjectAlreadyExists)
     }
 
     pub fn merge_profile(&mut self, cmd: impl MergeProject) -> Option<bool> {

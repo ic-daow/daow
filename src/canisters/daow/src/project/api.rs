@@ -17,13 +17,20 @@ fn create_project(cmd: ProjectCreateCommand) -> Result<ProjectId, ProjectError> 
         let id = ctx.id;
         let caller = ctx.env.caller();
         let now = ctx.env.now();
-        match ctx.project_service.create_project(cmd, id, caller, now) {
-            Some(id) => {
+
+        ctx.project_service
+            .create_project(cmd, id, caller, now)   
+            .map(|id| {
                 ctx.id += 1;
-                Ok(id)
-            },
-            None => Err(ProjectError::ProjectAlreadyExists),
-        }
+                id
+            })
+        // match ctx.project_service.create_project(cmd, id, caller, now) {
+        //     Ok(id) => {
+        //         ctx.id += 1;
+        //         Ok(id)
+        //     },
+        //     e => e,
+        // }
     })
 }
 
@@ -59,7 +66,7 @@ fn apply_project_capital_detail(cmd: ProjectApplyCapitalDetailCommand) -> Result
 
 #[update]
 fn edit_project(cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
-    merge_project_profile(cmd)
+    CONTEXT.with(|c| c.borrow_mut().project_service.edit_project(cmd))
 }
 
 #[update]
