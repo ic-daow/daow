@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DaowActor = exports.UserErrors = exports.UserStatus = exports.ProjectErrors = exports.ProgressStages = exports.ProjectStatus = exports.ReleaseMethods = void 0;
+exports.DaowActor = exports.UserErrors = exports.UserStatus = exports.TransactionErrors = exports.ProjectErrors = exports.ProgressStages = exports.ProjectStatus = exports.ReleaseMethods = void 0;
 const actor_1 = require("./actor");
 const daow_did_1 = require("./actor/daow.did");
 const utils_1 = require("./utils");
@@ -88,6 +88,22 @@ function fromProjectError(error) {
         throw new Error('uninmplemented');
     }
 }
+var TransactionErrors;
+(function (TransactionErrors) {
+    TransactionErrors["NotFound"] = "NotFound";
+    TransactionErrors["AlreadyExists"] = "AlreadyExists";
+})(TransactionErrors = exports.TransactionErrors || (exports.TransactionErrors = {}));
+function fromTransactionError(error) {
+    if ('TransactionAlreadyExists' in error) {
+        return TransactionErrors.AlreadyExists;
+    }
+    else if ('TransactionNotFound' in error) {
+        return TransactionErrors.NotFound;
+    }
+    else {
+        throw new Error('uninmplemented');
+    }
+}
 var UserStatus;
 (function (UserStatus) {
     UserStatus["Enable"] = "Enable";
@@ -163,6 +179,12 @@ class DaowActor extends actor_1.BaseActor {
         const result = await this.getActor().edit_project(this.toProjectEditCommand(project));
         return this.fromBoolProjectResult(result);
     }
+    async submitProject(id) {
+        const result = await this.getActor().submit_projet({
+            id: BigInt(id),
+        });
+        return this.fromBoolProjectResult(result);
+    }
     /**
      * get project
      */
@@ -183,6 +205,114 @@ class DaowActor extends actor_1.BaseActor {
     async getListProject(arg) {
         const result = await this.getActor().list_projects(this.toProjectListQuery(arg));
         return (0, utils_1.fromResult)(result, (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }), (err) => fromProjectError(err));
+    }
+    /**
+     * apply project capital detail
+     */
+    async applyProjectCapitalDetail(arg) {
+        const result = await this.getActor().apply_project_capital_detail({
+            id: BigInt(arg.id),
+            capital_detail: this.toCapitalDetail(arg.capital_detail),
+        });
+        return this.fromBoolProjectResult(result);
+    }
+    /**
+     * apply project description
+     */
+    async applyProjectDescription(arg) {
+        const result = await this.getActor().apply_project_description({
+            id: BigInt(arg.id),
+            description: arg.description,
+        });
+        return this.fromBoolProjectResult(result);
+    }
+    /**
+     * apply project roadmap
+     */
+    async applyProjectRoadmap(arg) {
+        const result = await this.getActor().apply_project_roadmap({
+            id: BigInt(arg.id),
+            roadmap: arg.roadmap,
+        });
+        return this.fromBoolProjectResult(result);
+    }
+    /**
+     * apply project team
+     */
+    async applyProjectTeam(arg) {
+        const result = await this.getActor().apply_project_team({
+            id: BigInt(arg.id),
+            team: this.toTeam(arg.team),
+        });
+        return this.fromBoolProjectResult(result);
+    }
+    /**
+     * apply project tokenomics
+     */
+    async applyProjectTokenomics(arg) {
+        const result = await this.getActor().apply_project_tokenomics({
+            id: BigInt(arg.id),
+            tokenomics: this.toTokenomics(arg.tokenomics),
+        });
+        return this.fromBoolProjectResult(result);
+    }
+    /**
+     * apply project trust by
+     */
+    async applyProjectTrustBy(arg) {
+        const result = await this.getActor().apply_project_trust_by({
+            id: BigInt(arg.id),
+            trust_by: this.toTrustBy(arg.trust_by),
+        });
+        return this.fromBoolProjectResult(result);
+    }
+    /**
+     * create transaction
+     */
+    async createTransaction(arg) {
+        const result = await this.getActor().create_transaction({
+            ...arg,
+            amount: BigInt(arg.amount),
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({ id: Number(result) }), (err) => fromTransactionError(err));
+    }
+    /**
+     * get transaction
+     */
+    async getTransaction(id) {
+        const result = await this.getActor().get_transaction({
+            id: BigInt(id),
+        });
+        return (0, utils_1.fromResult)(result, (result) => this.fromTransactionProfile(result), (err) => fromTransactionError(err));
+    }
+    /**
+     * get paged transactions
+     */
+    async getPagedTransaction(arg) {
+        const result = await this.getActor().page_transaction({
+            page_num: BigInt(arg.page),
+            page_size: BigInt(arg.size),
+            querystring: arg.query,
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({
+            page: Number(result.page_num),
+            size: Number(result.page_size),
+            total: Number(result.total_count),
+            data: result.data.map((tx) => this.fromTransactionProfile(tx)),
+        }), (err) => fromTransactionError(err));
+    }
+    /**
+     * modify transaction
+     */
+    async modifyTransaction(arg) {
+        const result = await this.getActor().update_transaction({
+            ...arg,
+            transaction_id: BigInt(arg.id),
+            amount: BigInt(arg.amount),
+            block_height: BigInt(arg.block_height),
+            memo: arg.memo,
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({ success: result }), (err) => fromTransactionError(err));
     }
     /**
      * create user
@@ -240,42 +370,6 @@ class DaowActor extends actor_1.BaseActor {
     fromProjectCreatedResult(from) {
         return (0, utils_1.fromResult)(from, (result) => ({ id: Number(result) }), (err) => fromProjectError(err));
     }
-    toProjectEditCommand(from) {
-        return {
-            ...from,
-            id: BigInt(from.id),
-            logo_id: BigInt(from.logo_id),
-            roadmap_id: BigInt(from.roadmap_id),
-            trust_by: {
-                ...from.trust_by,
-                logo_id: BigInt(from.trust_by.logo_id),
-            },
-            tokenomics: {
-                ...from.tokenomics,
-                total_supply: BigInt(from.tokenomics.total_supply),
-            },
-            owner: (0, utils_1.castToPrincipal)(from.owner),
-            team: {
-                ...from.team,
-                picture_id: BigInt(from.team.picture_id),
-                twitter: (0, utils_1.toOption)(from.team.twitter),
-            },
-            capital_detail: {
-                ...from.capital_detail,
-                price_per_icp: BigInt(from.capital_detail.price_per_icp),
-                release: {
-                    ...from.capital_detail.release,
-                    method: toReleaseMethod(from.capital_detail.release.method),
-                    start_date: BigInt(from.capital_detail.release.start_date),
-                    amount_per_day: BigInt(from.capital_detail.release.amount_per_day),
-                },
-                raise: {
-                    ...from.capital_detail.raise,
-                    amount: BigInt(from.capital_detail.raise.amount),
-                },
-            },
-        };
-    }
     toProjectPageQuery(from) {
         return {
             page_num: BigInt(from.page),
@@ -288,6 +382,19 @@ class DaowActor extends actor_1.BaseActor {
             status: from.status.toLowerCase(),
         };
     }
+    toProjectEditCommand(from) {
+        return {
+            ...from,
+            id: BigInt(from.id),
+            logo_id: BigInt(from.logo_id),
+            roadmap_id: BigInt(from.roadmap_id),
+            trust_by: this.toTrustBy(from.trust_by),
+            tokenomics: this.toTokenomics(from.tokenomics),
+            owner: (0, utils_1.castToPrincipal)(from.owner),
+            team: this.toTeam(from.team),
+            capital_detail: this.toCapitalDetail(from.capital_detail),
+        };
+    }
     fromProjectProfile(from) {
         return {
             ...from,
@@ -297,35 +404,82 @@ class DaowActor extends actor_1.BaseActor {
             progress: fromProgressStage(from.progress),
             logo_id: Number(from.logo_id),
             roadmap_id: Number(from.roadmap_id),
-            trust_by: {
-                ...from.trust_by,
-                logo_id: Number(from.trust_by.logo_id),
-            },
-            tokenomics: {
-                ...from.tokenomics,
-                total_supply: Number(from.tokenomics.total_supply),
-            },
-            team: {
-                ...from.team,
-                picture_id: Number(from.team.picture_id),
-                twitter: (0, utils_1.fromOption)(from.team.twitter),
-            },
-            capital_detail: {
-                ...from.capital_detail,
-                price_per_icp: Number(from.capital_detail.price_per_icp),
-                release: {
-                    ...from.capital_detail.release,
-                    method: fromReleaseMethod(from.capital_detail.release.method),
-                    start_date: Number(from.capital_detail.release.start_date),
-                    amount_per_day: Number(from.capital_detail.release.amount_per_day),
-                },
-                raise: {
-                    ...from.capital_detail.raise,
-                    amount: Number(from.capital_detail.raise.amount),
-                },
-            },
+            trust_by: this.fromTrustBy(from.trust_by),
+            tokenomics: this.fromTokenomics(from.tokenomics),
+            team: this.fromTeam(from.team),
+            capital_detail: this.fromCapitalDetail(from.capital_detail),
             created_at: Number(from.created_at),
             updated_at: Number(from.updated_at),
+        };
+    }
+    fromTrustBy(from) {
+        return {
+            ...from,
+            logo_id: Number(from.logo_id),
+        };
+    }
+    toTrustBy(from) {
+        return {
+            ...from,
+            logo_id: BigInt(from.logo_id),
+        };
+    }
+    fromTeam(from) {
+        return {
+            ...from,
+            picture_id: Number(from.picture_id),
+            twitter: (0, utils_1.fromOption)(from.twitter),
+        };
+    }
+    toTeam(from) {
+        return {
+            ...from,
+            picture_id: BigInt(from.picture_id),
+            twitter: (0, utils_1.toOption)(from.twitter),
+        };
+    }
+    fromTokenomics(from) {
+        return {
+            ...from,
+            total_supply: Number(from.total_supply),
+        };
+    }
+    toTokenomics(from) {
+        return {
+            ...from,
+            total_supply: BigInt(from.total_supply),
+        };
+    }
+    fromCapitalDetail(from) {
+        return {
+            ...from,
+            price_per_icp: Number(from.price_per_icp),
+            release: {
+                ...from.release,
+                method: fromReleaseMethod(from.release.method),
+                start_date: Number(from.release.start_date),
+                amount_per_day: Number(from.release.amount_per_day),
+            },
+            raise: {
+                ...from.raise,
+                amount: Number(from.raise.amount),
+            },
+        };
+    }
+    toCapitalDetail(from) {
+        return {
+            ...from,
+            price_per_icp: BigInt(from.price_per_icp),
+            release: {
+                ...from.release,
+                method: toReleaseMethod(from.release.method),
+                start_date: BigInt(from.release.start_date),
+                amount_per_day: BigInt(from.release.amount_per_day),
+            },
+            raise: {
+                ...from.raise,
+                amount: BigInt(from.raise.amount),
+            },
         };
     }
     fromProjectPageResult(from) {
@@ -344,6 +498,16 @@ class DaowActor extends actor_1.BaseActor {
     }
     fromBoolProjectResult(from) {
         return (0, utils_1.fromResult)(from, (result) => ({ success: result }), (err) => fromProjectError(err));
+    }
+    fromTransactionProfile(from) {
+        return {
+            ...from,
+            id: Number(from.id),
+            from_princiapl: (0, utils_1.castPrincipalToString)(from.from_princiapl),
+            amount: Number(from.amount),
+            block_height: Number(from.block_height),
+            created_at: Number(from.created_at),
+        };
     }
     toUserRegisterCommand(from) {
         return {

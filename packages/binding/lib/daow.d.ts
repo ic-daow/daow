@@ -131,6 +131,74 @@ export declare enum ProjectErrors {
     AlreadyCompleted = "AlreadyCompleted",
     UserNotFound = "UserNotFound"
 }
+interface IApplyProjectCapitalDetailArg {
+    id: number;
+    capital_detail: ICapitalDetail;
+}
+interface IApplyProjectDescriptionArg {
+    id: number;
+    description: string;
+}
+interface IApplyProjectRoadmapArg {
+    id: number;
+    roadmap: number[];
+}
+interface IApplyProjectTeamArg {
+    id: number;
+    team: ITeam;
+}
+interface IApplyProjectTokenomicsArg {
+    id: number;
+    tokenomics: ITokenomics;
+}
+interface IApplyProjectTrustByArg {
+    id: number;
+    trust_by: ITrustBy;
+}
+interface ICreateTransactionArg {
+    from: string;
+    to: string;
+    amount: number;
+    memo: string;
+}
+interface ICreateTransactionResult {
+    id: number;
+}
+interface ITransaction {
+    id: number;
+    from_princiapl: string;
+    from: string;
+    to: string;
+    amount: number;
+    memo: string;
+    is_finalize: boolean;
+    block_height: number;
+    created_at: number;
+}
+interface IPagedTransactionArg {
+    page: number;
+    size: number;
+    query: string;
+}
+interface IPagedTransactionResult {
+    page: number;
+    size: number;
+    total: number;
+    data: ITransaction[];
+}
+interface IModifyTransactionArg {
+    id: number;
+    amount: number;
+    block_height: number;
+    memo: string;
+}
+interface ITransactionResult {
+    success: boolean;
+}
+export declare enum TransactionErrors {
+    NotFound = "NotFound",
+    AlreadyExists = "AlreadyExists"
+}
 /**
  * user
  */
@@ -194,6 +262,7 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      * modify project
      */
     modifyProject(project: IModifyProjectArg): Promise<IProjectResult>;
+    submitProject(id: number): Promise<IProjectResult>;
     /**
      * get project
      */
@@ -206,6 +275,46 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      * get list project
      */
     getListProject(arg: IListProjectArg): Promise<IListProjectResult>;
+    /**
+     * apply project capital detail
+     */
+    applyProjectCapitalDetail(arg: IApplyProjectCapitalDetailArg): Promise<IProjectResult>;
+    /**
+     * apply project description
+     */
+    applyProjectDescription(arg: IApplyProjectDescriptionArg): Promise<IProjectResult>;
+    /**
+     * apply project roadmap
+     */
+    applyProjectRoadmap(arg: IApplyProjectRoadmapArg): Promise<IProjectResult>;
+    /**
+     * apply project team
+     */
+    applyProjectTeam(arg: IApplyProjectTeamArg): Promise<IProjectResult>;
+    /**
+     * apply project tokenomics
+     */
+    applyProjectTokenomics(arg: IApplyProjectTokenomicsArg): Promise<IProjectResult>;
+    /**
+     * apply project trust by
+     */
+    applyProjectTrustBy(arg: IApplyProjectTrustByArg): Promise<IProjectResult>;
+    /**
+     * create transaction
+     */
+    createTransaction(arg: ICreateTransactionArg): Promise<ICreateTransactionResult>;
+    /**
+     * get transaction
+     */
+    getTransaction(id: number): Promise<ITransaction>;
+    /**
+     * get paged transactions
+     */
+    getPagedTransaction(arg: IPagedTransactionArg): Promise<IPagedTransactionResult>;
+    /**
+     * modify transaction
+     */
+    modifyTransaction(arg: IModifyTransactionArg): Promise<ITransactionResult>;
     /**
      * create user
      */
@@ -236,17 +345,27 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
     greet(input: string): Promise<string>;
     private toCreateProjectCommand;
     private fromProjectCreatedResult;
-    private toProjectEditCommand;
     private toProjectPageQuery;
     private toProjectListQuery;
+    private toProjectEditCommand;
     private fromProjectProfile;
+    private fromTrustBy;
+    private toTrustBy;
+    private fromTeam;
+    private toTeam;
+    private fromTokenomics;
+    private toTokenomics;
+    private fromCapitalDetail;
+    private toCapitalDetail;
     private fromProjectPageResult;
     private toProjectIdCommand;
     private fromProjectResult;
     private fromBoolProjectResult;
+    private fromTransactionProfile;
     private toUserRegisterCommand;
     private fromRegisterUserResult;
     private toUserEditCommand;
     private fromBoolUserResult;
     private fromUserResult;
 }
+export {};

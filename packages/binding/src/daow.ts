@@ -3,6 +3,7 @@ import {
   _SERVICE,
   BoolProjectResult,
   BoolUserResult,
+  CapitalDetail,
   idlFactory,
   ProgressStage,
   ProjectCreateCommand,
@@ -20,6 +21,12 @@ import {
   ProjectStatus as _ProjectStatus,
   RegisterUserResult,
   ReleaseMethod,
+  Team,
+  Tokenomics,
+  TransactionError,
+  TransactionPage,
+  TransactionProfile,
+  TrustBy,
   UserEditCommand,
   UserError,
   UserProfile,
@@ -241,6 +248,98 @@ function fromProjectError(error: ProjectError): ProjectErrors {
   }
 }
 
+interface IApplyProjectCapitalDetailArg {
+  id: number
+  capital_detail: ICapitalDetail
+}
+
+interface IApplyProjectDescriptionArg {
+  id: number
+  description: string
+}
+
+interface IApplyProjectRoadmapArg {
+  id: number
+  roadmap: number[]
+}
+
+interface IApplyProjectTeamArg {
+  id: number
+  team: ITeam
+}
+
+interface IApplyProjectTokenomicsArg {
+  id: number
+  tokenomics: ITokenomics
+}
+
+interface IApplyProjectTrustByArg {
+  id: number
+  trust_by: ITrustBy
+}
+
+interface ICreateTransactionArg {
+  from: string
+  to: string
+  amount: number
+  memo: string
+}
+
+interface ICreateTransactionResult {
+  id: number
+}
+
+interface ITransaction {
+  id: number
+  from_princiapl: string
+  from: string
+  to: string
+  amount: number
+  memo: string
+  is_finalize: boolean
+  block_height: number
+  created_at: number
+}
+
+interface IPagedTransactionArg {
+  page: number
+  size: number
+  query: string
+}
+
+interface IPagedTransactionResult {
+  page: number
+  size: number
+  total: number
+  data: ITransaction[]
+}
+
+interface IModifyTransactionArg {
+  id: number
+  amount: number
+  block_height: number
+  memo: string
+}
+
+interface ITransactionResult {
+  success: boolean
+}
+
+export enum TransactionErrors {
+  NotFound = 'NotFound',
+  AlreadyExists = 'AlreadyExists',
+}
+
+function fromTransactionError(error: TransactionError): TransactionErrors {
+  if ('TransactionAlreadyExists' in error) {
+    return TransactionErrors.AlreadyExists
+  } else if ('TransactionNotFound' in error) {
+    return TransactionErrors.NotFound
+  } else {
+    throw new Error('uninmplemented')
+  }
+}
+
 /**
  * user
  */
@@ -360,6 +459,13 @@ export class DaowActor extends BaseActor<_SERVICE> {
     return this.fromBoolProjectResult(result)
   }
 
+  public async submitProject(id: number): Promise<IProjectResult> {
+    const result = await this.getActor().submit_projet({
+      id: BigInt(id),
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
   /**
    * get project
    */
@@ -385,6 +491,147 @@ export class DaowActor extends BaseActor<_SERVICE> {
       result,
       (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }),
       (err) => fromProjectError(err),
+    )
+  }
+
+  /**
+   * apply project capital detail
+   */
+  public async applyProjectCapitalDetail(
+    arg: IApplyProjectCapitalDetailArg,
+  ): Promise<IProjectResult> {
+    const result = await this.getActor().apply_project_capital_detail({
+      id: BigInt(arg.id),
+      capital_detail: this.toCapitalDetail(arg.capital_detail),
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
+  /**
+   * apply project description
+   */
+  public async applyProjectDescription(arg: IApplyProjectDescriptionArg): Promise<IProjectResult> {
+    const result = await this.getActor().apply_project_description({
+      id: BigInt(arg.id),
+      description: arg.description,
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
+  /**
+   * apply project roadmap
+   */
+  public async applyProjectRoadmap(arg: IApplyProjectRoadmapArg): Promise<IProjectResult> {
+    const result = await this.getActor().apply_project_roadmap({
+      id: BigInt(arg.id),
+      roadmap: arg.roadmap,
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
+  /**
+   * apply project team
+   */
+  public async applyProjectTeam(arg: IApplyProjectTeamArg): Promise<IProjectResult> {
+    const result = await this.getActor().apply_project_team({
+      id: BigInt(arg.id),
+      team: this.toTeam(arg.team),
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
+  /**
+   * apply project tokenomics
+   */
+  public async applyProjectTokenomics(arg: IApplyProjectTokenomicsArg): Promise<IProjectResult> {
+    const result = await this.getActor().apply_project_tokenomics({
+      id: BigInt(arg.id),
+      tokenomics: this.toTokenomics(arg.tokenomics),
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
+  /**
+   * apply project trust by
+   */
+  public async applyProjectTrustBy(arg: IApplyProjectTrustByArg): Promise<IProjectResult> {
+    const result = await this.getActor().apply_project_trust_by({
+      id: BigInt(arg.id),
+      trust_by: this.toTrustBy(arg.trust_by),
+    })
+    return this.fromBoolProjectResult(result)
+  }
+
+  /**
+   * create transaction
+   */
+  public async createTransaction(arg: ICreateTransactionArg): Promise<ICreateTransactionResult> {
+    const result = await this.getActor().create_transaction({
+      ...arg,
+      amount: BigInt(arg.amount),
+    })
+    return fromResult<bigint, TransactionError, ICreateTransactionResult, TransactionErrors>(
+      result,
+      (result) => ({ id: Number(result) }),
+      (err) => fromTransactionError(err),
+    )
+  }
+
+  /**
+   * get transaction
+   */
+  public async getTransaction(id: number): Promise<ITransaction> {
+    const result = await this.getActor().get_transaction({
+      id: BigInt(id),
+    })
+    return fromResult<TransactionProfile, TransactionError, ITransaction, TransactionErrors>(
+      result,
+      (result) => this.fromTransactionProfile(result),
+      (err) => fromTransactionError(err),
+    )
+  }
+
+  /**
+   * get paged transactions
+   */
+  public async getPagedTransaction(arg: IPagedTransactionArg): Promise<IPagedTransactionResult> {
+    const result = await this.getActor().page_transaction({
+      page_num: BigInt(arg.page),
+      page_size: BigInt(arg.size),
+      querystring: arg.query,
+    })
+    return fromResult<
+      TransactionPage,
+      TransactionError,
+      IPagedTransactionResult,
+      TransactionErrors
+    >(
+      result,
+      (result) => ({
+        page: Number(result.page_num),
+        size: Number(result.page_size),
+        total: Number(result.total_count),
+        data: result.data.map((tx) => this.fromTransactionProfile(tx)),
+      }),
+      (err) => fromTransactionError(err),
+    )
+  }
+
+  /**
+   * modify transaction
+   */
+  public async modifyTransaction(arg: IModifyTransactionArg): Promise<ITransactionResult> {
+    const result = await this.getActor().update_transaction({
+      ...arg,
+      transaction_id: BigInt(arg.id),
+      amount: BigInt(arg.amount),
+      block_height: BigInt(arg.block_height),
+      memo: arg.memo,
+    })
+    return fromResult<boolean, TransactionError, ITransactionResult, TransactionErrors>(
+      result,
+      (result) => ({ success: result }),
+      (err) => fromTransactionError(err),
     )
   }
 
@@ -457,43 +704,6 @@ export class DaowActor extends BaseActor<_SERVICE> {
     )
   }
 
-  private toProjectEditCommand(from: IModifyProjectArg): ProjectEditCommand {
-    return {
-      ...from,
-      id: BigInt(from.id),
-      logo_id: BigInt(from.logo_id),
-      roadmap_id: BigInt(from.roadmap_id),
-      trust_by: {
-        ...from.trust_by,
-        logo_id: BigInt(from.trust_by.logo_id),
-      },
-      tokenomics: {
-        ...from.tokenomics,
-        total_supply: BigInt(from.tokenomics.total_supply),
-      },
-      owner: castToPrincipal(from.owner),
-      team: {
-        ...from.team,
-        picture_id: BigInt(from.team.picture_id),
-        twitter: toOption(from.team.twitter),
-      },
-      capital_detail: {
-        ...from.capital_detail,
-        price_per_icp: BigInt(from.capital_detail.price_per_icp),
-        release: {
-          ...from.capital_detail.release,
-          method: toReleaseMethod(from.capital_detail.release.method),
-          start_date: BigInt(from.capital_detail.release.start_date),
-          amount_per_day: BigInt(from.capital_detail.release.amount_per_day),
-        },
-        raise: {
-          ...from.capital_detail.raise,
-          amount: BigInt(from.capital_detail.raise.amount),
-        },
-      },
-    }
-  }
-
   private toProjectPageQuery(from: IPagedProjectArg): ProjectPageQuery {
     return {
       page_num: BigInt(from.page),
@@ -508,6 +718,20 @@ export class DaowActor extends BaseActor<_SERVICE> {
     }
   }
 
+  private toProjectEditCommand(from: IModifyProjectArg): ProjectEditCommand {
+    return {
+      ...from,
+      id: BigInt(from.id),
+      logo_id: BigInt(from.logo_id),
+      roadmap_id: BigInt(from.roadmap_id),
+      trust_by: this.toTrustBy(from.trust_by),
+      tokenomics: this.toTokenomics(from.tokenomics),
+      owner: castToPrincipal(from.owner),
+      team: this.toTeam(from.team),
+      capital_detail: this.toCapitalDetail(from.capital_detail),
+    }
+  }
+
   private fromProjectProfile(from: ProjectProfile): IProject {
     return {
       ...from,
@@ -517,35 +741,90 @@ export class DaowActor extends BaseActor<_SERVICE> {
       progress: fromProgressStage(from.progress),
       logo_id: Number(from.logo_id),
       roadmap_id: Number(from.roadmap_id),
-      trust_by: {
-        ...from.trust_by,
-        logo_id: Number(from.trust_by.logo_id),
-      },
-      tokenomics: {
-        ...from.tokenomics,
-        total_supply: Number(from.tokenomics.total_supply),
-      },
-      team: {
-        ...from.team,
-        picture_id: Number(from.team.picture_id),
-        twitter: fromOption(from.team.twitter),
-      },
-      capital_detail: {
-        ...from.capital_detail,
-        price_per_icp: Number(from.capital_detail.price_per_icp),
-        release: {
-          ...from.capital_detail.release,
-          method: fromReleaseMethod(from.capital_detail.release.method),
-          start_date: Number(from.capital_detail.release.start_date),
-          amount_per_day: Number(from.capital_detail.release.amount_per_day),
-        },
-        raise: {
-          ...from.capital_detail.raise,
-          amount: Number(from.capital_detail.raise.amount),
-        },
-      },
+      trust_by: this.fromTrustBy(from.trust_by),
+      tokenomics: this.fromTokenomics(from.tokenomics),
+      team: this.fromTeam(from.team),
+      capital_detail: this.fromCapitalDetail(from.capital_detail),
       created_at: Number(from.created_at),
       updated_at: Number(from.updated_at),
+    }
+  }
+
+  private fromTrustBy(from: TrustBy): ITrustBy {
+    return {
+      ...from,
+      logo_id: Number(from.logo_id),
+    }
+  }
+
+  private toTrustBy(from: ITrustBy): TrustBy {
+    return {
+      ...from,
+      logo_id: BigInt(from.logo_id),
+    }
+  }
+
+  private fromTeam(from: Team): ITeam {
+    return {
+      ...from,
+      picture_id: Number(from.picture_id),
+      twitter: fromOption(from.twitter),
+    }
+  }
+
+  private toTeam(from: ITeam): Team {
+    return {
+      ...from,
+      picture_id: BigInt(from.picture_id),
+      twitter: toOption(from.twitter),
+    }
+  }
+
+  private fromTokenomics(from: Tokenomics): ITokenomics {
+    return {
+      ...from,
+      total_supply: Number(from.total_supply),
+    }
+  }
+
+  private toTokenomics(from: ITokenomics): Tokenomics {
+    return {
+      ...from,
+      total_supply: BigInt(from.total_supply),
+    }
+  }
+
+  private fromCapitalDetail(from: CapitalDetail): ICapitalDetail {
+    return {
+      ...from,
+      price_per_icp: Number(from.price_per_icp),
+      release: {
+        ...from.release,
+        method: fromReleaseMethod(from.release.method),
+        start_date: Number(from.release.start_date),
+        amount_per_day: Number(from.release.amount_per_day),
+      },
+      raise: {
+        ...from.raise,
+        amount: Number(from.raise.amount),
+      },
+    }
+  }
+
+  private toCapitalDetail(from: ICapitalDetail): CapitalDetail {
+    return {
+      ...from,
+      price_per_icp: BigInt(from.price_per_icp),
+      release: {
+        ...from.release,
+        method: toReleaseMethod(from.release.method),
+        start_date: BigInt(from.release.start_date),
+        amount_per_day: BigInt(from.release.amount_per_day),
+      },
+      raise: {
+        ...from.raise,
+        amount: BigInt(from.raise.amount),
+      },
     }
   }
 
@@ -580,6 +859,17 @@ export class DaowActor extends BaseActor<_SERVICE> {
       (result) => ({ success: result }),
       (err) => fromProjectError(err),
     )
+  }
+
+  private fromTransactionProfile(from: TransactionProfile): ITransaction {
+    return {
+      ...from,
+      id: Number(from.id),
+      from_princiapl: castPrincipalToString(from.from_princiapl),
+      amount: Number(from.amount),
+      block_height: Number(from.block_height),
+      created_at: Number(from.created_at),
+    }
   }
 
   private toUserRegisterCommand(from: ICreateUserArg): UserRegisterCommand {
