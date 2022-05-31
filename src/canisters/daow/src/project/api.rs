@@ -70,9 +70,14 @@ fn edit_project(cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
 }
 
 #[update]
+fn submit_project(cmd: ProjectIdCommand) -> Result<bool, ProjectError> {
+    CONTEXT.with(|c| c.borrow_mut().project_service.submit(&cmd.id))
+}
+
+#[update]
 fn delete_project(cmd: ProjectIdCommand) -> Result<bool, ProjectError> {
     CONTEXT.with(|c| {      
-        c.borrow_mut().project_service.delete_project(cmd.id).map(|_| true).ok_or(ProjectError::ProjectNotFound)
+        c.borrow_mut().project_service.delete_project(&cmd.id).map(|_| true).ok_or(ProjectError::ProjectNotFound)
     })
 }
 

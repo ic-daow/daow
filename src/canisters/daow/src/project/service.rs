@@ -71,7 +71,17 @@ impl ProjectService {
             })
     }
 
-    pub fn delete_project(&mut self, id: u64) -> Option<ProjectProfile> {
+    pub fn submit(&mut self, id: &u64) -> Result<bool, ProjectError> {
+        self.projects
+            .get_mut(id)
+            .map(|p| {
+                p.change_status(ProjectStatus::Enable);
+                true
+            })
+            .ok_or(ProjectError::ProjectNotFound)
+    }
+
+    pub fn delete_project(&mut self, id: &u64) -> Option<ProjectProfile> {
         self.projects.remove(&id)
     }
 

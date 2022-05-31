@@ -183,11 +183,6 @@ type BoolProjectResult = variant {
     Err: ProjectError;
 };
 
-type CreateProjectResult = variant {
-    Ok: nat64;
-    Err: ProjectError;
-};
-
 type ProjectResult = variant {
     Ok: ProjectProfile;
     Err: ProjectError;
@@ -198,6 +193,36 @@ type ProjectError = variant {
     ProjectNotFound;
     ProjectAlreadyCompleted;
     UserNotFound;
+};
+
+type ProjectApplyDescriptionCommand = record {
+    id: nat64;
+    description: text;
+};
+
+type ProjectApplyRoadmapCommand = record {
+    id: nat64;
+    roadmap: vec nat8;
+};
+
+type ProjectApplyTokenomicsCommand = record {
+    id: nat64;
+    tokenomics: Tokenomics;
+};
+
+type ProjectApplyTrustByCommand = record {
+    id: nat64;
+    trust_by: TrustBy;
+};
+
+type ProjectApplyTeamCommand = record {
+    id: nat64;
+    team: Team;
+};
+
+type ProjectApplyCapitalDetailCommand = record {
+    id: nat64;
+    capital_detail: CapitalDetail;
 };
 
 type ProjectPage = record {
@@ -229,6 +254,73 @@ type ProjectListResult = variant {
     Err: ProjectError;
 };
 
+type TransactionProfile = record {
+    id: nat64;
+    from_princiapl: principal;
+    from: text;
+    to: text;
+    amount: nat64;
+    block_height: nat64;
+    memo: text;
+    is_finalize: bool;
+    created_at: nat64;
+};
+
+type TransactionCreateCommand = record {
+    from: text;
+    to: text;
+    amount: nat64;
+    memo: text;
+};
+
+type TransactionUpdateCommand = record {
+    transaction_id: nat64;
+    memo: text;
+    amount: nat64;
+    block_height: nat64;
+};
+
+type TransactionIdCommand = record {
+    id: nat64;
+};
+
+type TransactionPageQuery = record {
+    page_size: nat64;
+    page_num: nat64;
+    querystring: text;
+};
+
+type BoolTransactionResult = variant {
+    Ok: bool;
+    Err: TransactionError;
+};
+
+type TransactionCreatedResult = variant {
+    Ok: nat64;
+    Err: TransactionError;
+};
+
+type TransactionResult = variant {
+    Ok: TransactionProfile;
+    Err: TransactionError;
+};
+
+type TransactionError = variant {
+    TransactionAlreadyExists;
+    TransactionNotFound;
+};
+
+type TransactionPage = record {
+   data: vec TransactionProfile;
+   page_num: nat64;
+   page_size: nat64;
+   total_count: nat64
+};
+
+type TransactionPageResult = variant {
+    Ok: TransactionPage;
+    Err: TransactionError;
+};
 
 service : {
  
@@ -244,7 +336,19 @@ service : {
     "create_project": (ProjectCreateCommand) -> (ProjectCreatedResult);
     "edit_project" : (ProjectEditCommand) -> (BoolProjectResult);
     "delete_projet" : (ProjectIdCommand) -> (BoolProjectResult);
+    "submit_projet" : (ProjectIdCommand) -> (BoolProjectResult);
+    "apply_project_description" : (ProjectApplyDescriptionCommand) -> (BoolProjectResult);
+    "apply_project_roadmap" : (ProjectApplyRoadmapCommand) -> (BoolProjectResult);
+    "apply_project_tokenomics" : (ProjectApplyTokenomicsCommand) -> (BoolProjectResult);
+    "apply_project_trust_by" : (ProjectApplyTrustByCommand)  -> (BoolProjectResult);
+    "apply_project_team" : (ProjectApplyTeamCommand) -> (BoolProjectResult);
+    "apply_project_capital_detail" : (ProjectApplyCapitalDetailCommand) -> (BoolProjectResult);
     "get_project" : (ProjectIdCommand) -> (ProjectResult);
     "page_project" : (ProjectPageQuery) -> (ProjectPageResult);
     "list_projects" : (ProjectListQuery) -> (ProjectListResult);
+
+    "create_transaction": (TransactionCreateCommand) -> (TransactionCreatedResult);
+    "update_transaction": (TransactionUpdateCommand) -> (BoolTransactionResult);
+    "get_transaction" : (TransactionIdCommand) -> (TransactionResult);
+    "page_transaction" : (TransactionPageQuery) -> (TransactionPageResult);
 }

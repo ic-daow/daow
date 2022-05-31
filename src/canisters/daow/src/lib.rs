@@ -14,6 +14,8 @@ pub mod context;
 
 pub mod storage;
 
+pub mod transaction;
+
 pub mod user;
 
 thread_local! {

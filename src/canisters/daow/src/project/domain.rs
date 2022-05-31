@@ -71,9 +71,14 @@ pub struct ProjectProfile {
 }
 
 impl ProjectProfile {
+    /// 项目名称只能是英文和数字
     pub fn valid_name(name: &str) -> bool {
         let len = name.chars().count();
-        len >= 3 && len <= 50
+        (len >= 3 && len <= 50) && name.chars().all(char::is_alphabetic)
+    }
+
+    pub fn change_status(&mut self, new_status: ProjectStatus) {
+        self.status = new_status;
     }
 }
 
