@@ -10,17 +10,20 @@ crate-type = ["cdylib"]
 
 
 [dependencies]
+anyhow = "1.0.56"
 candid = "0.7"
 ic-cdk = "0.5"
 ic-cdk-macros = "0.5"
-serde = "1.0"
+ic-ledger-types = "0.1"
+
 ic-event-hub = "0.3"
 ic-event-hub-macros = "0.3"
 ic-cron = "0.7"
 
-serde_bytes = "0.11"
 json_pretty = "0.1.2"
-anyhow = "1.0.56"
+serde = "1.0"
+serde_bytes = "0.11"
+
 thiserror = "1.0"
 
 [dev-dependencies]

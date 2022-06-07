@@ -41,6 +41,19 @@ impl TransactionService {
             
     }
 
+    // 确认 transation 是否 finalize, 如果确认成功，返回 确认的金额
+    pub fn finalize_transaction(&mut self, block_height: u64, memo: u64, project_id: u64) -> Result<u64, TransactionError> {
+        self.transactions
+            .iter_mut()
+            .find(|(_, tx)| { 
+                tx.block_height == block_height && tx.memo == memo && tx.project_id == project_id
+            })
+            .map(|(_, tx)| -> u64 { 
+                tx.is_finalize = true; tx.amount 
+            })
+            .ok_or_else(|| TransactionError::TransactionBlockHeightNotValid)
+    }
+
     // 按 付款地址和收款地址模糊查询
     pub fn page_transactions(&self, query_args: TransactionPageQuery) -> TransactionPage {
         let data: Vec<TransactionProfile> = self.transactions

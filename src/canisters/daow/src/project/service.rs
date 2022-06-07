@@ -14,7 +14,7 @@ use super::{
         ProjectProfile, 
         ProjectStatus, 
         Timestamp,
-        ProjectPage,   
+        ProjectPage, ProgressStage,   
     }, error::ProjectError,
 };
 
@@ -76,6 +76,17 @@ impl ProjectService {
             .get_mut(id)
             .map(|p| {
                 p.change_status(ProjectStatus::Enable);
+                p.change_progress(ProgressStage::InProgress);
+                true
+            })
+            .ok_or(ProjectError::ProjectNotFound)
+    }
+
+    pub fn add_actula_raised(&mut self, id: &u64, amount: u64) -> Result<bool, ProjectError> {
+        self.projects
+            .get_mut(id)
+            .map(|p| {
+                p.add_actual_raised(amount);
                 true
             })
             .ok_or(ProjectError::ProjectNotFound)

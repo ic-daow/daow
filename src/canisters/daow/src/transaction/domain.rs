@@ -1,5 +1,7 @@
 
 use candid::{CandidType, Deserialize, Principal};
+use ic_ledger_types::{Tokens, Subaccount};
+use serde::Serialize;
 
 use super::error::TransactionError;
 
@@ -15,7 +17,8 @@ pub struct TransactionProfile {
     pub to: String,     // ICP 交易收款地址
     pub amount: u64,    // ICP 付款金额,放大1亿倍, e.g. 1 ICP = 100,000,000
     pub block_height: u64,  // 交易记录在ICP ledger 的区块高度
-    pub memo: String,       // 转账时的 memo
+    pub memo: u64,       // 转账时的 memo, 随机数
+    pub project_id: u64,
     pub is_finalize: bool,  // 付款交易已经链上最终确认
     pub created_at: Timestamp,
 }
@@ -25,7 +28,8 @@ pub struct TransactionCreateCommand {
     pub from: String,
     pub to: String,
     pub amount: u64,
-    pub memo : String,
+    pub memo : u64,
+    pub project_id: u64,
 }
 
 impl TransactionCreateCommand {
@@ -38,6 +42,7 @@ impl TransactionCreateCommand {
             amount: self.amount, 
             block_height: 0, 
             memo: self.memo, 
+            project_id: self.project_id,
             is_finalize: false, 
             created_at
         }
@@ -47,13 +52,14 @@ impl TransactionCreateCommand {
 pub struct TransactionUpdateCommand {
     pub transaction_id: TransactionId,
     pub amount: u64,
-    pub memo: String,
+    pub memo: u64,
+    pub project_id: u64,
     pub block_height: u64,
 }
 
 impl TransactionUpdateCommand {
     pub fn merge_profile(self, profile: &mut TransactionProfile) -> Result<bool, TransactionError> {
-        if self.transaction_id == profile.id && profile.memo == self.memo && self.amount == profile.amount {
+        if self.transaction_id == profile.id && profile.memo == self.memo && self.amount == profile.amount && self.project_id == profile.project_id {
             profile.block_height = self.block_height;
             
             Ok(true)
@@ -81,4 +87,17 @@ pub struct TransactionPage {
     pub page_size: usize,
     pub page_num: usize,
     pub total_count: usize,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Clone, Debug, Hash)]
+pub struct TransferArgs {
+    amount: Tokens,
+    to_principal: Principal,
+    to_subaccount: Option<Subaccount>,
+}
+
+#[derive(Debug, Clone, CandidType, Deserialize)]
+pub struct TransactionValidCommand {
+    pub block_height: u64,
+    pub project_id: u64,
 }

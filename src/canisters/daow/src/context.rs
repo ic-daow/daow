@@ -3,6 +3,8 @@ use candid::{CandidType, Deserialize, Principal};
 use std::collections::BTreeMap;
 use std::iter::FromIterator;
 
+use crate::claim::ClaimService;
+use crate::claim::domain::ClaimProposal;
 use crate::env::{Environment, CanisterEnvironment, EmptyEnvironment};
 use crate::project::ProjectService;
 use crate::project::domain::ProjectProfile;
@@ -17,6 +19,7 @@ pub struct DaoDataStorage {
     pub users: Vec<UserProfile>,
     pub projects: Vec<ProjectProfile>,
     pub transactions: Vec<TransactionProfile>,
+    pub claims: Vec<ClaimProposal>,
 }
 
 impl From<DaoContext> for DaoDataStorage {
@@ -31,11 +34,15 @@ impl From<DaoContext> for DaoDataStorage {
         let transactions = Vec::from_iter(state.transaction_service.transactions
             .iter()
             .map(|(_k, v)| (v.clone())));
+        let claims = Vec::from_iter(state.claim_service.proposals
+            .iter()
+            .map(|(_k, v)| (v.clone())));
         Self {
             id,
             users,
             projects,
             transactions,
+            claims
         }
     }
 }
@@ -46,6 +53,7 @@ pub struct DaoContext {
     pub user_service: UserService,
     pub project_service: ProjectService,
     pub transaction_service: TransactionService,
+    pub claim_service: ClaimService,
 }
 
 impl Default for DaoContext {
@@ -56,6 +64,7 @@ impl Default for DaoContext {
             user_service: UserService::default(),
             project_service: ProjectService::default(),
             transaction_service: TransactionService::default(),
+            claim_service: ClaimService::default(),
         }
     }
 }
@@ -77,7 +86,11 @@ impl From<DaoDataStorage> for DaoContext {
             .into_iter()
             .map(|p| (p.id, p))
             .collect();
-        
+        let claims: BTreeMap<u64, ClaimProposal> = payload
+            .claims
+            .into_iter()
+            .map(|p| (p.id, p))
+            .collect();
 
         Self {
             env: Box::new(CanisterEnvironment {}),
@@ -85,6 +98,7 @@ impl From<DaoDataStorage> for DaoContext {
             user_service: UserService { users },
             project_service: ProjectService { projects },
             transaction_service: TransactionService { transactions },
+            claim_service: ClaimService { proposals: claims },
         }
     }
 }

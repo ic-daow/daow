@@ -55,8 +55,12 @@ fn pre_upgrade() {
         let transactions = Vec::from_iter(context.transaction_service.transactions
             .iter()
             .map(|(_k, v)| (v.clone())));
+        let claims = Vec::from_iter(context.claim_service.proposals
+            .iter()
+            .map(|(_k, v)| (v.clone())));
+
         let payload: DaoDataStorage = DaoDataStorage {
-            id, users, projects, transactions
+            id, users, projects, transactions, claims
         };
         
         storage::stable_save((payload,))

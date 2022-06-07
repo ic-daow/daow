@@ -10,6 +10,8 @@ pub mod env;
 
 pub mod project;
 
+pub mod claim;
+
 pub mod context;
 
 pub mod storage;

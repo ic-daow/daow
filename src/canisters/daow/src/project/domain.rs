@@ -10,11 +10,13 @@ pub type Timestamp = u64;
 pub type Blob = Vec<u8>;
 
 // DAO progress statge
-#[derive(Debug, Clone, CandidType, Deserialize)]
+#[derive(Debug, Clone, CandidType, Deserialize, PartialEq, Eq)]
 pub enum ProgressStage {
     Unopen,     // 未开始
     InProgress, // 进行中
-    Completed,  // 已完成
+    ToClaim,    // 准备 Claim, 还没 Claim 过一次
+    Claimed,    // Claim 最少成功过一次
+    Completed,  // 已完成， Claim 全部提取完毕
 }
 
 // DAO project status
@@ -65,6 +67,8 @@ pub struct ProjectProfile {
     pub tags: Vec<String>,
     pub memo: String,
     pub progress: ProgressStage,
+    pub actual_raised: u64, // 实际募到的款项
+    pub claimed: u64,       // 已经取出的款项
     pub status: ProjectStatus,
     pub created_at: Timestamp,
     pub updated_at: Timestamp,
@@ -79,6 +83,26 @@ impl ProjectProfile {
 
     pub fn change_status(&mut self, new_status: ProjectStatus) {
         self.status = new_status;
+    }
+
+    pub fn change_progress(&mut self, new_stage: ProgressStage) {
+        self.progress = new_stage;
+    }
+    
+    pub fn valid_status(&self) -> bool {
+        self.status == ProjectStatus::Enable
+    }  
+
+    pub fn valid_progress(&self) -> bool {
+        self.progress == ProgressStage::InProgress
+    }
+
+    pub fn can_claiming(&self) -> bool {
+        self.valid_status() && (self.progress == ProgressStage::ToClaim || self.progress == ProgressStage::Claimed)
+    }
+    
+    pub fn add_actual_raised(&mut self, amount: u64) {
+        self.actual_raised += amount;
     }
 }
 

@@ -76,6 +76,8 @@ type ProjectProfile = record {
     tags: vec text;
     memo: text;
     progress : ProgressStage;
+    actual_raise: nat64;
+    claimed: nat64;
     status : ProjectStatus;
     created_at : nat64;
     updated_at : nat64;
@@ -143,8 +145,7 @@ type ProjectStatus = variant {
 };
 
 type ProjectCreateCommand = record {
-    name: text;
-    
+    name: text;   
 };
 
 type ProjectIdCommand = record {
@@ -232,7 +233,7 @@ type ProjectPage = record {
    total_count: nat64
 };
 
-type ProjectPageQuery = record {
+type PageQuery = record {
     page_size: nat64;
     page_num: nat64;
     querystring: text;
@@ -261,7 +262,8 @@ type TransactionProfile = record {
     to: text;
     amount: nat64;
     block_height: nat64;
-    memo: text;
+    memo: nat64;
+    project_id: nat64;
     is_finalize: bool;
     created_at: nat64;
 };
@@ -270,24 +272,20 @@ type TransactionCreateCommand = record {
     from: text;
     to: text;
     amount: nat64;
-    memo: text;
+    memo: nat64;
+    project_id: nat64;
 };
 
 type TransactionUpdateCommand = record {
     transaction_id: nat64;
-    memo: text;
+    memo: nat64;
     amount: nat64;
+    project_id: nat64;
     block_height: nat64;
 };
 
 type TransactionIdCommand = record {
     id: nat64;
-};
-
-type TransactionPageQuery = record {
-    page_size: nat64;
-    page_num: nat64;
-    querystring: text;
 };
 
 type BoolTransactionResult = variant {
@@ -322,6 +320,98 @@ type TransactionPageResult = variant {
     Err: TransactionError;
 };
 
+type TransactionValidCommand = record {
+    block_height: nat64;
+    project_id: nat64;
+};
+
+type Weights = record {
+    amount_e8s: nat64;
+};
+
+type ProposalState = variant {
+    // The proposal is open for voting
+    Open;
+
+    // Enough "yes" votes have been cast to accept the proposal, and it will soon be executed
+    Accepted;
+
+    // Enough "no" votes have been cast to reject the proposal, and it will not be executed
+    Rejected;
+
+    // The proposal is currently being executed
+    Executing;
+
+    // The proposal has been successfully executed
+    Succeeded;
+
+    // A failure occurred while executing the proposal
+    Failed: text;
+};
+
+type ClaimProposal = record {
+    id: nat64;
+    proposer: principal;
+    payload: ProposalPayload;
+    state: ProposalState;
+    votes_yes: Weights;
+    votes_no: Weights;
+    voters: vec principal;
+    created_at: nat64;
+};
+
+type ProposalPayload = record {
+    canister_id: principal;
+    method: text;
+    message: blob;
+};
+
+type Vote = variant {
+    Yes;
+    No;
+};
+
+type VoteArgs = record {
+    proposal_id: nat64;
+    vote: Vote;
+};
+
+type VoteResult = variant {
+    Ok: ProposalState;
+    Err: text;
+};
+
+type ClaimProposalGetQuery = record {
+    id: nat64;
+};
+
+type ClaimProposalResult = variant {
+    Ok: ClaimProposal;
+    Err: ClaimError;
+};
+
+type ProposalSubmitResult = variant {
+    Ok: nat64;
+    Err: ClaimError;
+};
+
+type ClaimError = variant {
+    TransactionAlreadyExists;
+    TransactionNotFound;
+};
+
+type ClaimProposalPage = record {
+   data: vec ClaimProposal;
+   page_num: nat64;
+   page_size: nat64;
+   total_count: nat64
+};
+
+type ClaimProposalPageResult = variant {
+    Ok: ClaimProposalPage;
+    Err: ClaimError;
+};
+
 service : {
  
     "greet": (text) -> (text) query;
@@ -344,11 +434,17 @@ service : {
     "apply_project_team" : (ProjectApplyTeamCommand) -> (BoolProjectResult);
     "apply_project_capital_detail" : (ProjectApplyCapitalDetailCommand) -> (BoolProjectResult);
     "get_project" : (ProjectIdCommand) -> (ProjectResult);
-    "page_project" : (ProjectPageQuery) -> (ProjectPageResult);
+    "page_projects" : (PageQuery) -> (ProjectPageResult);
     "list_projects" : (ProjectListQuery) -> (ProjectListResult);
 
     "create_transaction": (TransactionCreateCommand) -> (TransactionCreatedResult);
     "update_transaction": (TransactionUpdateCommand) -> (BoolTransactionResult);
+    "valid_transaction" : (TransactionValidCommand) -> (BoolTransactionResult);
     "get_transaction" : (TransactionIdCommand) -> (TransactionResult);
-    "page_transaction" : (TransactionPageQuery) -> (TransactionPageResult);
+    "page_transactions" : (PageQuery) -> (TransactionPageResult);
+
+    "submit_claim_proposal" : (ProposalPayload) -> (ProposalSubmitResult);
+    "vote_claim_proposal" : (VoteArgs) -> (VoteResult);
+    "get_claim_proposal" : (ClaimProposalGetQuery) -> (ClaimProposalResult);
+    "page_claim_proposals" : (PageQuery) -> (ClaimProposalPageResult);
 }

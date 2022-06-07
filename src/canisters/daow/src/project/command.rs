@@ -40,6 +40,8 @@ impl ProjectCreateCommand {
             tags: vec![],
             memo: EMPTY_STR.into(),
             progress: ProgressStage::Unopen,
+            actual_raised: 0,
+            claimed: 0,
             status,
             created_at,
             updated_at,
