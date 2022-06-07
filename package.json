@@ -1,6 +1,7 @@
 {
   "name": "daow",
+  "private": true,
   "workspaces": [
-    "packages/binding"
+    "packages/*"
   ]
 }

@@ -1,6 +1,7 @@
 {
   "name": "@daow/binding",
   "version": "1.0.0",
+  "private": true,
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc"
@@ -8,7 +9,9 @@
   "dependencies": {
     "@dfinity/agent": "^0.11.1",
     "@dfinity/auth-client": "^0.11.1",
+    "@dfinity/authentication": "^0.11.3",
     "@dfinity/candid": "^0.11.1",
+    "@dfinity/identity": "^0.11.3",
     "@dfinity/principal": "^0.11.1",
     "@psychedelic/plug-inpage-provider": "^1.9.3",
     "assert": "^2.0.0"
