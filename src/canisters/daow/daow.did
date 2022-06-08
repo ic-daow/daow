@@ -396,8 +396,9 @@ type ProposalSubmitResult = variant {
 };
 
 type ClaimError = variant {
-    TransactionAlreadyExists;
-    TransactionNotFound;
+    ProposalNotFound,
+    ProposalAlreadyExists,
+    ProjectInvalid,
 };
 
 type ClaimProposalPage = record {
