@@ -398,7 +398,7 @@ type ProposalSubmitResult = variant {
 type ClaimError = variant {
     ProposalNotFound;
     ProposalAlreadyExists;
-    ProjectInvalid;
+    ProposalStateNotOpen;
     ProjectInvalid;
     VoterAlreadyVoted;
 };

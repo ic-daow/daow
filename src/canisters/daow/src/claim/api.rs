@@ -15,19 +15,15 @@ fn submit_claim_proposal(payload: ProposalPayload) -> Result<u64, ClaimError> {
         let caller = ctx.env.caller();
         let now = ctx.env.now();
 
-        let actual_raised = ctx.project_service
-            .get_project(payload.project_id)
-            .map(|p| p.actual_raised)
-            .ok_or(ClaimError::ProjectInvalid)?;
-
-        // 投票通过阀值超过半数
-        let vote_threshold = Weights {
-            amount_e8s: (actual_raised / 2) + 1
-        };
-
         match ctx.project_service.get_project(payload.project_id) {
-            Some(p) if p.can_claiming() => {
+            Some(p) if p.can_claiming(caller) => {
+                let actual_raised = p.actual_raised;
+                // 投票通过阀值超过半数
+                let vote_threshold = Weights {
+                    amount_e8s: (actual_raised / 2) + 1
+                };
                 let proposal = payload.build_proposal(id, caller, vote_threshold, now);
+
                 ctx.claim_service
                     .insert_proposal(proposal)   
                     .map(|id| {

@@ -49,6 +49,21 @@ impl ClaimService {
         self.proposals.get(id).cloned()
     }
 
+    // 执行 Accepted 的提案，并修改 state
+    pub fn executing_accepted_proposals(&mut self) -> Vec<ClaimProposal> {
+        self.proposals
+            .values_mut()
+            .filter(|p| p.state == ProposalState::Accepted)
+            .map(|p| { p.state = ProposalState::Executing; p.clone() })
+            .collect()
+    }
+
+    pub fn update_proposal_state(&mut self, proposal_id: u64, state: ProposalState) {
+        if let Some(p) = self.proposals.get_mut(&proposal_id) {
+            p.state = state;
+        }
+    }
+
     // 分页查询 claim proposal
     pub fn page_proposals(&self, q: ClaimProposalPageQuery) -> ClaimProposalPage {
         let data: Vec<ClaimProposal> = self.proposals
