@@ -21,9 +21,28 @@ impl ClaimService {
         }
     }
 
-    // TODO
-    pub fn vote_proposal(&mut self, args: VoteArgs) -> Result<ProposalState, ClaimError> {
-        todo!()
+    pub fn vote_proposal(&mut self, cmd: ClaimVoteCommand) -> Result<ProposalState, ClaimError> {
+        let proposal = self.proposals
+            .get_mut(&cmd.proposal_id)
+            .ok_or(ClaimError::ProposalNotFound)?;
+        
+        if proposal.state != ProposalState::Open {
+            return Err(ClaimError::ProposalStateNotOpen);
+        }
+        
+        if proposal.voters.contains(&cmd.voter) {
+            return Err(ClaimError::VoterAlreadyVoted);
+        }
+
+        proposal.calc(cmd.vote, cmd.vote_weights);
+
+        proposal.voters.push(cmd.voter);
+
+        proposal.refresh_state();
+        
+
+        Ok(proposal.state.clone())
+        
     }
 
     pub fn get_proposal(&self, id: &u64) -> Option<ClaimProposal> {

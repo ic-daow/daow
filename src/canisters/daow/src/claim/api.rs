@@ -15,9 +15,19 @@ fn submit_claim_proposal(payload: ProposalPayload) -> Result<u64, ClaimError> {
         let caller = ctx.env.caller();
         let now = ctx.env.now();
 
+        let actual_raised = ctx.project_service
+            .get_project(payload.project_id)
+            .map(|p| p.actual_raised)
+            .ok_or(ClaimError::ProjectInvalid)?;
+
+        // 投票通过阀值超过半数
+        let vote_threshold = Weights {
+            amount_e8s: (actual_raised / 2) + 1
+        };
+
         match ctx.project_service.get_project(payload.project_id) {
             Some(p) if p.can_claiming() => {
-                let proposal = payload.build_proposal(id, caller, now);
+                let proposal = payload.build_proposal(id, caller, vote_threshold, now);
                 ctx.claim_service
                     .insert_proposal(proposal)   
                     .map(|id| {
@@ -33,7 +43,27 @@ fn submit_claim_proposal(payload: ProposalPayload) -> Result<u64, ClaimError> {
 
 #[update]
 fn vote_claim_proposal(args: VoteArgs) -> Result<ProposalState, ClaimError> {
-    CONTEXT.with(|c| c.borrow_mut().claim_service.vote_proposal(args))
+    CONTEXT.with(|c| {
+        let mut ctx = c.borrow_mut();
+        let voter = ctx.env.caller();
+        
+        let project_id = ctx.claim_service
+            .get_proposal(&args.proposal_id)
+            .map(|p| p.payload.project_id)
+            .ok_or(ClaimError::ProposalNotFound)?;
+
+        let vote_amount = ctx.transaction_service.accumulate_invest(project_id, voter);
+        let vote_weights = Weights { amount_e8s: vote_amount };
+
+        let cmd = ClaimVoteCommand {
+            proposal_id: args.proposal_id,
+            vote: args.vote,
+            voter,
+            vote_weights,
+        };
+
+        ctx.claim_service.vote_proposal(cmd)
+    })
 }
 
 #[query]

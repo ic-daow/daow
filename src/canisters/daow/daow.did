@@ -399,6 +399,8 @@ type ClaimError = variant {
     ProposalNotFound;
     ProposalAlreadyExists;
     ProjectInvalid;
+    ProjectInvalid;
+    VoterAlreadyVoted;
 };
 
 type ClaimProposalPage = record {

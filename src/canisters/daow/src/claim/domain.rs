@@ -16,7 +16,26 @@ pub struct ClaimProposal {
     pub votes_yes: Weights,
     pub votes_no: Weights,
     pub voters: Vec<Principal>,
+    pub vote_threshold: Weights,
     pub created_at: u64,
+}
+
+impl ClaimProposal {
+
+    pub fn calc(&mut self, vote: Vote, weights: Weights) {
+        match vote {
+            Vote::Yes => self.votes_yes += weights,
+            Vote::No => self.votes_no += weights,
+        }
+    }
+    
+    pub fn refresh_state(&mut self) {
+        if self.votes_yes > self.vote_threshold {
+            self.state = ProposalState::Accepted;
+        } else if self.votes_no > self.vote_threshold {
+            self.state = ProposalState::Rejected;
+        }
+    }
 }
 
 /// The data needed to call a given method on a given canister with given args
@@ -29,7 +48,7 @@ pub struct ProposalPayload {
 }
 
 impl ProposalPayload {
-    pub fn build_proposal(self, id: u64, proposer: Principal, created_at: Timestamp) -> ClaimProposal {
+    pub fn build_proposal(self, id: u64, proposer: Principal, vote_threshold: Weights, created_at: Timestamp) -> ClaimProposal {
         ClaimProposal { 
             id, 
             proposer,
@@ -38,6 +57,7 @@ impl ProposalPayload {
             votes_yes: Weights::default(),
             votes_no: Weights::default(),
             voters: vec![],
+            vote_threshold,
             created_at
         }
     }
@@ -47,6 +67,13 @@ impl ProposalPayload {
 pub struct VoteArgs {
     pub proposal_id: u64,
     pub vote: Vote,
+}
+
+pub struct ClaimVoteCommand {
+    pub proposal_id: u64,
+    pub vote: Vote,
+    pub voter: Principal,
+    pub vote_weights: Weights,
 }
 
 #[derive(Clone, Debug, CandidType, Deserialize)]

@@ -5,5 +5,7 @@ use candid::{CandidType, Deserialize};
 pub enum ClaimError { 
     ProposalNotFound,
     ProposalAlreadyExists,
+    ProposalStateNotOpen,
     ProjectInvalid,
+    VoterAlreadyVoted,
 }

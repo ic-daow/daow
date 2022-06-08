@@ -74,4 +74,13 @@ impl TransactionService {
         }
     }
 
+    // 获取指定 principal 对 指定 project 的募资金额，可能有多次, 计算累计
+    pub fn accumulate_invest(&self, project_id: u64, investor: Principal) -> u64 {
+        self.transactions
+            .iter()
+            .filter(|(_, tx)| tx.from_principal == investor && tx.project_id == project_id)
+            .map(|(_, tx)| tx.amount)
+            .sum()
+    }
+
 }
