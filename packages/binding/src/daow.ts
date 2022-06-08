@@ -4,6 +4,9 @@ import {
   BoolProjectResult,
   BoolUserResult,
   CapitalDetail,
+  ClaimError,
+  ClaimProposal,
+  ClaimProposalPage,
   idlFactory,
   ProgressStage,
   ProjectCreateCommand,
@@ -13,12 +16,12 @@ import {
   ProjectIdCommand,
   ProjectListQuery,
   ProjectPage,
-  ProjectPageQuery,
   ProjectPageResult,
   ProjectProfile,
   ProjectProfiles,
   ProjectResult,
   ProjectStatus as _ProjectStatus,
+  ProposalState,
   RegisterUserResult,
   ReleaseMethod,
   Team,
@@ -33,6 +36,7 @@ import {
   UserRegisterCommand,
   UserResult,
   UserStatus as _UserStatus,
+  Vote,
 } from './actor/daow.did'
 import {
   castPrincipalToString,
@@ -42,161 +46,13 @@ import {
   ICPrincipal,
   toOption,
 } from './utils'
+import { ProjectPageQuery } from '../../../.dfx/local/canisters/daow/daow.did'
 
 /**
- * dao
+ *******************************************************************************
+ ********************************** Project ************************************
+ *******************************************************************************
  */
-export interface ICreateProjectArg {
-  name: string
-}
-
-export interface ICreateProjectResult {
-  id: number
-}
-
-export interface IDistribution {
-  marketing: string
-  team: string
-}
-
-export interface ITeam {
-  name: string
-  position: string
-  picture_id: number
-  picture: number[]
-  twitter?: string
-}
-
-export interface ITokenomics {
-  symbol: string
-  token: string
-  total_supply: number
-  distribution: IDistribution[]
-  did: string
-}
-
-export enum ReleaseMethods {
-  Linear = 'Linear',
-}
-
-function fromReleaseMethod(method: ReleaseMethod): ReleaseMethods {
-  if ('Linear' in method) {
-    return ReleaseMethods.Linear
-  } else {
-    throw new Error('unimplemented')
-  }
-}
-
-function toReleaseMethod(method: ReleaseMethods): ReleaseMethod {
-  switch (method) {
-    case ReleaseMethods.Linear:
-      return { Linear: null }
-    default:
-      throw new Error('unimplemented')
-  }
-}
-
-export interface IReleaseRule {
-  start_date: number
-  amount_per_day: number
-  method: ReleaseMethods
-}
-
-export interface IRaise {
-  currency: string
-  amount: number
-}
-
-export interface ICapitalDetail {
-  release: IReleaseRule
-  raise: IRaise
-  price_per_icp: number
-}
-
-export interface ITrustBy {
-  name: string
-  link: string
-  logo_id: number
-  logo: number[]
-}
-
-export interface IModifyProjectArg {
-  id: number
-  name: string
-  description: string
-  owner: string
-  owner_info: string
-  wallet_addr: string
-  logo_id: number
-  logo: number[]
-  roadmap_id: number
-  roadmap: number[]
-  tags: string[]
-  links: string[]
-  contact_info: string[]
-  trust_by: ITrustBy
-  tokenomics: ITokenomics
-  team: ITeam
-  capital_detail: ICapitalDetail
-  memo: string
-}
-
-export interface IPagedProjectArg {
-  page: number
-  size: number
-  query: string
-}
-
-export interface IPagedProjectResult {
-  page: number
-  size: number
-  total: number
-  data: IProject[]
-}
-
-export interface IListProjectArg {
-  status: ProjectStatus
-}
-
-export interface IListProjectResult {
-  data: IProject[]
-}
-
-export enum ProjectStatus {
-  Enable = 'Enable',
-  Disable = 'Disable',
-  Pending = 'Pending',
-}
-
-function fromProjectStatus(status: _ProjectStatus): ProjectStatus {
-  if ('Enable' in status) {
-    return ProjectStatus.Enable
-  } else if ('Disable' in status) {
-    return ProjectStatus.Disable
-  } else if ('Pending' in status) {
-    return ProjectStatus.Pending
-  } else {
-    throw new Error('unimplemented')
-  }
-}
-
-export enum ProgressStages {
-  UnOpen = 'Unopen',
-  InProgress = 'InProgress',
-  Completed = 'Completed',
-}
-
-function fromProgressStage(stage: ProgressStage): ProgressStages {
-  if ('Unopen' in stage) {
-    return ProgressStages.UnOpen
-  } else if ('InProgress' in stage) {
-    return ProgressStages.InProgress
-  } else if ('Completed' in stage) {
-    return ProgressStages.Completed
-  } else {
-    throw new Error('unimplemented')
-  }
-}
 
 export interface IProject {
   id: number
@@ -227,6 +83,108 @@ export interface IProjectResult {
   success: boolean
 }
 
+export interface IDistribution {
+  marketing: string
+  team: string
+}
+
+export interface ITeam {
+  name: string
+  position: string
+  picture_id: number
+  picture: number[]
+  twitter?: string
+}
+
+export interface ITokenomics {
+  symbol: string
+  token: string
+  total_supply: number
+  distribution: IDistribution[]
+  did: string
+}
+
+export interface IRaise {
+  currency: string
+  amount: number
+}
+
+export interface ICapitalDetail {
+  release: IReleaseRule
+  raise: IRaise
+  price_per_icp: number
+}
+
+export interface ITrustBy {
+  name: string
+  link: string
+  logo_id: number
+  logo: number[]
+}
+
+export interface IReleaseRule {
+  start_date: number
+  amount_per_day: number
+  method: ReleaseMethods
+}
+
+export enum ReleaseMethods {
+  Linear = 'Linear',
+}
+
+function fromReleaseMethod(method: ReleaseMethod): ReleaseMethods {
+  if ('Linear' in method) {
+    return ReleaseMethods.Linear
+  } else {
+    throw new Error('unimplemented')
+  }
+}
+
+function toReleaseMethod(method: ReleaseMethods): ReleaseMethod {
+  switch (method) {
+    case ReleaseMethods.Linear:
+      return { Linear: null }
+    default:
+      throw new Error('unimplemented')
+  }
+}
+
+export enum ProgressStages {
+  UnOpen = 'Unopen',
+  InProgress = 'InProgress',
+  Completed = 'Completed',
+}
+
+function fromProgressStage(stage: ProgressStage): ProgressStages {
+  if ('Unopen' in stage) {
+    return ProgressStages.UnOpen
+  } else if ('InProgress' in stage) {
+    return ProgressStages.InProgress
+  } else if ('Completed' in stage) {
+    return ProgressStages.Completed
+  } else {
+    throw new Error('unimplemented')
+  }
+}
+
+export enum ProjectStatus {
+  Enable = 'Enable',
+  Disable = 'Disable',
+  Pending = 'Pending',
+}
+
+function fromProjectStatus(status: _ProjectStatus): ProjectStatus {
+  if ('Enable' in status) {
+    return ProjectStatus.Enable
+  } else if ('Disable' in status) {
+    return ProjectStatus.Disable
+  } else if ('Pending' in status) {
+    return ProjectStatus.Pending
+  } else {
+    throw new Error('unimplemented')
+  }
+}
+
 export enum ProjectErrors {
   NotFound = 'NotFound',
   AlreadyExists = 'AlreadyExists',
@@ -244,81 +202,337 @@ function fromProjectError(error: ProjectError): ProjectErrors {
   } else if ('ProjectNotFound' in error) {
     return ProjectErrors.NotFound
   } else {
-    throw new Error('uninmplemented')
+    throw new Error('unimplemented')
   }
 }
 
-interface IApplyProjectCapitalDetailArg {
+/**
+ * create project
+ */
+export interface ICreateProjectArg {
+  name: string
+}
+
+export interface ICreateProjectResult {
+  id: number
+}
+
+/**
+ * modify project
+ */
+export interface IModifyProjectArg {
+  id: number
+  name: string
+  description: string
+  owner: string
+  owner_info: string
+  wallet_addr: string
+  logo_id: number
+  logo: number[]
+  roadmap_id: number
+  roadmap: number[]
+  tags: string[]
+  links: string[]
+  contact_info: string[]
+  trust_by: ITrustBy
+  tokenomics: ITokenomics
+  team: ITeam
+  capital_detail: ICapitalDetail
+  memo: string
+}
+
+/**
+ * get paged project
+ */
+export interface IGetPagedProjectArg {
+  page: number
+  size: number
+  query: string
+}
+
+export interface IPagedProjectResult {
+  page: number
+  size: number
+  total: number
+  data: IProject[]
+}
+
+/**
+ * get list project
+ */
+export interface IGetListProjectArg {
+  status: ProjectStatus
+}
+
+export interface IGetListProjectResult {
+  data: IProject[]
+}
+
+/**
+ * apply project capital
+ */
+interface IApplyProjectCapitalArg {
   id: number
   capital_detail: ICapitalDetail
 }
 
+/**
+ * apply project description
+ */
 interface IApplyProjectDescriptionArg {
   id: number
   description: string
 }
 
+/**
+ * apply project roadmap
+ */
 interface IApplyProjectRoadmapArg {
   id: number
   roadmap: number[]
 }
 
+/**
+ * apply project team
+ */
 interface IApplyProjectTeamArg {
   id: number
   team: ITeam
 }
 
+/**
+ * apply project tokenomics
+ */
 interface IApplyProjectTokenomicsArg {
   id: number
   tokenomics: ITokenomics
 }
 
+/**
+ * apply project trust by
+ */
 interface IApplyProjectTrustByArg {
   id: number
   trust_by: ITrustBy
 }
 
-interface ICreateTransactionArg {
+/**
+ *******************************************************************************
+ ********************************** Proposal ***********************************
+ *******************************************************************************
+ */
+
+interface IClaimProposal {
+  id: number
+  proposer: string
+  voters: string[]
+  state: ProposalStates
+  failed_reason: string | null
+  payload: IProposalPayload
+  votes_yes: IProposalWeight
+  votes_no: IProposalWeight
+  created_at: number
+}
+
+interface IProposalWeight {
+  amount_e8s: number
+}
+
+interface IProposalPayload {
+  canister_id: string
+  method: string
+  message: number[]
+}
+
+/**
+ * create claim proposal
+ */
+interface ICreateClaimProposalArg {
+  canister_id: string
+  method: string
+  message: number[]
+}
+
+interface ICreateClaimProposalResult {
+  id: number
+}
+
+/**
+ * get claim proposal
+ */
+interface IGetClaimProposal {
+  id: number
+}
+
+/**
+ * get paged claim proposal
+ */
+interface IGetPagedClaimProposalArg {
+  page: number
+  size: number
+  query: string
+}
+
+interface IGetPagedClaimProposalResult {
+  page: number
+  size: number
+  total: number
+  data: IClaimProposal[]
+}
+
+/**
+ * vote claim proposal
+ */
+interface IVoteClaimProposalArg {
+  proposal_id: number
+  vote: Votes
+}
+
+interface IVoteClaimProposalResult {
+  state: ProposalStates
+  failed_reason: string | null
+}
+
+interface IVoteClaimProposalError {
+  error: string
+}
+
+export enum ProposalStates {
+  Open = 'Open',
+  Executing = 'Executing',
+  Accepted = 'Accepted',
+  Succeeded = 'Succeeded',
+  Rejected = 'Rejected',
+  Failed = 'Failed',
+}
+
+function fromProposalState(state: ProposalState): ProposalStates {
+  if ('Failed' in state) {
+    return ProposalStates.Failed
+  } else if ('Open' in state) {
+    return ProposalStates.Open
+  } else if ('Executing' in state) {
+    return ProposalStates.Executing
+  } else if ('Rejected' in state) {
+    return ProposalStates.Rejected
+  } else if ('Succeeded' in state) {
+    return ProposalStates.Succeeded
+  } else if ('Accepted' in state) {
+    return ProposalStates.Accepted
+  } else {
+    throw new Error('unimplemented')
+  }
+}
+
+function extractProposalFailedReason(state: ProposalState): string | null {
+  if ('Failed' in state) {
+    return state.Failed
+  } else {
+    return null
+  }
+}
+
+enum Votes {
+  Yes = 'Yes',
+  No = 'No',
+}
+
+function toVote(vote: Votes): Vote {
+  switch (vote) {
+    case Votes.Yes:
+      return { Yes: null }
+    case Votes.No:
+      return { No: null }
+    default:
+      throw new Error('unimplemented')
+  }
+}
+
+export enum ProposalClaimErrors {
+  NotFound = 'NotFound',
+  AlreadyExists = 'AlreadyExists',
+  Invalid = 'Invalid',
+}
+
+function fromClaimError(error: ClaimError): ProposalClaimErrors {
+  if ('ProposalNotFound' in error) {
+    return ProposalClaimErrors.NotFound
+  } else if ('ProposalAlreadyExists' in error) {
+    return ProposalClaimErrors.AlreadyExists
+  } else if ('ProjectInvalid' in error) {
+    return ProposalClaimErrors.Invalid
+  } else {
+    throw new Error('unimplemented')
+  }
+}
+
+/**
+ *******************************************************************************
+ ******************************** Transaction **********************************
+ *******************************************************************************
+ */
+
+interface ITransaction {
+  tx_id: number
+  project_id: number
+  from_principal: string
   from: string
   to: string
   amount: number
-  memo: string
+  memo: number
+  is_finalize: boolean
+  block_height: number
+  created_at: number
+}
+
+/**
+ * create transaction
+ */
+interface ICreateTransactionArg {
+  id: number
+  from: string
+  to: string
+  amount: number
+  memo: number
 }
 
 interface ICreateTransactionResult {
   id: number
 }
 
-interface ITransaction {
-  id: number
-  from_princiapl: string
-  from: string
-  to: string
+/**
+ * modify transaction
+ */
+interface IModifyTransactionArg {
+  project_id: number
+  tx_id: number
   amount: number
-  memo: string
-  is_finalize: boolean
   block_height: number
-  created_at: number
+  memo: number
 }
 
-interface IPagedTransactionArg {
+/**
+ * get paged transaction
+ */
+interface IGetPagedTransactionArg {
   page: number
   size: number
   query: string
 }
 
-interface IPagedTransactionResult {
+interface IGetPagedTransactionResult {
   page: number
   size: number
   total: number
   data: ITransaction[]
 }
 
-interface IModifyTransactionArg {
-  id: number
-  amount: number
+/**
+ * verify transaction
+ */
+interface IVerifyTransactionArg {
+  project_id: number
   block_height: number
-  memo: string
 }
 
 interface ITransactionResult {
@@ -336,33 +550,15 @@ function fromTransactionError(error: TransactionError): TransactionErrors {
   } else if ('TransactionNotFound' in error) {
     return TransactionErrors.NotFound
   } else {
-    throw new Error('uninmplemented')
+    throw new Error('unimplemented')
   }
 }
 
 /**
- * user
+ *******************************************************************************
+ ************************************ User *************************************
+ *******************************************************************************
  */
-export interface ICreateUserArg {
-  name: string
-  email: string
-  memo: string
-}
-
-export interface ICreateUserResult {
-  name: string
-}
-
-export interface IModifyUserArg {
-  name: string
-  email: string
-  avatar_uri: string
-  avatar_id: bigint
-  biography: string
-  interests: string[]
-  status: UserStatus
-  memo: string
-}
 
 export interface IUser {
   id: number
@@ -382,6 +578,33 @@ export interface IUserResult {
   success: boolean
 }
 
+/**
+ * create user
+ */
+export interface ICreateUserArg {
+  name: string
+  email: string
+  memo: string
+}
+
+export interface ICreateUserResult {
+  name: string
+}
+
+/**
+ * modify user
+ */
+export interface IModifyUserArg {
+  name: string
+  email: string
+  avatar_uri: string
+  avatar_id: bigint
+  biography: string
+  interests: string[]
+  status: UserStatus
+  memo: string
+}
+
 export enum UserStatus {
   Enable = 'Enable',
   Disable = 'Disable',
@@ -393,7 +616,7 @@ function fromUserStatus(status: _UserStatus): UserStatus {
   } else if ('Disable' in status) {
     return UserStatus.Disable
   } else {
-    throw new Error('uninmplemented')
+    throw new Error('unimplemented')
   }
 }
 
@@ -422,9 +645,15 @@ function fromUserError(error: UserError): UserErrors {
   } else if ('UserNotFound' in error) {
     return UserErrors.NotFound
   } else {
-    throw new Error('uninmplemented')
+    throw new Error('unimplemented')
   }
 }
+
+/**
+ *******************************************************************************
+ ********************************** Canister ***********************************
+ *******************************************************************************
+ */
 
 export class DaowActor extends BaseActor<_SERVICE> {
   /**
@@ -434,6 +663,10 @@ export class DaowActor extends BaseActor<_SERVICE> {
     await this._create(cid, idlFactory, options)
     return this
   }
+
+  /**
+   ********************************* Project ***********************************
+   */
 
   /**
    * create project
@@ -459,6 +692,9 @@ export class DaowActor extends BaseActor<_SERVICE> {
     return this.fromBoolProjectResult(result)
   }
 
+  /**
+   * submit project
+   */
   public async submitProject(id: number): Promise<IProjectResult> {
     const result = await this.getActor().submit_projet({
       id: BigInt(id),
@@ -477,17 +713,17 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * get paged project
    */
-  public async getPagedProject(arg: IPagedProjectArg): Promise<IPagedProjectResult> {
-    const result = await this.getActor().page_project(this.toProjectPageQuery(arg))
+  public async getPagedProject(arg: IGetPagedProjectArg): Promise<IPagedProjectResult> {
+    const result = await this.getActor().page_projects(this.toProjectPageQuery(arg))
     return this.fromProjectPageResult(result)
   }
 
   /**
    * get list project
    */
-  public async getListProject(arg: IListProjectArg): Promise<IListProjectResult> {
+  public async getListProject(arg: IGetListProjectArg): Promise<IGetListProjectResult> {
     const result = await this.getActor().list_projects(this.toProjectListQuery(arg))
-    return fromResult<ProjectProfiles, ProjectError, IListProjectResult, ProjectErrors>(
+    return fromResult<ProjectProfiles, ProjectError, IGetListProjectResult, ProjectErrors>(
       result,
       (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }),
       (err) => fromProjectError(err),
@@ -495,11 +731,9 @@ export class DaowActor extends BaseActor<_SERVICE> {
   }
 
   /**
-   * apply project capital detail
+   * apply project capital
    */
-  public async applyProjectCapitalDetail(
-    arg: IApplyProjectCapitalDetailArg,
-  ): Promise<IProjectResult> {
+  public async applyProjectCapital(arg: IApplyProjectCapitalArg): Promise<IProjectResult> {
     const result = await this.getActor().apply_project_capital_detail({
       id: BigInt(arg.id),
       capital_detail: this.toCapitalDetail(arg.capital_detail),
@@ -563,16 +797,142 @@ export class DaowActor extends BaseActor<_SERVICE> {
   }
 
   /**
+   ****************************** Claim Proposal *******************************
+   */
+
+  /**
+   * create claim proposal
+   */
+  public async createClaimProposal(
+    arg: ICreateClaimProposalArg,
+  ): Promise<ICreateClaimProposalResult> {
+    const result = await this.getActor().submit_claim_proposal({
+      ...arg,
+      canister_id: castToPrincipal(arg.canister_id),
+    })
+    return fromResult<bigint, ClaimError, ICreateClaimProposalResult, ProposalClaimErrors>(
+      result,
+      (result) => ({ id: Number(result) }),
+      (err) => fromClaimError(err),
+    )
+  }
+
+  /**
+   * vote claim proposal
+   */
+  public async voteClaimProposal(arg: IVoteClaimProposalArg): Promise<IVoteClaimProposalResult> {
+    const result = await this.getActor().vote_claim_proposal({
+      ...arg,
+      proposal_id: BigInt(arg.proposal_id),
+      vote: toVote(arg.vote),
+    })
+    return fromResult<ProposalState, string, IVoteClaimProposalResult, IVoteClaimProposalError>(
+      result,
+      (result) => ({
+        state: fromProposalState(result),
+        failed_reason: extractProposalFailedReason(result),
+      }),
+      (err) => ({ error: err }),
+    )
+  }
+
+  /**
+   * get claim proposal
+   */
+  public async getClaimProposal(arg: IGetClaimProposal): Promise<IClaimProposal> {
+    const result = await this.getActor().get_claim_proposal({
+      ...arg,
+      id: BigInt(arg.id),
+    })
+    return fromResult<ClaimProposal, ClaimError, IClaimProposal, ProposalClaimErrors>(
+      result,
+      (result) => this.fromClaimProposal(result),
+      (err) => fromClaimError(err),
+    )
+  }
+
+  /**
+   * get paged claim proposal
+   */
+  public async getPagedClaimProposal(
+    arg: IGetPagedClaimProposalArg,
+  ): Promise<IGetPagedClaimProposalResult> {
+    const result = await this.getActor().page_claim_proposals({
+      ...arg,
+      page_num: BigInt(arg.page),
+      page_size: BigInt(arg.size),
+      querystring: arg.query,
+    })
+    return fromResult<
+      ClaimProposalPage,
+      ClaimError,
+      IGetPagedClaimProposalResult,
+      ProposalClaimErrors
+    >(
+      result,
+      (result) => ({
+        ...result,
+        page: Number(result.page_num),
+        size: Number(result.page_size),
+        total: Number(result.total_count),
+        data: result.data.map((it) => this.fromClaimProposal(it)),
+      }),
+      (err) => fromClaimError(err),
+    )
+  }
+
+  /**
+   ******************************** Transaction ********************************
+   */
+
+  /**
    * create transaction
    */
   public async createTransaction(arg: ICreateTransactionArg): Promise<ICreateTransactionResult> {
     const result = await this.getActor().create_transaction({
       ...arg,
+      project_id: BigInt(arg.id),
       amount: BigInt(arg.amount),
+      memo: BigInt(arg.memo),
     })
     return fromResult<bigint, TransactionError, ICreateTransactionResult, TransactionErrors>(
       result,
       (result) => ({ id: Number(result) }),
+      (err) => fromTransactionError(err),
+    )
+  }
+
+  /**
+   * modify transaction
+   */
+  public async modifyTransaction(arg: IModifyTransactionArg): Promise<ITransactionResult> {
+    const result = await this.getActor().update_transaction({
+      ...arg,
+      project_id: BigInt(arg.project_id),
+      transaction_id: BigInt(arg.tx_id),
+      amount: BigInt(arg.amount),
+      block_height: BigInt(arg.block_height),
+      memo: BigInt(arg.memo),
+    })
+    return fromResult<boolean, TransactionError, ITransactionResult, TransactionErrors>(
+      result,
+      (result) => ({ success: result }),
+      (err) => fromTransactionError(err),
+    )
+  }
+
+  /**
+   * verify transaction
+   */
+  public async verifyTransaction(arg: IVerifyTransactionArg): Promise<ITransactionResult> {
+    const result = await this.getActor().valid_transaction({
+      ...arg,
+      project_id: BigInt(arg.project_id),
+      block_height: BigInt(arg.block_height),
+    })
+    return fromResult<boolean, TransactionError, ITransactionResult, TransactionErrors>(
+      result,
+      (result) => ({ success: result }),
       (err) => fromTransactionError(err),
     )
   }
@@ -594,8 +954,10 @@ export class DaowActor extends BaseActor<_SERVICE> {
   /**
    * get paged transactions
    */
-  public async getPagedTransaction(arg: IPagedTransactionArg): Promise<IPagedTransactionResult> {
-    const result = await this.getActor().page_transaction({
+  public async getPagedTransaction(
+    arg: IGetPagedTransactionArg,
+  ): Promise<IGetPagedTransactionResult> {
+    const result = await this.getActor().page_transactions({
       page_num: BigInt(arg.page),
       page_size: BigInt(arg.size),
       querystring: arg.query,
@@ -603,7 +965,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
     return fromResult<
       TransactionPage,
       TransactionError,
-      IPagedTransactionResult,
+      IGetPagedTransactionResult,
       TransactionErrors
     >(
       result,
@@ -618,22 +980,8 @@ export class DaowActor extends BaseActor<_SERVICE> {
   }
 
   /**
-   * modify transaction
+   ********************************** User *************************************
    */
-  public async modifyTransaction(arg: IModifyTransactionArg): Promise<ITransactionResult> {
-    const result = await this.getActor().update_transaction({
-      ...arg,
-      transaction_id: BigInt(arg.id),
-      amount: BigInt(arg.amount),
-      block_height: BigInt(arg.block_height),
-      memo: arg.memo,
-    })
-    return fromResult<boolean, TransactionError, ITransactionResult, TransactionErrors>(
-      result,
-      (result) => ({ success: result }),
-      (err) => fromTransactionError(err),
-    )
-  }
 
   /**
    * create user
@@ -690,6 +1038,10 @@ export class DaowActor extends BaseActor<_SERVICE> {
     return this.getActor().greet(input)
   }
 
+  /**
+   ***************************** Private Methods *******************************
+   */
+
   private toCreateProjectCommand(from: ICreateProjectArg): ProjectCreateCommand {
     return {
       name: from.name,
@@ -704,7 +1056,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
     )
   }
 
-  private toProjectPageQuery(from: IPagedProjectArg): ProjectPageQuery {
+  private toProjectPageQuery(from: IGetPagedProjectArg): ProjectPageQuery {
     return {
       page_num: BigInt(from.page),
       page_size: BigInt(from.size),
@@ -712,7 +1064,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
     }
   }
 
-  private toProjectListQuery(from: IListProjectArg): ProjectListQuery {
+  private toProjectListQuery(from: IGetListProjectArg): ProjectListQuery {
     return {
       status: from.status.toLowerCase(),
     }
@@ -864,10 +1216,12 @@ export class DaowActor extends BaseActor<_SERVICE> {
   private fromTransactionProfile(from: TransactionProfile): ITransaction {
     return {
       ...from,
-      id: Number(from.id),
-      from_princiapl: castPrincipalToString(from.from_princiapl),
+      tx_id: Number(from.id),
+      project_id: Number(from.project_id),
+      from_principal: castPrincipalToString(from.from_princiapl),
       amount: Number(from.amount),
       block_height: Number(from.block_height),
+      memo: Number(from.memo),
       created_at: Number(from.created_at),
     }
   }
@@ -914,5 +1268,27 @@ export class DaowActor extends BaseActor<_SERVICE> {
       }),
       (err) => fromUserError(err),
     )
+  }
+
+  private fromClaimProposal(from: ClaimProposal): IClaimProposal {
+    return {
+      ...from,
+      id: Number(from.id),
+      proposer: castPrincipalToString(from.proposer),
+      voters: from.voters.map((voter) => castPrincipalToString(voter)),
+      state: fromProposalState(from.state),
+      failed_reason: extractProposalFailedReason(from.state),
+      payload: {
+        ...from.payload,
+        canister_id: castPrincipalToString(from.payload.canister_id),
+      },
+      votes_yes: {
+        amount_e8s: Number(from.votes_yes.amount_e8s),
+      },
+      votes_no: {
+        amount_e8s: Number(from.votes_no.amount_e8s),
+      },
+      created_at: Number(from.created_at),
+    }
   }
 }

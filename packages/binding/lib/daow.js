@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DaowActor = exports.UserErrors = exports.UserStatus = exports.TransactionErrors = exports.ProjectErrors = exports.ProgressStages = exports.ProjectStatus = exports.ReleaseMethods = void 0;
+exports.DaowActor = exports.UserErrors = exports.UserStatus = exports.TransactionErrors = exports.ProposalClaimErrors = exports.ProposalStates = exports.ProjectErrors = exports.ProjectStatus = exports.ProgressStages = exports.ReleaseMethods = void 0;
 const actor_1 = require("./actor");
 const daow_did_1 = require("./actor/daow.did");
 const utils_1 = require("./utils");
@@ -24,26 +24,6 @@ function toReleaseMethod(method) {
             throw new Error('unimplemented');
     }
 }
-var ProjectStatus;
-(function (ProjectStatus) {
-    ProjectStatus["Enable"] = "Enable";
-    ProjectStatus["Disable"] = "Disable";
-    ProjectStatus["Pending"] = "Pending";
-})(ProjectStatus = exports.ProjectStatus || (exports.ProjectStatus = {}));
-function fromProjectStatus(status) {
-    if ('Enable' in status) {
-        return ProjectStatus.Enable;
-    }
-    else if ('Disable' in status) {
-        return ProjectStatus.Disable;
-    }
-    else if ('Pending' in status) {
-        return ProjectStatus.Pending;
-    }
-    else {
-        throw new Error('unimplemented');
-    }
-}
 var ProgressStages;
 (function (ProgressStages) {
     ProgressStages["UnOpen"] = "Unopen";
@@ -59,6 +39,26 @@ function fromProgressStage(stage) {
     }
     else if ('Completed' in stage) {
         return ProgressStages.Completed;
+    }
+    else {
+        throw new Error('unimplemented');
+    }
+}
+var ProjectStatus;
+(function (ProjectStatus) {
+    ProjectStatus["Enable"] = "Enable";
+    ProjectStatus["Disable"] = "Disable";
+    ProjectStatus["Pending"] = "Pending";
+})(ProjectStatus = exports.ProjectStatus || (exports.ProjectStatus = {}));
+function fromProjectStatus(status) {
+    if ('Enable' in status) {
+        return ProjectStatus.Enable;
+    }
+    else if ('Disable' in status) {
+        return ProjectStatus.Disable;
+    }
+    else if ('Pending' in status) {
+        return ProjectStatus.Pending;
     }
     else {
         throw new Error('unimplemented');
@@ -85,7 +85,82 @@ function fromProjectError(error) {
         return ProjectErrors.NotFound;
     }
     else {
-        throw new Error('uninmplemented');
+        throw new Error('unimplemented');
+    }
+}
+var ProposalStates;
+(function (ProposalStates) {
+    ProposalStates["Open"] = "Open";
+    ProposalStates["Executing"] = "Executing";
+    ProposalStates["Accepted"] = "Accepted";
+    ProposalStates["Succeeded"] = "Succeeded";
+    ProposalStates["Rejected"] = "Rejected";
+    ProposalStates["Failed"] = "Failed";
+})(ProposalStates = exports.ProposalStates || (exports.ProposalStates = {}));
+function fromProposalState(state) {
+    if ('Failed' in state) {
+        return ProposalStates.Failed;
+    }
+    else if ('Open' in state) {
+        return ProposalStates.Open;
+    }
+    else if ('Executing' in state) {
+        return ProposalStates.Executing;
+    }
+    else if ('Rejected' in state) {
+        return ProposalStates.Rejected;
+    }
+    else if ('Succeeded' in state) {
+        return ProposalStates.Succeeded;
+    }
+    else if ('Accepted' in state) {
+        return ProposalStates.Accepted;
+    }
+    else {
+        throw new Error('unimplemented');
+    }
+}
+function extractProposalFailedReason(state) {
+    if ('Failed' in state) {
+        return state.Failed;
+    }
+    else {
+        return null;
+    }
+}
+var Votes;
+(function (Votes) {
+    Votes["Yes"] = "Yes";
+    Votes["No"] = "No";
+})(Votes || (Votes = {}));
+function toVote(vote) {
+    switch (vote) {
+        case Votes.Yes:
+            return { Yes: null };
+        case Votes.No:
+            return { No: null };
+        default:
+            throw new Error('unimplemented');
+    }
+}
+var ProposalClaimErrors;
+(function (ProposalClaimErrors) {
+    ProposalClaimErrors["NotFound"] = "NotFound";
+    ProposalClaimErrors["AlreadyExists"] = "AlreadyExists";
+    ProposalClaimErrors["Invalid"] = "Invalid";
+})(ProposalClaimErrors = exports.ProposalClaimErrors || (exports.ProposalClaimErrors = {}));
+function fromClaimError(error) {
+    if ('ProposalNotFound' in error) {
+        return ProposalClaimErrors.NotFound;
+    }
+    else if ('ProposalAlreadyExists' in error) {
+        return ProposalClaimErrors.AlreadyExists;
+    }
+    else if ('ProjectInvalid' in error) {
+        return ProposalClaimErrors.Invalid;
+    }
+    else {
+        throw new Error('unimplemented');
     }
 }
 var TransactionErrors;
@@ -101,7 +176,7 @@ function fromTransactionError(error) {
         return TransactionErrors.NotFound;
     }
     else {
-        throw new Error('uninmplemented');
+        throw new Error('unimplemented');
     }
 }
 var UserStatus;
@@ -117,7 +192,7 @@ function fromUserStatus(status) {
         return UserStatus.Disable;
     }
     else {
-        throw new Error('uninmplemented');
+        throw new Error('unimplemented');
     }
 }
 function toUserStatus(status) {
@@ -147,9 +222,14 @@ function fromUserError(error) {
         return UserErrors.NotFound;
     }
     else {
-        throw new Error('uninmplemented');
+        throw new Error('unimplemented');
     }
 }
+/**
+ *******************************************************************************
+ ********************************** Canister ***********************************
+ *******************************************************************************
+ */
 class DaowActor extends actor_1.BaseActor {
     /**
      * 创建actor
@@ -158,6 +238,9 @@ class DaowActor extends actor_1.BaseActor {
         await this._create(cid, daow_did_1.idlFactory, options);
         return this;
     }
+    /**
+     ********************************* Project ***********************************
+     */
     /**
      * create project
      */
@@ -179,6 +262,9 @@ class DaowActor extends actor_1.BaseActor {
         const result = await this.getActor().edit_project(this.toProjectEditCommand(project));
         return this.fromBoolProjectResult(result);
     }
+    /**
+     * submit project
+     */
     async submitProject(id) {
         const result = await this.getActor().submit_projet({
             id: BigInt(id),
@@ -196,7 +282,7 @@ class DaowActor extends actor_1.BaseActor {
      * get paged project
      */
     async getPagedProject(arg) {
-        const result = await this.getActor().page_project(this.toProjectPageQuery(arg));
+        const result = await this.getActor().page_projects(this.toProjectPageQuery(arg));
         return this.fromProjectPageResult(result);
     }
     /**
@@ -207,9 +293,9 @@ class DaowActor extends actor_1.BaseActor {
         return (0, utils_1.fromResult)(result, (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }), (err) => fromProjectError(err));
     }
     /**
-     * apply project capital detail
+     * apply project capital
      */
-    async applyProjectCapitalDetail(arg) {
+    async applyProjectCapital(arg) {
         const result = await this.getActor().apply_project_capital_detail({
             id: BigInt(arg.id),
             capital_detail: this.toCapitalDetail(arg.capital_detail),
@@ -267,14 +353,99 @@ class DaowActor extends actor_1.BaseActor {
         return this.fromBoolProjectResult(result);
     }
     /**
+     ****************************** Claim Proposal *******************************
+     */
+    /**
+     * create claim proposal
+     */
+    async createClaimProposal(arg) {
+        const result = await this.getActor().submit_claim_proposal({
+            ...arg,
+            canister_id: (0, utils_1.castToPrincipal)(arg.canister_id),
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({ id: Number(result) }), (err) => fromClaimError(err));
+    }
+    /**
+     * vote claim proposal
+     */
+    async voteClaimProposal(arg) {
+        const result = await this.getActor().vote_claim_proposal({
+            ...arg,
+            proposal_id: BigInt(arg.proposal_id),
+            vote: toVote(arg.vote),
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({
+            state: fromProposalState(result),
+            failed_reason: extractProposalFailedReason(result),
+        }), (err) => ({ error: err }));
+    }
+    /**
+     * get claim proposal
+     */
+    async getClaimProposal(arg) {
+        const result = await this.getActor().get_claim_proposal({
+            ...arg,
+            id: BigInt(arg.id),
+        });
+        return (0, utils_1.fromResult)(result, (result) => this.fromClaimProposal(result), (err) => fromClaimError(err));
+    }
+    /**
+     * get paged claim proposal
+     */
+    async getPagedClaimProposal(arg) {
+        const result = await this.getActor().page_claim_proposals({
+            ...arg,
+            page_num: BigInt(arg.page),
+            page_size: BigInt(arg.size),
+            querystring: arg.query,
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({
+            ...result,
+            page: Number(result.page_num),
+            size: Number(result.page_size),
+            total: Number(result.total_count),
+            data: result.data.map((it) => this.fromClaimProposal(it)),
+        }), (err) => fromClaimError(err));
+    }
+    /**
+     ******************************** Transaction ********************************
+     */
+    /**
      * create transaction
      */
     async createTransaction(arg) {
         const result = await this.getActor().create_transaction({
             ...arg,
+            project_id: BigInt(arg.id),
             amount: BigInt(arg.amount),
+            memo: BigInt(arg.memo),
         });
         return (0, utils_1.fromResult)(result, (result) => ({ id: Number(result) }), (err) => fromTransactionError(err));
+    }
+    /**
+     * modify transaction
+     */
+    async modifyTransaction(arg) {
+        const result = await this.getActor().update_transaction({
+            ...arg,
+            project_id: BigInt(arg.project_id),
+            transaction_id: BigInt(arg.tx_id),
+            amount: BigInt(arg.amount),
+            block_height: BigInt(arg.block_height),
+            memo: BigInt(arg.memo),
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({ success: result }), (err) => fromTransactionError(err));
+    }
+    /**
+     * verify transaction
+     */
+    async verifyTransaction(arg) {
+        const result = await this.getActor().valid_transaction({
+            ...arg,
+            project_id: BigInt(arg.project_id),
+            block_height: BigInt(arg.block_height),
+        });
+        return (0, utils_1.fromResult)(result, (result) => ({ success: result }), (err) => fromTransactionError(err));
     }
     /**
      * get transaction
@@ -289,7 +460,7 @@ class DaowActor extends actor_1.BaseActor {
      * get paged transactions
      */
     async getPagedTransaction(arg) {
-        const result = await this.getActor().page_transaction({
+        const result = await this.getActor().page_transactions({
             page_num: BigInt(arg.page),
             page_size: BigInt(arg.size),
             querystring: arg.query,
@@ -302,18 +473,8 @@ class DaowActor extends actor_1.BaseActor {
         }), (err) => fromTransactionError(err));
     }
     /**
-     * modify transaction
+     ********************************** User *************************************
      */
-    async modifyTransaction(arg) {
-        const result = await this.getActor().update_transaction({
-            ...arg,
-            transaction_id: BigInt(arg.id),
-            amount: BigInt(arg.amount),
-            block_height: BigInt(arg.block_height),
-            memo: arg.memo,
-        });
-        return (0, utils_1.fromResult)(result, (result) => ({ success: result }), (err) => fromTransactionError(err));
-    }
     /**
      * create user
      */
@@ -362,6 +523,9 @@ class DaowActor extends actor_1.BaseActor {
     async greet(input) {
         return this.getActor().greet(input);
     }
+    /**
+     ***************************** Private Methods *******************************
+     */
     toCreateProjectCommand(from) {
         return {
             name: from.name,
@@ -502,10 +666,12 @@ class DaowActor extends actor_1.BaseActor {
     fromTransactionProfile(from) {
         return {
             ...from,
-            id: Number(from.id),
-            from_princiapl: (0, utils_1.castPrincipalToString)(from.from_princiapl),
+            tx_id: Number(from.id),
+            project_id: Number(from.project_id),
+            from_principal: (0, utils_1.castPrincipalToString)(from.from_princiapl),
             amount: Number(from.amount),
             block_height: Number(from.block_height),
+            memo: Number(from.memo),
             created_at: Number(from.created_at),
         };
     }
@@ -535,6 +701,27 @@ class DaowActor extends actor_1.BaseActor {
             avatar_id: Number(result.avatar_id),
             created_at: Number(result.created_at),
         }), (err) => fromUserError(err));
+    }
+    fromClaimProposal(from) {
+        return {
+            ...from,
+            id: Number(from.id),
+            proposer: (0, utils_1.castPrincipalToString)(from.proposer),
+            voters: from.voters.map((voter) => (0, utils_1.castPrincipalToString)(voter)),
+            state: fromProposalState(from.state),
+            failed_reason: extractProposalFailedReason(from.state),
+            payload: {
+                ...from.payload,
+                canister_id: (0, utils_1.castPrincipalToString)(from.payload.canister_id),
+            },
+            votes_yes: {
+                amount_e8s: Number(from.votes_yes.amount_e8s),
+            },
+            votes_no: {
+                amount_e8s: Number(from.votes_no.amount_e8s),
+            },
+            created_at: Number(from.created_at),
+        };
     }
 }
 exports.DaowActor = DaowActor;

@@ -80,7 +80,8 @@ const idlFactory = ({ IDL }) => {
     const TransactionCreateCommand = IDL.Record({
         'to': IDL.Text,
         'from': IDL.Text,
-        'memo': IDL.Text,
+        'memo': IDL.Nat64,
+        'project_id': IDL.Nat64,
         'amount': IDL.Nat64,
     });
     const TransactionError = IDL.Variant({
@@ -129,6 +130,40 @@ const idlFactory = ({ IDL }) => {
         'email': IDL.Text,
         'avatar_id': IDL.Nat64,
     });
+    const ClaimProposalGetQuery = IDL.Record({ 'id': IDL.Nat64 });
+    const Weights = IDL.Record({ 'amount_e8s': IDL.Nat64 });
+    const ProposalState = IDL.Variant({
+        'Failed': IDL.Text,
+        'Open': IDL.Null,
+        'Executing': IDL.Null,
+        'Rejected': IDL.Null,
+        'Succeeded': IDL.Null,
+        'Accepted': IDL.Null,
+    });
+    const ProposalPayload = IDL.Record({
+        'method': IDL.Text,
+        'canister_id': IDL.Principal,
+        'message': IDL.Vec(IDL.Nat8),
+    });
+    const ClaimProposal = IDL.Record({
+        'id': IDL.Nat64,
+        'votes_no': Weights,
+        'voters': IDL.Vec(IDL.Principal),
+        'created_at': IDL.Nat64,
+        'state': ProposalState,
+        'proposer': IDL.Principal,
+        'votes_yes': Weights,
+        'payload': ProposalPayload,
+    });
+    const ClaimError = IDL.Variant({
+        'ProjectInvalid': IDL.Null,
+        'ProposalNotFound': IDL.Null,
+        'ProposalAlreadyExists': IDL.Null,
+    });
+    const ClaimProposalResult = IDL.Variant({
+        'Ok': ClaimProposal,
+        'Err': ClaimError,
+    });
     const ProjectStatus = IDL.Variant({
         'Enable': IDL.Null,
         'Disable': IDL.Null,
@@ -152,6 +187,8 @@ const idlFactory = ({ IDL }) => {
         'tags': IDL.Vec(IDL.Text),
         'team': Team,
         'description': IDL.Text,
+        'actual_raise': IDL.Nat64,
+        'claimed': IDL.Nat64,
         'capital_detail': CapitalDetail,
         'created_at': IDL.Nat64,
         'links': IDL.Vec(IDL.Text),
@@ -186,10 +223,11 @@ const idlFactory = ({ IDL }) => {
         'id': IDL.Nat64,
         'to': IDL.Text,
         'from': IDL.Text,
-        'memo': IDL.Text,
+        'memo': IDL.Nat64,
         'created_at': IDL.Nat64,
         'from_princiapl': IDL.Principal,
         'is_finalize': IDL.Bool,
+        'project_id': IDL.Nat64,
         'amount': IDL.Nat64,
         'block_height': IDL.Nat64,
     });
@@ -203,10 +241,20 @@ const idlFactory = ({ IDL }) => {
         'Ok': ProjectProfiles,
         'Err': ProjectError,
     });
-    const ProjectPageQuery = IDL.Record({
+    const PageQuery = IDL.Record({
         'page_size': IDL.Nat64,
         'querystring': IDL.Text,
         'page_num': IDL.Nat64,
+    });
+    const ClaimProposalPage = IDL.Record({
+        'page_size': IDL.Nat64,
+        'data': IDL.Vec(ClaimProposal),
+        'page_num': IDL.Nat64,
+        'total_count': IDL.Nat64,
+    });
+    const ClaimProposalPageResult = IDL.Variant({
+        'Ok': ClaimProposalPage,
+        'Err': ClaimError,
     });
     const ProjectPage = IDL.Record({
         'page_size': IDL.Nat64,
@@ -217,11 +265,6 @@ const idlFactory = ({ IDL }) => {
     const ProjectPageResult = IDL.Variant({
         'Ok': ProjectPage,
         'Err': ProjectError,
-    });
-    const TransactionPageQuery = IDL.Record({
-        'page_size': IDL.Nat64,
-        'querystring': IDL.Text,
-        'page_num': IDL.Nat64,
     });
     const TransactionPage = IDL.Record({
         'page_size': IDL.Nat64,
@@ -242,9 +285,14 @@ const idlFactory = ({ IDL }) => {
         'Ok': IDL.Text,
         'Err': UserError,
     });
+    const ProposalSubmitResult = IDL.Variant({
+        'Ok': IDL.Nat64,
+        'Err': ClaimError,
+    });
     const TransactionUpdateCommand = IDL.Record({
         'transaction_id': IDL.Nat64,
-        'memo': IDL.Text,
+        'memo': IDL.Nat64,
+        'project_id': IDL.Nat64,
         'amount': IDL.Nat64,
         'block_height': IDL.Nat64,
     });
@@ -252,6 +300,13 @@ const idlFactory = ({ IDL }) => {
         'Ok': IDL.Bool,
         'Err': TransactionError,
     });
+    const TransactionValidCommand = IDL.Record({
+        'project_id': IDL.Nat64,
+        'block_height': IDL.Nat64,
+    });
+    const Vote = IDL.Variant({ 'No': IDL.Null, 'Yes': IDL.Null });
+    const VoteArgs = IDL.Record({ 'vote': Vote, 'proposal_id': IDL.Nat64 });
+    const VoteResult = IDL.Variant({ 'Ok': ProposalState, 'Err': IDL.Text });
     return IDL.Service({
         'apply_project_capital_detail': IDL.Func([ProjectApplyCapitalDetailCommand], [BoolProjectResult], []),
         'apply_project_description': IDL.Func([ProjectApplyDescriptionCommand], [BoolProjectResult], []),
@@ -266,17 +321,22 @@ const idlFactory = ({ IDL }) => {
         'edit_project': IDL.Func([ProjectEditCommand], [BoolProjectResult], []),
         'edit_user': IDL.Func([UserEditCommand], [BoolUserResult], []),
         'enable_user': IDL.Func([IDL.Principal], [BoolUserResult], []),
+        'get_claim_proposal': IDL.Func([ClaimProposalGetQuery], [ClaimProposalResult], []),
         'get_project': IDL.Func([ProjectIdCommand], [ProjectResult], []),
         'get_self': IDL.Func([], [UserResult], []),
         'get_transaction': IDL.Func([TransactionIdCommand], [TransactionResult], []),
         'get_user': IDL.Func([IDL.Text], [BoolUserResult], []),
         'greet': IDL.Func([IDL.Text], [IDL.Text], ['query']),
         'list_projects': IDL.Func([ProjectListQuery], [ProjectListResult], []),
-        'page_project': IDL.Func([ProjectPageQuery], [ProjectPageResult], []),
-        'page_transaction': IDL.Func([TransactionPageQuery], [TransactionPageResult], []),
+        'page_claim_proposals': IDL.Func([PageQuery], [ClaimProposalPageResult], []),
+        'page_projects': IDL.Func([PageQuery], [ProjectPageResult], []),
+        'page_transactions': IDL.Func([PageQuery], [TransactionPageResult], []),
         'register_user': IDL.Func([UserRegisterCommand], [RegisterUserResult], []),
+        'submit_claim_proposal': IDL.Func([ProposalPayload], [ProposalSubmitResult], []),
         'submit_projet': IDL.Func([ProjectIdCommand], [BoolProjectResult], []),
         'update_transaction': IDL.Func([TransactionUpdateCommand], [BoolTransactionResult], []),
+        'valid_transaction': IDL.Func([TransactionValidCommand], [BoolTransactionResult], []),
+        'vote_claim_proposal': IDL.Func([VoteArgs], [VoteResult], []),
     });
 };
 exports.idlFactory = idlFactory;

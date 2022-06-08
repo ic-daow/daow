@@ -2,102 +2,10 @@ import { BaseActor, ICreateActorOptions } from './actor';
 import { _SERVICE } from './actor/daow.did';
 import { ICPrincipal } from './utils';
 /**
- * dao
+ *******************************************************************************
+ ********************************** Project ************************************
+ *******************************************************************************
  */
-export interface ICreateProjectArg {
-    name: string;
-}
-export interface ICreateProjectResult {
-    id: number;
-}
-export interface IDistribution {
-    marketing: string;
-    team: string;
-}
-export interface ITeam {
-    name: string;
-    position: string;
-    picture_id: number;
-    picture: number[];
-    twitter?: string;
-}
-export interface ITokenomics {
-    symbol: string;
-    token: string;
-    total_supply: number;
-    distribution: IDistribution[];
-    did: string;
-}
-export declare enum ReleaseMethods {
-    Linear = "Linear"
-}
-export interface IReleaseRule {
-    start_date: number;
-    amount_per_day: number;
-    method: ReleaseMethods;
-}
-export interface IRaise {
-    currency: string;
-    amount: number;
-}
-export interface ICapitalDetail {
-    release: IReleaseRule;
-    raise: IRaise;
-    price_per_icp: number;
-}
-export interface ITrustBy {
-    name: string;
-    link: string;
-    logo_id: number;
-    logo: number[];
-}
-export interface IModifyProjectArg {
-    id: number;
-    name: string;
-    description: string;
-    owner: string;
-    owner_info: string;
-    wallet_addr: string;
-    logo_id: number;
-    logo: number[];
-    roadmap_id: number;
-    roadmap: number[];
-    tags: string[];
-    links: string[];
-    contact_info: string[];
-    trust_by: ITrustBy;
-    tokenomics: ITokenomics;
-    team: ITeam;
-    capital_detail: ICapitalDetail;
-    memo: string;
-}
-export interface IPagedProjectArg {
-    page: number;
-    size: number;
-    query: string;
-}
-export interface IPagedProjectResult {
-    page: number;
-    size: number;
-    total: number;
-    data: IProject[];
-}
-export interface IListProjectArg {
-    status: ProjectStatus;
-}
-export interface IListProjectResult {
-    data: IProject[];
-}
-export declare enum ProjectStatus {
-    Enable = "Enable",
-    Disable = "Disable",
-    Pending = "Pending"
-}
-export declare enum ProgressStages {
-    UnOpen = "Unopen",
-    InProgress = "InProgress",
-    Completed = "Completed"
-}
 export interface IProject {
     id: number;
     name: string;
@@ -125,72 +33,303 @@ export interface IProject {
 export interface IProjectResult {
     success: boolean;
 }
+export interface IDistribution {
+    marketing: string;
+    team: string;
+}
+export interface ITeam {
+    name: string;
+    position: string;
+    picture_id: number;
+    picture: number[];
+    twitter?: string;
+}
+export interface ITokenomics {
+    symbol: string;
+    token: string;
+    total_supply: number;
+    distribution: IDistribution[];
+    did: string;
+}
+export interface IRaise {
+    currency: string;
+    amount: number;
+}
+export interface ICapitalDetail {
+    release: IReleaseRule;
+    raise: IRaise;
+    price_per_icp: number;
+}
+export interface ITrustBy {
+    name: string;
+    link: string;
+    logo_id: number;
+    logo: number[];
+}
+export interface IReleaseRule {
+    start_date: number;
+    amount_per_day: number;
+    method: ReleaseMethods;
+}
+export declare enum ReleaseMethods {
+    Linear = "Linear"
+}
+export declare enum ProgressStages {
+    UnOpen = "Unopen",
+    InProgress = "InProgress",
+    Completed = "Completed"
+}
+export declare enum ProjectStatus {
+    Enable = "Enable",
+    Disable = "Disable",
+    Pending = "Pending"
+}
 export declare enum ProjectErrors {
     NotFound = "NotFound",
     AlreadyExists = "AlreadyExists",
     AlreadyCompleted = "AlreadyCompleted",
     UserNotFound = "UserNotFound"
 }
-interface IApplyProjectCapitalDetailArg {
-    id: number;
-    capital_detail: ICapitalDetail;
+/**
+ * create project
+ */
+export interface ICreateProjectArg {
+    name: string;
 }
-interface IApplyProjectDescriptionArg {
+export interface ICreateProjectResult {
     id: number;
+}
+/**
+ * modify project
+ */
+export interface IModifyProjectArg {
+    id: number;
+    name: string;
     description: string;
-}
-interface IApplyProjectRoadmapArg {
-    id: number;
+    owner: string;
+    owner_info: string;
+    wallet_addr: string;
+    logo_id: number;
+    logo: number[];
+    roadmap_id: number;
     roadmap: number[];
-}
-interface IApplyProjectTeamArg {
-    id: number;
-    team: ITeam;
-}
-interface IApplyProjectTokenomicsArg {
-    id: number;
-    tokenomics: ITokenomics;
-}
-interface IApplyProjectTrustByArg {
-    id: number;
+    tags: string[];
+    links: string[];
+    contact_info: string[];
     trust_by: ITrustBy;
-}
-interface ICreateTransactionArg {
-    from: string;
-    to: string;
-    amount: number;
+    tokenomics: ITokenomics;
+    team: ITeam;
+    capital_detail: ICapitalDetail;
     memo: string;
 }
-interface ICreateTransactionResult {
-    id: number;
-}
-interface ITransaction {
-    id: number;
-    from_princiapl: string;
-    from: string;
-    to: string;
-    amount: number;
-    memo: string;
-    is_finalize: boolean;
-    block_height: number;
-    created_at: number;
-}
-interface IPagedTransactionArg {
+/**
+ * get paged project
+ */
+export interface IGetPagedProjectArg {
     page: number;
     size: number;
     query: string;
 }
-interface IPagedTransactionResult {
+export interface IPagedProjectResult {
+    page: number;
+    size: number;
+    total: number;
+    data: IProject[];
+}
+/**
+ * get list project
+ */
+export interface IGetListProjectArg {
+    status: ProjectStatus;
+}
+export interface IGetListProjectResult {
+    data: IProject[];
+}
+/**
+ * apply project capital
+ */
+interface IApplyProjectCapitalArg {
+    id: number;
+    capital_detail: ICapitalDetail;
+}
+/**
+ * apply project description
+ */
+interface IApplyProjectDescriptionArg {
+    id: number;
+    description: string;
+}
+/**
+ * apply project roadmap
+ */
+interface IApplyProjectRoadmapArg {
+    id: number;
+    roadmap: number[];
+}
+/**
+ * apply project team
+ */
+interface IApplyProjectTeamArg {
+    id: number;
+    team: ITeam;
+}
+/**
+ * apply project tokenomics
+ */
+interface IApplyProjectTokenomicsArg {
+    id: number;
+    tokenomics: ITokenomics;
+}
+/**
+ * apply project trust by
+ */
+interface IApplyProjectTrustByArg {
+    id: number;
+    trust_by: ITrustBy;
+}
+/**
+ *******************************************************************************
+ ********************************** Proposal ***********************************
+ *******************************************************************************
+ */
+interface IClaimProposal {
+    id: number;
+    proposer: string;
+    voters: string[];
+    state: ProposalStates;
+    failed_reason: string | null;
+    payload: IProposalPayload;
+    votes_yes: IProposalWeight;
+    votes_no: IProposalWeight;
+    created_at: number;
+}
+interface IProposalWeight {
+    amount_e8s: number;
+}
+interface IProposalPayload {
+    canister_id: string;
+    method: string;
+    message: number[];
+}
+/**
+ * create claim proposal
+ */
+interface ICreateClaimProposalArg {
+    canister_id: string;
+    method: string;
+    message: number[];
+}
+interface ICreateClaimProposalResult {
+    id: number;
+}
+/**
+ * get claim proposal
+ */
+interface IGetClaimProposal {
+    id: number;
+}
+/**
+ * get paged claim proposal
+ */
+interface IGetPagedClaimProposalArg {
+    page: number;
+    size: number;
+    query: string;
+}
+interface IGetPagedClaimProposalResult {
+    page: number;
+    size: number;
+    total: number;
+    data: IClaimProposal[];
+}
+/**
+ * vote claim proposal
+ */
+interface IVoteClaimProposalArg {
+    proposal_id: number;
+    vote: Votes;
+}
+interface IVoteClaimProposalResult {
+    state: ProposalStates;
+    failed_reason: string | null;
+}
+export declare enum ProposalStates {
+    Open = "Open",
+    Executing = "Executing",
+    Accepted = "Accepted",
+    Succeeded = "Succeeded",
+    Rejected = "Rejected",
+    Failed = "Failed"
+}
+declare enum Votes {
+    Yes = "Yes",
+    No = "No"
+}
+export declare enum ProposalClaimErrors {
+    NotFound = "NotFound",
+    AlreadyExists = "AlreadyExists",
+    Invalid = "Invalid"
+}
+/**
+ *******************************************************************************
+ ******************************** Transaction **********************************
+ *******************************************************************************
+ */
+interface ITransaction {
+    tx_id: number;
+    project_id: number;
+    from_principal: string;
+    from: string;
+    to: string;
+    amount: number;
+    memo: number;
+    is_finalize: boolean;
+    block_height: number;
+    created_at: number;
+}
+/**
+ * create transaction
+ */
+interface ICreateTransactionArg {
+    id: number;
+    from: string;
+    to: string;
+    amount: number;
+    memo: number;
+}
+interface ICreateTransactionResult {
+    id: number;
+}
+/**
+ * modify transaction
+ */
+interface IModifyTransactionArg {
+    project_id: number;
+    tx_id: number;
+    amount: number;
+    block_height: number;
+    memo: number;
+}
+/**
+ * get paged transaction
+ */
+interface IGetPagedTransactionArg {
+    page: number;
+    size: number;
+    query: string;
+}
+interface IGetPagedTransactionResult {
     page: number;
     size: number;
     total: number;
     data: ITransaction[];
 }
-interface IModifyTransactionArg {
-    id: number;
-    amount: number;
+/**
+ * verify transaction
+ */
+interface IVerifyTransactionArg {
+    project_id: number;
     block_height: number;
-    memo: string;
 }
 interface ITransactionResult {
     success: boolean;
@@ -200,26 +339,10 @@ export declare enum TransactionErrors {
     AlreadyExists = "AlreadyExists"
 }
 /**
- * user
+ *******************************************************************************
+ ************************************ User *************************************
+ *******************************************************************************
  */
-export interface ICreateUserArg {
-    name: string;
-    email: string;
-    memo: string;
-}
-export interface ICreateUserResult {
-    name: string;
-}
-export interface IModifyUserArg {
-    name: string;
-    email: string;
-    avatar_uri: string;
-    avatar_id: bigint;
-    biography: string;
-    interests: string[];
-    status: UserStatus;
-    memo: string;
-}
 export interface IUser {
     id: number;
     name: string;
@@ -236,6 +359,30 @@ export interface IUser {
 export interface IUserResult {
     success: boolean;
 }
+/**
+ * create user
+ */
+export interface ICreateUserArg {
+    name: string;
+    email: string;
+    memo: string;
+}
+export interface ICreateUserResult {
+    name: string;
+}
+/**
+ * modify user
+ */
+export interface IModifyUserArg {
+    name: string;
+    email: string;
+    avatar_uri: string;
+    avatar_id: bigint;
+    biography: string;
+    interests: string[];
+    status: UserStatus;
+    memo: string;
+}
 export declare enum UserStatus {
     Enable = "Enable",
     Disable = "Disable"
@@ -245,11 +392,19 @@ export declare enum UserErrors {
     AlreadyCompleted = "AlreadyCompleted",
     NotFound = "NotFound"
 }
+/**
+ *******************************************************************************
+ ********************************** Canister ***********************************
+ *******************************************************************************
+ */
 export declare class DaowActor extends BaseActor<_SERVICE> {
     /**
      * 创建actor
      */
     create(cid: string, options?: ICreateActorOptions): Promise<DaowActor>;
+    /**
+     ********************************* Project ***********************************
+     */
     /**
      * create project
      */
@@ -262,6 +417,9 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      * modify project
      */
     modifyProject(project: IModifyProjectArg): Promise<IProjectResult>;
+    /**
+     * submit project
+     */
     submitProject(id: number): Promise<IProjectResult>;
     /**
      * get project
@@ -270,15 +428,15 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
     /**
      * get paged project
      */
-    getPagedProject(arg: IPagedProjectArg): Promise<IPagedProjectResult>;
+    getPagedProject(arg: IGetPagedProjectArg): Promise<IPagedProjectResult>;
     /**
      * get list project
      */
-    getListProject(arg: IListProjectArg): Promise<IListProjectResult>;
+    getListProject(arg: IGetListProjectArg): Promise<IGetListProjectResult>;
     /**
-     * apply project capital detail
+     * apply project capital
      */
-    applyProjectCapitalDetail(arg: IApplyProjectCapitalDetailArg): Promise<IProjectResult>;
+    applyProjectCapital(arg: IApplyProjectCapitalArg): Promise<IProjectResult>;
     /**
      * apply project description
      */
@@ -300,9 +458,39 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      */
     applyProjectTrustBy(arg: IApplyProjectTrustByArg): Promise<IProjectResult>;
     /**
+     ****************************** Claim Proposal *******************************
+     */
+    /**
+     * create claim proposal
+     */
+    createClaimProposal(arg: ICreateClaimProposalArg): Promise<ICreateClaimProposalResult>;
+    /**
+     * vote claim proposal
+     */
+    voteClaimProposal(arg: IVoteClaimProposalArg): Promise<IVoteClaimProposalResult>;
+    /**
+     * get claim proposal
+     */
+    getClaimProposal(arg: IGetClaimProposal): Promise<IClaimProposal>;
+    /**
+     * get paged claim proposal
+     */
+    getPagedClaimProposal(arg: IGetPagedClaimProposalArg): Promise<IGetPagedClaimProposalResult>;
+    /**
+     ******************************** Transaction ********************************
+     */
+    /**
      * create transaction
      */
     createTransaction(arg: ICreateTransactionArg): Promise<ICreateTransactionResult>;
+    /**
+     * modify transaction
+     */
+    modifyTransaction(arg: IModifyTransactionArg): Promise<ITransactionResult>;
+    /**
+     * verify transaction
+     */
+    verifyTransaction(arg: IVerifyTransactionArg): Promise<ITransactionResult>;
     /**
      * get transaction
      */
@@ -310,11 +498,10 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
     /**
      * get paged transactions
      */
-    getPagedTransaction(arg: IPagedTransactionArg): Promise<IPagedTransactionResult>;
+    getPagedTransaction(arg: IGetPagedTransactionArg): Promise<IGetPagedTransactionResult>;
     /**
-     * modify transaction
+     ********************************** User *************************************
      */
-    modifyTransaction(arg: IModifyTransactionArg): Promise<ITransactionResult>;
     /**
      * create user
      */
@@ -343,6 +530,9 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      * greet
      */
     greet(input: string): Promise<string>;
+    /**
+     ***************************** Private Methods *******************************
+     */
     private toCreateProjectCommand;
     private fromProjectCreatedResult;
     private toProjectPageQuery;
@@ -367,5 +557,6 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
     private toUserEditCommand;
     private fromBoolUserResult;
     private fromUserResult;
+    private fromClaimProposal;
 }
 export {};

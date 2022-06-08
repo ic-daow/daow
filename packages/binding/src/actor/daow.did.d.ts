@@ -12,7 +12,36 @@ export interface CapitalDetail {
   'raise' : Raise,
   'price_per_icp' : bigint,
 }
+export type ClaimError = { 'ProjectInvalid' : null } |
+  { 'ProposalNotFound' : null } |
+  { 'ProposalAlreadyExists' : null };
+export interface ClaimProposal {
+  'id' : bigint,
+  'votes_no' : Weights,
+  'voters' : Array<Principal>,
+  'created_at' : bigint,
+  'state' : ProposalState,
+  'proposer' : Principal,
+  'votes_yes' : Weights,
+  'payload' : ProposalPayload,
+}
+export interface ClaimProposalGetQuery { 'id' : bigint }
+export interface ClaimProposalPage {
+  'page_size' : bigint,
+  'data' : Array<ClaimProposal>,
+  'page_num' : bigint,
+  'total_count' : bigint,
+}
+export type ClaimProposalPageResult = { 'Ok' : ClaimProposalPage } |
+  { 'Err' : ClaimError };
+export type ClaimProposalResult = { 'Ok' : ClaimProposal } |
+  { 'Err' : ClaimError };
 export interface Distribution { 'marketing' : string, 'team' : string }
+export interface PageQuery {
+  'page_size' : bigint,
+  'querystring' : string,
+  'page_num' : bigint,
+}
 export type ProgressStage = { 'Unopen' : null } |
   { 'InProgress' : null } |
   { 'Completed' : null };
@@ -74,11 +103,6 @@ export interface ProjectPage {
   'page_num' : bigint,
   'total_count' : bigint,
 }
-export interface ProjectPageQuery {
-  'page_size' : bigint,
-  'querystring' : string,
-  'page_num' : bigint,
-}
 export type ProjectPageResult = { 'Ok' : ProjectPage } |
   { 'Err' : ProjectError };
 export interface ProjectProfile {
@@ -94,6 +118,8 @@ export interface ProjectProfile {
   'tags' : Array<string>,
   'team' : Team,
   'description' : string,
+  'actual_raise' : bigint,
+  'claimed' : bigint,
   'capital_detail' : CapitalDetail,
   'created_at' : bigint,
   'links' : Array<string>,
@@ -111,6 +137,19 @@ export type ProjectResult = { 'Ok' : ProjectProfile } |
 export type ProjectStatus = { 'Enable' : null } |
   { 'Disable' : null } |
   { 'Pending' : null };
+export interface ProposalPayload {
+  'method' : string,
+  'canister_id' : Principal,
+  'message' : Array<number>,
+}
+export type ProposalState = { 'Failed' : string } |
+  { 'Open' : null } |
+  { 'Executing' : null } |
+  { 'Rejected' : null } |
+  { 'Succeeded' : null } |
+  { 'Accepted' : null };
+export type ProposalSubmitResult = { 'Ok' : bigint } |
+  { 'Err' : ClaimError };
 export interface Raise { 'currency' : string, 'amount' : bigint }
 export type RegisterUserResult = { 'Ok' : string } |
   { 'Err' : UserError };
@@ -137,7 +176,8 @@ export interface Tokenomics {
 export interface TransactionCreateCommand {
   'to' : string,
   'from' : string,
-  'memo' : string,
+  'memo' : bigint,
+  'project_id' : bigint,
   'amount' : bigint,
 }
 export type TransactionCreatedResult = { 'Ok' : bigint } |
@@ -151,21 +191,17 @@ export interface TransactionPage {
   'page_num' : bigint,
   'total_count' : bigint,
 }
-export interface TransactionPageQuery {
-  'page_size' : bigint,
-  'querystring' : string,
-  'page_num' : bigint,
-}
 export type TransactionPageResult = { 'Ok' : TransactionPage } |
   { 'Err' : TransactionError };
 export interface TransactionProfile {
   'id' : bigint,
   'to' : string,
   'from' : string,
-  'memo' : string,
+  'memo' : bigint,
   'created_at' : bigint,
   'from_princiapl' : Principal,
   'is_finalize' : boolean,
+  'project_id' : bigint,
   'amount' : bigint,
   'block_height' : bigint,
 }
@@ -173,8 +209,13 @@ export type TransactionResult = { 'Ok' : TransactionProfile } |
   { 'Err' : TransactionError };
 export interface TransactionUpdateCommand {
   'transaction_id' : bigint,
-  'memo' : string,
+  'memo' : bigint,
+  'project_id' : bigint,
   'amount' : bigint,
+  'block_height' : bigint,
+}
+export interface TransactionValidCommand {
+  'project_id' : bigint,
   'block_height' : bigint,
 }
 export interface TrustBy {
@@ -218,6 +259,12 @@ export type UserResult = { 'Ok' : UserProfile } |
   { 'Err' : UserError };
 export type UserStatus = { 'Enable' : null } |
   { 'Disable' : null };
+export type Vote = { 'No' : null } |
+  { 'Yes' : null };
+export interface VoteArgs { 'vote' : Vote, 'proposal_id' : bigint }
+export type VoteResult = { 'Ok' : ProposalState } |
+  { 'Err' : string };
+export interface Weights { 'amount_e8s' : bigint }
 export interface _SERVICE {
   'apply_project_capital_detail' : ActorMethod<
     [ProjectApplyCapitalDetailCommand],
@@ -253,23 +300,34 @@ export interface _SERVICE {
   'edit_project' : ActorMethod<[ProjectEditCommand], BoolProjectResult>,
   'edit_user' : ActorMethod<[UserEditCommand], BoolUserResult>,
   'enable_user' : ActorMethod<[Principal], BoolUserResult>,
+  'get_claim_proposal' : ActorMethod<
+    [ClaimProposalGetQuery],
+    ClaimProposalResult,
+  >,
   'get_project' : ActorMethod<[ProjectIdCommand], ProjectResult>,
   'get_self' : ActorMethod<[], UserResult>,
   'get_transaction' : ActorMethod<[TransactionIdCommand], TransactionResult>,
   'get_user' : ActorMethod<[string], BoolUserResult>,
   'greet' : ActorMethod<[string], string>,
   'list_projects' : ActorMethod<[ProjectListQuery], ProjectListResult>,
-  'page_project' : ActorMethod<[ProjectPageQuery], ProjectPageResult>,
-  'page_transaction' : ActorMethod<
-    [TransactionPageQuery],
-    TransactionPageResult,
-  >,
+  'page_claim_proposals' : ActorMethod<[PageQuery], ClaimProposalPageResult>,
+  'page_projects' : ActorMethod<[PageQuery], ProjectPageResult>,
+  'page_transactions' : ActorMethod<[PageQuery], TransactionPageResult>,
   'register_user' : ActorMethod<[UserRegisterCommand], RegisterUserResult>,
+  'submit_claim_proposal' : ActorMethod<
+    [ProposalPayload],
+    ProposalSubmitResult,
+  >,
   'submit_projet' : ActorMethod<[ProjectIdCommand], BoolProjectResult>,
   'update_transaction' : ActorMethod<
     [TransactionUpdateCommand],
     BoolTransactionResult,
   >,
+  'valid_transaction' : ActorMethod<
+    [TransactionValidCommand],
+    BoolTransactionResult,
+  >,
+  'vote_claim_proposal' : ActorMethod<[VoteArgs], VoteResult>,
 }
 import type { IDL } from '@dfinity/candid';
 export const idlFactory: IDL;
