@@ -158,6 +158,8 @@ const idlFactory = ({ IDL }) => {
     const ClaimError = IDL.Variant({
         'ProjectInvalid': IDL.Null,
         'ProposalNotFound': IDL.Null,
+        'VoterAlreadyVoted': IDL.Null,
+        'ProposalStateNotOpen': IDL.Null,
         'ProposalAlreadyExists': IDL.Null,
     });
     const ClaimProposalResult = IDL.Variant({

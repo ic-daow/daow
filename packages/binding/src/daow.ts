@@ -452,6 +452,8 @@ export enum ProposalClaimErrors {
   NotFound = 'NotFound',
   AlreadyExists = 'AlreadyExists',
   Invalid = 'Invalid',
+  AlreadyVoted = 'AlreadyVoted',
+  NotOpen = 'NotOpen',
 }
 
 function fromClaimError(error: ClaimError): ProposalClaimErrors {
@@ -461,6 +463,10 @@ function fromClaimError(error: ClaimError): ProposalClaimErrors {
     return ProposalClaimErrors.AlreadyExists
   } else if ('ProjectInvalid' in error) {
     return ProposalClaimErrors.Invalid
+  } else if ('VoterAlreadyVoted' in error) {
+    return ProposalClaimErrors.AlreadyVoted
+  } else if ('ProposalStateNotOpen' in error) {
+    return ProposalClaimErrors.NotOpen
   } else {
     throw new Error('unimplemented')
   }

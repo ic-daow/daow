@@ -14,6 +14,8 @@ export interface CapitalDetail {
 }
 export type ClaimError = { 'ProjectInvalid' : null } |
   { 'ProposalNotFound' : null } |
+  { 'VoterAlreadyVoted' : null } |
+  { 'ProposalStateNotOpen' : null } |
   { 'ProposalAlreadyExists' : null };
 export interface ClaimProposal {
   'id' : bigint,
