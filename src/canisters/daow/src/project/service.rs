@@ -56,9 +56,10 @@ impl ProjectService {
 
     pub fn edit_project(&mut self, cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
         self.projects
-            .iter_mut()
-            .find(|(_, p)| p.name != cmd.name)
-            .map(|(_, p)| { cmd.merge_profile(p); true })
+            .get_mut(&cmd.id)
+            // .iter_mut()
+            // .find(|(_, p)| p.name != cmd.name)
+            .map(|p| { cmd.merge_profile(p); true })
             .ok_or(ProjectError::ProjectAlreadyExists)
     }
 
