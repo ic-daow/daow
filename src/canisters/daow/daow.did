@@ -76,7 +76,7 @@ type ProjectProfile = record {
     tags: vec text;
     memo: text;
     progress : ProgressStage;
-    actual_raise: nat64;
+    actual_raised: nat64;
     claimed: nat64;
     status : ProjectStatus;
     created_at : nat64;
