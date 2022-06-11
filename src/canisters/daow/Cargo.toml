@@ -12,6 +12,7 @@ crate-type = ["cdylib"]
 [dependencies]
 anyhow = "1.0.56"
 candid = "0.7"
+hex = "0"
 ic-cdk = "0.5"
 ic-cdk-macros = "0.5"
 ic-ledger-types = "0.1"

@@ -111,6 +111,11 @@ impl ProjectProfile {
     pub fn add_actual_raised(&mut self, amount: u64) {
         self.actual_raised += amount;
     }
+
+    pub fn add_claimed(&mut self, amount_e8s: u64) {
+        self.claimed += amount_e8s;
+    }
+    
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]

@@ -93,6 +93,13 @@ impl ProjectService {
             .ok_or(ProjectError::ProjectNotFound)
     }
 
+    pub fn add_claimed_amount_e8s(&mut self, id: &u64, amount_e8s: u64) -> Result<(), ProjectError> {
+        self.projects
+            .get_mut(id)
+            .map(|p| p.add_claimed(amount_e8s))
+            .ok_or(ProjectError::ProjectNotFound)
+    }
+
     pub fn delete_project(&mut self, id: &u64) -> Option<ProjectProfile> {
         self.projects.remove(&id)
     }

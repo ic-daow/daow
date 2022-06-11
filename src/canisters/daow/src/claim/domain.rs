@@ -28,7 +28,7 @@ impl ClaimProposal {
             Vote::No => self.votes_no += weights,
         }
     }
-    
+
     pub fn refresh_state(&mut self) {
         if self.votes_yes > self.vote_threshold {
             self.state = ProposalState::Accepted;
@@ -42,9 +42,11 @@ impl ClaimProposal {
 #[derive(Clone, Debug, CandidType, Deserialize)]
 pub struct ProposalPayload {
     pub project_id: u64,
-    pub canister_id: Principal,
-    pub method: String,
-    pub message: Vec<u8>,
+    pub amount_e8s: u64,
+    pub recipient_principal: String,
+    // pub canister_id: Principal,
+    // pub method: String,
+    // pub message: Vec<u8>,
 }
 
 impl ProposalPayload {
@@ -61,6 +63,12 @@ impl ProposalPayload {
             created_at
         }
     }
+}
+
+#[derive(Clone, Debug, CandidType, Deserialize)]
+pub struct TransferCommand {
+    pub amount_e8s: u64,
+    pub recipient_principal: String,
 }
 
 #[derive(Clone, Debug, CandidType, Deserialize)]
@@ -154,3 +162,4 @@ pub struct ClaimProposalPage {
     pub page_num: usize,
     pub total_count: usize,
 }
+
