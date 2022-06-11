@@ -71,7 +71,7 @@ export interface IProject {
   contact_info: string[]
   roadmap_id: number
   roadmap: number[]
-  actual_raise: number
+  actual_raised: number
   tokenomics: ITokenomics
   team: ITeam
   trust_by: ITrustBy
@@ -1101,7 +1101,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
       logo_id: Number(from.logo_id),
       roadmap_id: Number(from.roadmap_id),
       trust_by: this.fromTrustBy(from.trust_by),
-      actual_raise: Number(from.actual_raise),
+      actual_raised: Number(from.actual_raised),
       tokenomics: this.fromTokenomics(from.tokenomics),
       team: this.fromTeam(from.team),
       capital_detail: this.fromCapitalDetail(from.capital_detail),

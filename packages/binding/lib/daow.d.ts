@@ -23,7 +23,7 @@ export interface IProject {
     contact_info: string[];
     roadmap_id: number;
     roadmap: number[];
-    actual_raise: number;
+    actual_raised: number;
     tokenomics: ITokenomics;
     team: ITeam;
     trust_by: ITrustBy;
