@@ -11,7 +11,7 @@ use super::{
 };
 
 #[update] 
-fn create_transactoin(cmd: TransactionCreateCommand) -> Result<TransactionId, TransactionError> {
+fn create_transaction(cmd: TransactionCreateCommand) -> Result<TransactionId, TransactionError> {
     CONTEXT.with(|c| {      
         let mut ctx = c.borrow_mut();
         let id = ctx.id;
