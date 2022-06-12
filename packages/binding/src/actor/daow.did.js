@@ -82,6 +82,9 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Nat64,
   });
   const TransactionError = IDL.Variant({
+    'ProjectInvalid' : IDL.Null,
+    'TransactionNotFinalized' : IDL.Null,
+    'TransactionBlockHeightNotValid' : IDL.Null,
     'TransactionAlreadyExists' : IDL.Null,
     'TransactionNotFound' : IDL.Null,
   });

@@ -294,7 +294,7 @@ interface ITransaction {
  * create transaction
  */
 interface ICreateTransactionArg {
-    id: number;
+    project_id: number;
     from: string;
     to: string;
     amount: number;
@@ -339,7 +339,10 @@ interface ITransactionResult {
 }
 export declare enum TransactionErrors {
     NotFound = "NotFound",
-    AlreadyExists = "AlreadyExists"
+    AlreadyExists = "AlreadyExists",
+    NotFinalized = "NotFinalized",
+    BlockHeightNotValid = "BlockHeightNotValid",
+    ProjectInvalid = "ProjectInvalid"
 }
 /**
  *******************************************************************************

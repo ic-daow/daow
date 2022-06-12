@@ -496,7 +496,7 @@ interface ITransaction {
  * create transaction
  */
 interface ICreateTransactionArg {
-  id: number
+  project_id: number
   from: string
   to: string
   amount: number
@@ -549,6 +549,9 @@ interface ITransactionResult {
 export enum TransactionErrors {
   NotFound = 'NotFound',
   AlreadyExists = 'AlreadyExists',
+  NotFinalized = 'NotFinalized',
+  BlockHeightNotValid = 'BlockHeightNotValid',
+  ProjectInvalid = 'ProjectInvalid',
 }
 
 function fromTransactionError(error: TransactionError): TransactionErrors {
@@ -556,6 +559,12 @@ function fromTransactionError(error: TransactionError): TransactionErrors {
     return TransactionErrors.AlreadyExists
   } else if ('TransactionNotFound' in error) {
     return TransactionErrors.NotFound
+  } else if ('TransactionNotFinalized' in error) {
+    return TransactionErrors.NotFinalized
+  } else if ('BlockHeightNotValid' in error) {
+    return TransactionErrors.BlockHeightNotValid
+  } else if ('ProjectInvalid' in error) {
+    return TransactionErrors.ProjectInvalid
   } else {
     throw new Error('unimplemented')
   }
@@ -898,7 +907,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   public async createTransaction(arg: ICreateTransactionArg): Promise<ICreateTransactionResult> {
     const result = await this.getActor().create_transaction({
       ...arg,
-      project_id: BigInt(arg.id),
+      project_id: BigInt(arg.project_id),
       amount: BigInt(arg.amount),
       memo: BigInt(arg.memo),
     })

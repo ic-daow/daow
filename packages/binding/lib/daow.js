@@ -175,6 +175,9 @@ var TransactionErrors;
 (function (TransactionErrors) {
     TransactionErrors["NotFound"] = "NotFound";
     TransactionErrors["AlreadyExists"] = "AlreadyExists";
+    TransactionErrors["NotFinalized"] = "NotFinalized";
+    TransactionErrors["BlockHeightNotValid"] = "BlockHeightNotValid";
+    TransactionErrors["ProjectInvalid"] = "ProjectInvalid";
 })(TransactionErrors = exports.TransactionErrors || (exports.TransactionErrors = {}));
 function fromTransactionError(error) {
     if ('TransactionAlreadyExists' in error) {
@@ -182,6 +185,15 @@ function fromTransactionError(error) {
     }
     else if ('TransactionNotFound' in error) {
         return TransactionErrors.NotFound;
+    }
+    else if ('TransactionNotFinalized' in error) {
+        return TransactionErrors.NotFinalized;
+    }
+    else if ('BlockHeightNotValid' in error) {
+        return TransactionErrors.BlockHeightNotValid;
+    }
+    else if ('ProjectInvalid' in error) {
+        return TransactionErrors.ProjectInvalid;
     }
     else {
         throw new Error('unimplemented');
@@ -424,7 +436,7 @@ class DaowActor extends actor_1.BaseActor {
     async createTransaction(arg) {
         const result = await this.getActor().create_transaction({
             ...arg,
-            project_id: BigInt(arg.id),
+            project_id: BigInt(arg.project_id),
             amount: BigInt(arg.amount),
             memo: BigInt(arg.memo),
         });

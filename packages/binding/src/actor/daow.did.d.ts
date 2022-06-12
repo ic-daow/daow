@@ -184,7 +184,10 @@ export interface TransactionCreateCommand {
 }
 export type TransactionCreatedResult = { 'Ok' : bigint } |
   { 'Err' : TransactionError };
-export type TransactionError = { 'TransactionAlreadyExists' : null } |
+export type TransactionError = { 'ProjectInvalid' : null } |
+  { 'TransactionNotFinalized' : null } |
+  { 'TransactionBlockHeightNotValid' : null } |
+  { 'TransactionAlreadyExists' : null } |
   { 'TransactionNotFound' : null };
 export interface TransactionIdCommand { 'id' : bigint }
 export interface TransactionPage {

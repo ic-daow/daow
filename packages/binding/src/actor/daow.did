@@ -1,4 +1,3 @@
-
 type UserRegisterCommand = record {
     email: text;
     name: text;
@@ -85,7 +84,7 @@ type ProjectProfile = record {
 
 type Tokenomics = record {
     token : text;
-    did :  text;
+    did : text;
     symbol : text;
     total_supply : nat64;
     distribution : vec Distribution;
@@ -145,7 +144,7 @@ type ProjectStatus = variant {
 };
 
 type ProjectCreateCommand = record {
-    name: text;   
+    name: text;
 };
 
 type ProjectIdCommand = record {
@@ -227,10 +226,10 @@ type ProjectApplyCapitalDetailCommand = record {
 };
 
 type ProjectPage = record {
-   data: vec ProjectProfile;
-   page_num: nat64;
-   page_size: nat64;
-   total_count: nat64
+    data: vec ProjectProfile;
+    page_num: nat64;
+    page_size: nat64;
+    total_count: nat64
 };
 
 type PageQuery = record {
@@ -304,15 +303,18 @@ type TransactionResult = variant {
 };
 
 type TransactionError = variant {
-    TransactionAlreadyExists;
     TransactionNotFound;
+    TransactionNotFinalized;
+    TransactionBlockHeightNotValid;
+    TransactionAlreadyExists;
+    ProjectInvalid;
 };
 
 type TransactionPage = record {
-   data: vec TransactionProfile;
-   page_num: nat64;
-   page_size: nat64;
-   total_count: nat64
+    data: vec TransactionProfile;
+    page_num: nat64;
+    page_size: nat64;
+    total_count: nat64
 };
 
 type TransactionPageResult = variant {
@@ -404,10 +406,10 @@ type ClaimError = variant {
 };
 
 type ClaimProposalPage = record {
-   data: vec ClaimProposal;
-   page_num: nat64;
-   page_size: nat64;
-   total_count: nat64
+    data: vec ClaimProposal;
+    page_num: nat64;
+    page_size: nat64;
+    total_count: nat64
 };
 
 type ClaimProposalPageResult = variant {
@@ -416,7 +418,7 @@ type ClaimProposalPageResult = variant {
 };
 
 service : {
- 
+
     "greet": (text) -> (text) query;
 
     "register_user": (UserRegisterCommand) -> (RegisterUserResult);
