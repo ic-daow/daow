@@ -8,4 +8,5 @@ pub enum ClaimError {
     ProposalStateNotOpen,
     ProjectInvalid,
     VoterAlreadyVoted,
+    ClaimAmountExceedUpperLimit,
 }

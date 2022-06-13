@@ -72,15 +72,22 @@ impl ProjectService {
             })
     }
 
-    pub fn submit(&mut self, id: &u64) -> Result<bool, ProjectError> {
-        self.projects
-            .get_mut(id)
-            .map(|p| {
+    pub fn submit(&mut self, id: &u64, submit_time: u64) -> Result<bool, ProjectError> {
+        
+        match self.projects.get_mut(id) {
+            Some(p) => {
+                // 如果 提交 项目的时间比 提款 时间晚，返回错误
+                if submit_time > p.capital_detail.release.start_date {
+                    return Err(ProjectError::ProjectReleaseTimeTooEarly);
+                }
+                
                 p.change_status(ProjectStatus::Enable);
                 p.change_progress(ProgressStage::InProgress);
-                true
-            })
-            .ok_or(ProjectError::ProjectNotFound)
+                p.refresh_update_at(submit_time);
+                Ok(true)
+            }
+            None => Err(ProjectError::ProjectNotFound)
+        }
     }
 
     pub fn add_actula_raised(&mut self, id: &u64, amount: u64) -> Result<bool, ProjectError> {
@@ -93,15 +100,18 @@ impl ProjectService {
             .ok_or(ProjectError::ProjectNotFound)
     }
 
-    pub fn add_claimed_amount_e8s(&mut self, id: &u64, amount_e8s: u64) -> Result<(), ProjectError> {
+    pub fn update_claimed_info(&mut self, id: &u64, amount_e8s: u64, claim_time: u64) -> Result<(), ProjectError> {
         self.projects
             .get_mut(id)
-            .map(|p| p.add_claimed(amount_e8s))
+            .map(|p| {
+                p.add_claimed(amount_e8s);
+                p.update_lastes_claim_time(claim_time)
+            })
             .ok_or(ProjectError::ProjectNotFound)
     }
 
     pub fn delete_project(&mut self, id: &u64) -> Option<ProjectProfile> {
-        self.projects.remove(&id)
+        self.projects.remove(id)
     }
 
     pub fn page_projects(&self, query_args: ProjectPageQuery) -> ProjectPage {

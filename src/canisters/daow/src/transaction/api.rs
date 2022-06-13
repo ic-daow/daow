@@ -5,6 +5,7 @@ use ic_cdk_macros::*;
 use ic_ledger_types::{BlockIndex, GetBlocksArgs, MAINNET_LEDGER_CANISTER_ID, Block};
 
 use crate::CONTEXT;
+
 use super::{
     domain::*, 
     error:: TransactionError,
@@ -20,6 +21,7 @@ fn create_transaction(cmd: TransactionCreateCommand) -> Result<TransactionId, Tr
 
         match ctx.project_service.get_project(cmd.project_id) {
             Some(p) if p.valid_status() && p.valid_progress() => {
+                
                 ctx.transaction_service
                     .create_transaction(cmd, id, caller, now)   
                     .map(|id| {

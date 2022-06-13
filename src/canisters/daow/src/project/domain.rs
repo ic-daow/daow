@@ -69,6 +69,7 @@ pub struct ProjectProfile {
     pub progress: ProgressStage,
     pub actual_raised: u64, // 实际募到的款项
     pub claimed: u64,       // 已经取出的款项
+    pub latest_claim_at: Option<u64>, // 最近一次取钱的时间
     pub status: ProjectStatus,
     pub created_at: Timestamp,
     pub updated_at: Timestamp,
@@ -87,6 +88,10 @@ impl ProjectProfile {
 
     pub fn change_progress(&mut self, new_stage: ProgressStage) {
         self.progress = new_stage;
+    }
+    
+    pub fn refresh_update_at(&mut self, update_time: u64) {
+        self.updated_at = update_time;
     }
     
     pub fn valid_status(&self) -> bool {
@@ -115,59 +120,63 @@ impl ProjectProfile {
     pub fn add_claimed(&mut self, amount_e8s: u64) {
         self.claimed += amount_e8s;
     }
+
+    pub fn update_lastes_claim_time(&mut self, claim_time: u64) {
+        self.latest_claim_at = Some(claim_time);
+    }
     
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct Tokenomics {
-    token: String,
-    did: String,
-    symbol: String,
-    total_supply: u64,
-    distribution: Vec<Distribution>,
+    pub token: String,
+    pub did: String,
+    pub symbol: String,
+    pub total_supply: u64,
+    pub distribution: Vec<Distribution>,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct Distribution {
-    team: String,
-    marketing: String
+    pub team: String,
+    pub marketing: String
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct Team {
-    name: String,
-    position: String,
-    twitter: Option<String>,
-    picture: Blob,
-    picture_id: u64,
+    pub name: String,
+    pub position: String,
+    pub twitter: Option<String>,
+    pub picture: Blob,
+    pub picture_id: u64,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct TrustBy {
-    name: String,
-    link: String,
-    logo: Blob,
-    logo_id: u64,
+    pub name: String,
+    pub link: String,
+    pub logo: Blob,
+    pub logo_id: u64,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct CapitalDetail {
-    raise: Raise,
-    price_per_icp: u64,
-    release: ReleaseRule,
+    pub raise: Raise,
+    pub price_per_icp: u64,
+    pub release: ReleaseRule,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct Raise {
-    currency: String,
-    amount: u64,
+    pub currency: String,
+    pub amount: u64,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize, Default)]
 pub struct ReleaseRule {
-    method: ReleaseMethod,
-    amount_per_day: u64,
-    start_date: u64,
+    pub method: ReleaseMethod,
+    pub amount_per_day: u64,
+    pub start_date: u64,
 }
 
 #[derive(Debug, Clone, CandidType, Deserialize)]

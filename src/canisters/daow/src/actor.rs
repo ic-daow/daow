@@ -4,6 +4,7 @@ use std::iter::FromIterator;
 use ic_cdk::{caller, id, print};
 use ic_cdk_macros::*;
 use ic_cdk::storage;
+use ic_ledger_types::{MAINNET_LEDGER_CANISTER_ID, AccountBalanceArgs, AccountIdentifier, DEFAULT_SUBACCOUNT, Tokens};
 
 use crate::context::{DaoContext, DaoDataStorage};
 
@@ -35,6 +36,19 @@ fn init_cainster() {
     };
 
     CONTEXT.with(|c| *c.borrow_mut() = context);
+}
+
+#[update]
+async fn canister_balance() -> Tokens {  
+    match ic_ledger_types::account_balance(
+        MAINNET_LEDGER_CANISTER_ID,
+        AccountBalanceArgs {
+            account: AccountIdentifier::new(&ic_cdk::api::id(), &DEFAULT_SUBACCOUNT)
+        }
+    ).await {
+        Ok(t) => t,
+        _ => Tokens::from_e8s(0)
+    }    
 }
 
 #[pre_upgrade]

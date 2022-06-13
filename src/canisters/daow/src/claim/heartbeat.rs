@@ -46,8 +46,9 @@ async fn execute_claim_proposal(proposal: ClaimProposal) -> Result<(), String> {
     // 更新 项目 Claimed 的数量
     CONTEXT.with(|c| {
         let mut ctx = c.borrow_mut();
+        let claim_time = ctx.env.now();
         ctx.project_service
-            .add_claimed_amount_e8s(&proposal.payload.project_id, proposal.payload.amount_e8s)
+            .update_claimed_info(&proposal.payload.project_id, proposal.payload.amount_e8s, claim_time)
             .map_err(|_| "project not found".to_string())
     })
 

@@ -5,5 +5,7 @@ use candid::{CandidType, Deserialize};
 pub enum ProjectError { 
     ProjectNotFound,
     ProjectAlreadyExists,
+    ProjectAlreadyCompleted,
     UserNotFound,
+    ProjectReleaseTimeTooEarly,
 }

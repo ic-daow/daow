@@ -42,6 +42,7 @@ impl ProjectCreateCommand {
             progress: ProgressStage::Unopen,
             actual_raised: 0,
             claimed: 0,
+            latest_claim_at: None,
             status,
             created_at,
             updated_at,
