@@ -16,7 +16,8 @@ export type ClaimError = { 'ProjectInvalid' : null } |
   { 'ProposalNotFound' : null } |
   { 'VoterAlreadyVoted' : null } |
   { 'ProposalStateNotOpen' : null } |
-  { 'ProposalAlreadyExists' : null };
+  { 'ProposalAlreadyExists' : null } |
+  { 'ClaimAmountExceedUpperLimit' : null };
 export interface ClaimProposal {
   'id' : bigint,
   'votes_no' : Weights,
@@ -44,8 +45,10 @@ export interface PageQuery {
   'querystring' : string,
   'page_num' : bigint,
 }
-export type ProgressStage = { 'Unopen' : null } |
+export type ProgressStage = { 'Claimed' : null } |
+  { 'Unopen' : null } |
   { 'InProgress' : null } |
+  { 'ToClaim' : null } |
   { 'Completed' : null };
 export interface ProjectApplyCapitalDetailCommand {
   'id' : bigint,
@@ -91,7 +94,8 @@ export interface ProjectEditCommand {
   'roadmap_id' : bigint,
   'owner_info' : string,
 }
-export type ProjectError = { 'ProjectAlreadyExists' : null } |
+export type ProjectError = { 'ProjectReleaseTimeTooEarly' : null } |
+  { 'ProjectAlreadyExists' : null } |
   { 'ProjectAlreadyCompleted' : null } |
   { 'ProjectNotFound' : null } |
   { 'UserNotFound' : null };
@@ -129,6 +133,7 @@ export interface ProjectProfile {
   'progress' : ProgressStage,
   'contact_info' : Array<string>,
   'wallet_addr' : string,
+  'latest_claim_at' : [] | [bigint],
   'trust_by' : TrustBy,
   'roadmap_id' : bigint,
   'owner_info' : string,
@@ -175,6 +180,7 @@ export interface Tokenomics {
   'total_supply' : bigint,
   'symbol' : string,
 }
+export interface Tokens { 'e8s' : bigint }
 export interface TransactionCreateCommand {
   'to' : string,
   'from' : string,
@@ -295,6 +301,7 @@ export interface _SERVICE {
     [ProjectApplyTrustByCommand],
     BoolProjectResult,
   >,
+  'cansiter_balance' : ActorMethod<[], Tokens>,
   'create_project' : ActorMethod<[ProjectCreateCommand], ProjectCreatedResult>,
   'create_transaction' : ActorMethod<
     [TransactionCreateCommand],

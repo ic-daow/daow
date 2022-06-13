@@ -28,6 +28,8 @@ export interface IProject {
     team: ITeam;
     trust_by: ITrustBy;
     capital_detail: ICapitalDetail;
+    claimed: number;
+    latest_claim_at?: number;
     created_at: number;
     updated_at: number;
 }
@@ -78,6 +80,8 @@ export declare enum ReleaseMethods {
 export declare enum ProgressStages {
     UnOpen = "Unopen",
     InProgress = "InProgress",
+    ToClaim = "ToClaim",
+    Claimed = "Claimed",
     Completed = "Completed"
 }
 export declare enum ProjectStatus {
@@ -89,7 +93,8 @@ export declare enum ProjectErrors {
     NotFound = "NotFound",
     AlreadyExists = "AlreadyExists",
     AlreadyCompleted = "AlreadyCompleted",
-    UserNotFound = "UserNotFound"
+    UserNotFound = "UserNotFound",
+    ProjectReleaseTimeTooEarly = "ProjectReleaseTimeTooEarly"
 }
 /**
  * create project
@@ -400,6 +405,14 @@ export declare enum UserErrors {
 }
 /**
  *******************************************************************************
+ *********************************** Others ************************************
+ *******************************************************************************
+ */
+interface IBalance {
+    e8s: number;
+}
+/**
+ *******************************************************************************
  ********************************** Canister ***********************************
  *******************************************************************************
  */
@@ -532,6 +545,13 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      * get self
      */
     getSelf(): Promise<IUser>;
+    /**
+     ********************************* Others ************************************
+     */
+    /**
+     * get balance
+     */
+    getBalance(): Promise<IBalance>;
     /**
      * greet
      */

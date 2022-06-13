@@ -28,6 +28,8 @@ var ProgressStages;
 (function (ProgressStages) {
     ProgressStages["UnOpen"] = "Unopen";
     ProgressStages["InProgress"] = "InProgress";
+    ProgressStages["ToClaim"] = "ToClaim";
+    ProgressStages["Claimed"] = "Claimed";
     ProgressStages["Completed"] = "Completed";
 })(ProgressStages = exports.ProgressStages || (exports.ProgressStages = {}));
 function fromProgressStage(stage) {
@@ -36,6 +38,12 @@ function fromProgressStage(stage) {
     }
     else if ('InProgress' in stage) {
         return ProgressStages.InProgress;
+    }
+    else if ('ToClaim' in stage) {
+        return ProgressStages.ToClaim;
+    }
+    else if ('Claimed' in stage) {
+        return ProgressStages.Claimed;
     }
     else if ('Completed' in stage) {
         return ProgressStages.Completed;
@@ -70,6 +78,7 @@ var ProjectErrors;
     ProjectErrors["AlreadyExists"] = "AlreadyExists";
     ProjectErrors["AlreadyCompleted"] = "AlreadyCompleted";
     ProjectErrors["UserNotFound"] = "UserNotFound";
+    ProjectErrors["ProjectReleaseTimeTooEarly"] = "ProjectReleaseTimeTooEarly";
 })(ProjectErrors = exports.ProjectErrors || (exports.ProjectErrors = {}));
 function fromProjectError(error) {
     if ('ProjectAlreadyExists' in error) {
@@ -83,6 +92,9 @@ function fromProjectError(error) {
     }
     else if ('ProjectNotFound' in error) {
         return ProjectErrors.NotFound;
+    }
+    else if ('ProjectReleaseTimeTooEarly' in error) {
+        return ProjectErrors.ProjectReleaseTimeTooEarly;
     }
     else {
         throw new Error('unimplemented');
@@ -538,6 +550,16 @@ class DaowActor extends actor_1.BaseActor {
         return this.fromUserResult(result);
     }
     /**
+     ********************************* Others ************************************
+     */
+    /**
+     * get balance
+     */
+    async getBalance() {
+        const result = await this.getActor().cansiter_balance();
+        return { e8s: Number(result.e8s) };
+    }
+    /**
      * greet
      */
     async greet(input) {
@@ -580,6 +602,7 @@ class DaowActor extends actor_1.BaseActor {
         };
     }
     fromProjectProfile(from) {
+        const latestClaimAt = (0, utils_1.fromOption)(from.latest_claim_at);
         return {
             ...from,
             id: Number(from.id),
@@ -593,6 +616,8 @@ class DaowActor extends actor_1.BaseActor {
             tokenomics: this.fromTokenomics(from.tokenomics),
             team: this.fromTeam(from.team),
             capital_detail: this.fromCapitalDetail(from.capital_detail),
+            claimed: Number(from.claimed),
+            latest_claim_at: latestClaimAt ? Number(latestClaimAt) : undefined,
             created_at: Number(from.created_at),
             updated_at: Number(from.updated_at),
         };

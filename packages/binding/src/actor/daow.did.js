@@ -16,6 +16,7 @@ export const idlFactory = ({ IDL }) => {
     'capital_detail' : CapitalDetail,
   });
   const ProjectError = IDL.Variant({
+    'ProjectReleaseTimeTooEarly' : IDL.Null,
     'ProjectAlreadyExists' : IDL.Null,
     'ProjectAlreadyCompleted' : IDL.Null,
     'ProjectNotFound' : IDL.Null,
@@ -69,6 +70,7 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Nat64,
     'trust_by' : TrustBy,
   });
+  const Tokens = IDL.Record({ 'e8s' : IDL.Nat64 });
   const ProjectCreateCommand = IDL.Record({ 'name' : IDL.Text });
   const ProjectCreatedResult = IDL.Variant({
     'Ok' : IDL.Nat64,
@@ -161,6 +163,7 @@ export const idlFactory = ({ IDL }) => {
     'VoterAlreadyVoted' : IDL.Null,
     'ProposalStateNotOpen' : IDL.Null,
     'ProposalAlreadyExists' : IDL.Null,
+    'ClaimAmountExceedUpperLimit' : IDL.Null,
   });
   const ClaimProposalResult = IDL.Variant({
     'Ok' : ClaimProposal,
@@ -172,8 +175,10 @@ export const idlFactory = ({ IDL }) => {
     'Pending' : IDL.Null,
   });
   const ProgressStage = IDL.Variant({
+    'Claimed' : IDL.Null,
     'Unopen' : IDL.Null,
     'InProgress' : IDL.Null,
+    'ToClaim' : IDL.Null,
     'Completed' : IDL.Null,
   });
   const ProjectProfile = IDL.Record({
@@ -198,6 +203,7 @@ export const idlFactory = ({ IDL }) => {
     'progress' : ProgressStage,
     'contact_info' : IDL.Vec(IDL.Text),
     'wallet_addr' : IDL.Text,
+    'latest_claim_at' : IDL.Opt(IDL.Nat64),
     'trust_by' : TrustBy,
     'roadmap_id' : IDL.Nat64,
     'owner_info' : IDL.Text,
@@ -340,6 +346,7 @@ export const idlFactory = ({ IDL }) => {
         [BoolProjectResult],
         [],
       ),
+    'cansiter_balance' : IDL.Func([], [Tokens], []),
     'create_project' : IDL.Func(
         [ProjectCreateCommand],
         [ProjectCreatedResult],

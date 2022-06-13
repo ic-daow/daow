@@ -19,6 +19,7 @@ const idlFactory = ({ IDL }) => {
         'capital_detail': CapitalDetail,
     });
     const ProjectError = IDL.Variant({
+        'ProjectReleaseTimeTooEarly': IDL.Null,
         'ProjectAlreadyExists': IDL.Null,
         'ProjectAlreadyCompleted': IDL.Null,
         'ProjectNotFound': IDL.Null,
@@ -72,6 +73,7 @@ const idlFactory = ({ IDL }) => {
         'id': IDL.Nat64,
         'trust_by': TrustBy,
     });
+    const Tokens = IDL.Record({ 'e8s': IDL.Nat64 });
     const ProjectCreateCommand = IDL.Record({ 'name': IDL.Text });
     const ProjectCreatedResult = IDL.Variant({
         'Ok': IDL.Nat64,
@@ -164,6 +166,7 @@ const idlFactory = ({ IDL }) => {
         'VoterAlreadyVoted': IDL.Null,
         'ProposalStateNotOpen': IDL.Null,
         'ProposalAlreadyExists': IDL.Null,
+        'ClaimAmountExceedUpperLimit': IDL.Null,
     });
     const ClaimProposalResult = IDL.Variant({
         'Ok': ClaimProposal,
@@ -175,8 +178,10 @@ const idlFactory = ({ IDL }) => {
         'Pending': IDL.Null,
     });
     const ProgressStage = IDL.Variant({
+        'Claimed': IDL.Null,
         'Unopen': IDL.Null,
         'InProgress': IDL.Null,
+        'ToClaim': IDL.Null,
         'Completed': IDL.Null,
     });
     const ProjectProfile = IDL.Record({
@@ -201,6 +206,7 @@ const idlFactory = ({ IDL }) => {
         'progress': ProgressStage,
         'contact_info': IDL.Vec(IDL.Text),
         'wallet_addr': IDL.Text,
+        'latest_claim_at': IDL.Opt(IDL.Nat64),
         'trust_by': TrustBy,
         'roadmap_id': IDL.Nat64,
         'owner_info': IDL.Text,
@@ -319,6 +325,7 @@ const idlFactory = ({ IDL }) => {
         'apply_project_team': IDL.Func([ProjectApplyTeamCommand], [BoolProjectResult], []),
         'apply_project_tokenomics': IDL.Func([ProjectApplyTokenomicsCommand], [BoolProjectResult], []),
         'apply_project_trust_by': IDL.Func([ProjectApplyTrustByCommand], [BoolProjectResult], []),
+        'cansiter_balance': IDL.Func([], [Tokens], []),
         'create_project': IDL.Func([ProjectCreateCommand], [ProjectCreatedResult], []),
         'create_transaction': IDL.Func([TransactionCreateCommand], [TransactionCreatedResult], []),
         'delete_project': IDL.Func([ProjectIdCommand], [BoolProjectResult], []),

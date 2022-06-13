@@ -76,6 +76,8 @@ export interface IProject {
   team: ITeam
   trust_by: ITrustBy
   capital_detail: ICapitalDetail
+  claimed: number
+  latest_claim_at?: number
   created_at: number
   updated_at: number
 }
@@ -153,6 +155,8 @@ function toReleaseMethod(method: ReleaseMethods): ReleaseMethod {
 export enum ProgressStages {
   UnOpen = 'Unopen',
   InProgress = 'InProgress',
+  ToClaim = 'ToClaim',
+  Claimed = 'Claimed',
   Completed = 'Completed',
 }
 
@@ -161,6 +165,10 @@ function fromProgressStage(stage: ProgressStage): ProgressStages {
     return ProgressStages.UnOpen
   } else if ('InProgress' in stage) {
     return ProgressStages.InProgress
+  } else if ('ToClaim' in stage) {
+    return ProgressStages.ToClaim
+  } else if ('Claimed' in stage) {
+    return ProgressStages.Claimed
   } else if ('Completed' in stage) {
     return ProgressStages.Completed
   } else {
@@ -191,6 +199,7 @@ export enum ProjectErrors {
   AlreadyExists = 'AlreadyExists',
   AlreadyCompleted = 'AlreadyCompleted',
   UserNotFound = 'UserNotFound',
+  ProjectReleaseTimeTooEarly = 'ProjectReleaseTimeTooEarly',
 }
 
 function fromProjectError(error: ProjectError): ProjectErrors {
@@ -202,6 +211,8 @@ function fromProjectError(error: ProjectError): ProjectErrors {
     return ProjectErrors.UserNotFound
   } else if ('ProjectNotFound' in error) {
     return ProjectErrors.NotFound
+  } else if ('ProjectReleaseTimeTooEarly' in error) {
+    return ProjectErrors.ProjectReleaseTimeTooEarly
   } else {
     throw new Error('unimplemented')
   }
@@ -667,6 +678,16 @@ function fromUserError(error: UserError): UserErrors {
 
 /**
  *******************************************************************************
+ *********************************** Others ************************************
+ *******************************************************************************
+ */
+
+interface IBalance {
+  e8s: number
+}
+
+/**
+ *******************************************************************************
  ********************************** Canister ***********************************
  *******************************************************************************
  */
@@ -1048,6 +1069,18 @@ export class DaowActor extends BaseActor<_SERVICE> {
   }
 
   /**
+   ********************************* Others ************************************
+   */
+
+  /**
+   * get balance
+   */
+  public async getBalance(): Promise<IBalance> {
+    const result = await this.getActor().cansiter_balance()
+    return { e8s: Number(result.e8s) }
+  }
+
+  /**
    * greet
    */
   public async greet(input: string): Promise<string> {
@@ -1101,6 +1134,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
   }
 
   private fromProjectProfile(from: ProjectProfile): IProject {
+    const latestClaimAt = fromOption(from.latest_claim_at)
     return {
       ...from,
       id: Number(from.id),
@@ -1114,6 +1148,8 @@ export class DaowActor extends BaseActor<_SERVICE> {
       tokenomics: this.fromTokenomics(from.tokenomics),
       team: this.fromTeam(from.team),
       capital_detail: this.fromCapitalDetail(from.capital_detail),
+      claimed: Number(from.claimed),
+      latest_claim_at: latestClaimAt ? Number(latestClaimAt) : undefined,
       created_at: Number(from.created_at),
       updated_at: Number(from.updated_at),
     }

@@ -77,6 +77,7 @@ type ProjectProfile = record {
     progress : ProgressStage;
     actual_raised: nat64;
     claimed: nat64;
+    latest_claim_at: opt nat64;
     status : ProjectStatus;
     created_at : nat64;
     updated_at : nat64;
@@ -134,6 +135,8 @@ type ReleaseMethod = variant {
 type ProgressStage = variant {
     Unopen;
     InProgress;
+    ToClaim;
+    Claimed;
     Completed;
 };
 
@@ -193,6 +196,7 @@ type ProjectError = variant {
     ProjectNotFound;
     ProjectAlreadyCompleted;
     UserNotFound;
+    ProjectReleaseTimeTooEarly;
 };
 
 type ProjectApplyDescriptionCommand = record {
@@ -403,6 +407,7 @@ type ClaimError = variant {
     ProposalStateNotOpen;
     ProjectInvalid;
     VoterAlreadyVoted;
+    ClaimAmountExceedUpperLimit;
 };
 
 type ClaimProposalPage = record {
@@ -417,9 +422,16 @@ type ClaimProposalPageResult = variant {
     Err: ClaimError;
 };
 
+type Tokens = record {
+    e8s: nat64;
+};
+
 service : {
 
     "greet": (text) -> (text) query;
+
+    // query this canister ICP balance, only for mainnet(ic)
+    "cansiter_balance" : () -> (Tokens);
 
     "register_user": (UserRegisterCommand) -> (RegisterUserResult);
     "edit_user" : (UserEditCommand) -> (BoolUserResult);
