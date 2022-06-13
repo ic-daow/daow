@@ -272,7 +272,7 @@ class DaowActor extends actor_1.BaseActor {
      * delete project
      */
     async deleteProject(projectId) {
-        const result = await this.getActor().delete_projet(this.toProjectIdCommand(projectId));
+        const result = await this.getActor().delete_project(this.toProjectIdCommand(projectId));
         return this.fromBoolProjectResult(result);
     }
     /**
@@ -286,7 +286,7 @@ class DaowActor extends actor_1.BaseActor {
      * submit project
      */
     async submitProject(id) {
-        const result = await this.getActor().submit_projet({
+        const result = await this.getActor().submit_project({
             id: BigInt(id),
         });
         return this.fromBoolProjectResult(result);

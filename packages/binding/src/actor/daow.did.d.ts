@@ -300,7 +300,7 @@ export interface _SERVICE {
     [TransactionCreateCommand],
     TransactionCreatedResult,
   >,
-  'delete_projet' : ActorMethod<[ProjectIdCommand], BoolProjectResult>,
+  'delete_project' : ActorMethod<[ProjectIdCommand], BoolProjectResult>,
   'disable_user' : ActorMethod<[Principal], BoolUserResult>,
   'edit_project' : ActorMethod<[ProjectEditCommand], BoolProjectResult>,
   'edit_user' : ActorMethod<[UserEditCommand], BoolUserResult>,
@@ -323,7 +323,7 @@ export interface _SERVICE {
     [ProposalPayload],
     ProposalSubmitResult,
   >,
-  'submit_projet' : ActorMethod<[ProjectIdCommand], BoolProjectResult>,
+  'submit_project' : ActorMethod<[ProjectIdCommand], BoolProjectResult>,
   'update_transaction' : ActorMethod<
     [TransactionUpdateCommand],
     BoolTransactionResult,

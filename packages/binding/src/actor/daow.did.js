@@ -350,7 +350,7 @@ export const idlFactory = ({ IDL }) => {
         [TransactionCreatedResult],
         [],
       ),
-    'delete_projet' : IDL.Func([ProjectIdCommand], [BoolProjectResult], []),
+    'delete_project' : IDL.Func([ProjectIdCommand], [BoolProjectResult], []),
     'disable_user' : IDL.Func([IDL.Principal], [BoolUserResult], []),
     'edit_project' : IDL.Func([ProjectEditCommand], [BoolProjectResult], []),
     'edit_user' : IDL.Func([UserEditCommand], [BoolUserResult], []),
@@ -383,7 +383,7 @@ export const idlFactory = ({ IDL }) => {
         [ProposalSubmitResult],
         [],
       ),
-    'submit_projet' : IDL.Func([ProjectIdCommand], [BoolProjectResult], []),
+    'submit_project' : IDL.Func([ProjectIdCommand], [BoolProjectResult], []),
     'update_transaction' : IDL.Func(
         [TransactionUpdateCommand],
         [BoolTransactionResult],

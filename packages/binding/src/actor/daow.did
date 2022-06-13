@@ -430,8 +430,8 @@ service : {
 
     "create_project": (ProjectCreateCommand) -> (ProjectCreatedResult);
     "edit_project" : (ProjectEditCommand) -> (BoolProjectResult);
-    "delete_projet" : (ProjectIdCommand) -> (BoolProjectResult);
-    "submit_projet" : (ProjectIdCommand) -> (BoolProjectResult);
+    "delete_project" : (ProjectIdCommand) -> (BoolProjectResult);
+    "submit_project" : (ProjectIdCommand) -> (BoolProjectResult);
     "apply_project_description" : (ProjectApplyDescriptionCommand) -> (BoolProjectResult);
     "apply_project_roadmap" : (ProjectApplyRoadmapCommand) -> (BoolProjectResult);
     "apply_project_tokenomics" : (ProjectApplyTokenomicsCommand) -> (BoolProjectResult);

@@ -696,7 +696,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
    * delete project
    */
   public async deleteProject(projectId: number): Promise<IProjectResult> {
-    const result = await this.getActor().delete_projet(this.toProjectIdCommand(projectId))
+    const result = await this.getActor().delete_project(this.toProjectIdCommand(projectId))
     return this.fromBoolProjectResult(result)
   }
 
@@ -712,7 +712,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
    * submit project
    */
   public async submitProject(id: number): Promise<IProjectResult> {
-    const result = await this.getActor().submit_projet({
+    const result = await this.getActor().submit_project({
       id: BigInt(id),
     })
     return this.fromBoolProjectResult(result)
