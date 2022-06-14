@@ -13,6 +13,14 @@
     "photo": {
       "main": "src/photo/Main.mo",
       "type": "motoko"
+    },
+    "frontend": {
+      "dependencies": ["daow", "photo"],
+      "frontend": {
+        "entrypoint": "packages/frontend/dist/index.html"
+      },
+      "source": ["packages/frontend/dist"],
+      "type": "assets"
     }
   },
   "defaults": {

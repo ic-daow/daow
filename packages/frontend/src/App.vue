@@ -22,4 +22,14 @@
 		-moz-osx-font-smoothing: grayscale;
 		color: #2c3e50;
 	}
+	.field-body > .field{
+		flex-grow: unset !important;
+	}
+	.icon{
+		height: 1rem !important;
+    	width: 1rem !important;
+	}
+	.tag {
+
+    }
 </style>

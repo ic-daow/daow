@@ -2,14 +2,11 @@
   <b-navbar class="index-navbar">
     <template #brand>
       <b-navbar-item tag="router-link" :to="{ path: '/' }">
-        <img
-          src="https://raw.githubusercontent.com/buefy/buefy/dev/static/img/buefy-logo.png"
-          alt="Bulma"
-        />
+       <span class="logo">DAOWORLD</span>
       </b-navbar-item>
     </template>
     <template #start>
-      <b-navbar-item href="#"> Home </b-navbar-item>
+      <b-navbar-item tag="router-link" :to="{ path: '/' }"> Home </b-navbar-item>
       <b-navbar-item tag="router-link" :to="{ path: '/IDO' }">
         IDO
       </b-navbar-item>
@@ -23,68 +20,89 @@
 
     <template #end>
       <b-navbar-item tag="div">
-        <div class="buttons">
+        <b-button type="is-primary" :loading="loading">{{ userText }}</b-button>
+        <!-- <div class="buttons">
           <a class="button is-primary">
-            <strong>{{userText}}</strong>
+            <strong>{{ userText }}</strong>
           </a>
-        </div>
+        </div> -->
       </b-navbar-item>
     </template>
   </b-navbar>
 </template>
 
 <script>
-import { DaowActor, IUser, UserErrors } from "@daow/binding";
-const daoCid = process.env.VUE_APP_DAO_ID;
-const host = process.env.VUE_APP_IC_HOST;
-let daoDao, userDao;
 export default {
   name: "Header",
   props: {
     msg: String,
   },
-  data(){
-	  return {
-		  userText:'Connect'
-	  }
+  data() {
+    return {
+      userText: "Connect",
+      loading: false,
+    };
   },
-  mounted: function () {
-	  let that=this;
-    (async function () {
-      console.log("check user");
-      daoDao = await new DaowActor().create(daoCid, {
-        agentOptions: {
-          production: false,
-          host,
-        },
-      });
-	  console.log("connect server");
+  mounted() {
+    this.initUser();
+  },
+  methods: {
+    async initUser() {
       try {
-        userDao = await daoDao.getSelf();
-		console.log("get user info",userDao);
-		that.userText=userDao.name;
+        this.loading = true;
+        this.$daoDao
+          .then((daoDao) => {
+            return daoDao.getSelf();
+          })
+          .then((userDao) => {
+            this.loading = false;
+            console.log("get user info", userDao);
+            this.userText = userDao.name;
+            this.$store.commit("setUserInfo", userDao);
+          })
+          .catch((err) => {
+            this.loading = false;
+            if (err == "NotFound") {
+              this.createUser();
+            }
+          });
       } catch (err) {
-		  console.log("get err info",err);
-        if (err === UserErrors.NotFound) {
-          await daoDao.createUser({
+        console.log("get err info", err);
+        if (err == "NotFound") {
+          this.createUser();
+        }
+      }
+    },
+    createUser() {
+      this.$daoDao
+        .then((daoDao) => {
+          return daoDao.createUser({
             name: "张三",
             email: "zhangsan@dao.com",
             memo: "",
           });
-          userDao = await daoDao.getSelf();
-          console.log(userDao);
-        }
-      }
-    })();
-  },
-  methods: {
+        })
+        .then((_userDao) => {
+          return _userDao.getSelf();
+        })
+        .then((userDao) => {
+          console.log("get user info", userDao);
+          this.$store.commit("setUserInfo", userDao);
+          this.userText = userDao.name;
+        });
+    },
     goto(urlIndex) {},
   },
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
 .index-navbar {
   margin-bottom: 2rem;
+  .logo{
+    font-weight: 600;
+    color: #7957d5;
+    font-size: 20px;
+  }
 }
 </style>

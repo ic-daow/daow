@@ -15,20 +15,24 @@
       <div class="columns index-list is-multiline">
         <div
           class="column is-one-third"
-          v-for="(item, index) in itemlist"
+          v-for="(item, index) in projectList"
           :key="index"
         >
-          <div class="card">
+          <div class="card" @click="godetail(item.id)">
             <div class="card-image">
               <figure class="image is-4by3">
-                <img :src="item.pic" :alt="item.title" />
+                <img :src="item.logo" :alt="item.name" />
               </figure>
             </div>
             <div class="card-content">
               <div class="media">
                 <div class="media-content">
-                  <p class="title is-4"><a href="http://" @click="godetail(item.id)">{{ item.title }}</a></p>
-                  <p class="subtitle is-6">{{ item.desc }}</p>
+                  <p class="title is-4">
+                    <a href="javascript:;" >{{
+                      item.name
+                    }}</a>
+                  </p>
+                  <p class="subtitle is-6">{{ item.description }}</p>
                 </div>
               </div>
               <div class="content"></div>
@@ -37,72 +41,80 @@
         </div>
       </div>
     </div>
+    <b-notification
+      style="min-height: 100px"
+      v-if="projectList.length == 0"
+      :closable="false"
+    >
+      <b-loading
+        :is-full-page="false"
+        v-model="isLoading"
+        :can-cancel="true"
+      ></b-loading>
+    </b-notification>
   </div>
 </template>
 
 <script>
-import { DaowActor, IUser, UserErrors } from "@daow/binding";
-const daoCid = process.env.VUE_APP_DAO_ID;
-const host = process.env.VUE_APP_IC_HOST;
-let daoDao, userDao;
+import { mapState } from "vuex";
 export default {
   name: "Index",
   data() {
     return {
-      itemlist: [
-        {
-          id:"asdfasdf",
-          title: "Ludus",
-          desc: "Web-based tools for the performing arts trusted by 1,000+ organizations",
-          pic: "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
-        },
-         {
-          id:"asdfasdf",
-          title: "Ludus",
-          desc: "Web-based tools for the performing arts trusted by 1,000+ organizations",
-          pic: "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
-        },
-         {
-          id:"asdfasdf",
-          title: "Ludus",
-          desc: "Web-based tools for the performing arts trusted by 1,000+ organizations",
-          pic: "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
-        },
-         {
-          id:"asdfasdf",
-          title: "Ludus",
-          desc: "Web-based tools for the performing arts trusted by 1,000+ organizations",
-          pic: "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
-        },
-         {
-          id:"asdfasdf",
-          title: "Ludus",
-          desc: "Web-based tools for the performing arts trusted by 1,000+ organizations",
-          pic: "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
-        },
-         {
-          id:"asdfasdf",
-          title: "Ludus",
-          desc: "Web-based tools for the performing arts trusted by 1,000+ organizations",
-          pic: "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
-        }
-      ],
+      projectList: [],
+      isLoading: true,
     };
   },
   components: {},
   mounted() {
-    (async function () {
-      daoDao = await new DaowActor().create(daoCid, {
-        agentOptions: {
-          production: false,
-          host,
-        },
-      });
-      let projectset = await daoDao.getListProject({ status: "Enable" });
-      console.log(projectset);
-    })();
+    if(this.userInfo){
+      this.getListProject();
+    }
+  },
+  computed: {
+    ...mapState({
+      userInfo: (state) => state.userInfo,
+    }),
+  },
+  watch: {
+    userInfo() {
+      this.getListProject();
+    },
   },
   methods: {
+    getListProject() {
+      this.$daoDao
+        .then((daoDao) => {
+          return daoDao.getListProject({ status: "Enable" });
+        })
+        .then((projectset) => {
+          console.log(projectset);
+          this.isLoading = false;
+          this.projectList = projectset.data;
+          this.formateInfo();
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          console.error(err);
+        });
+    },
+    formateInfo() {
+      this.$picActor.then((picActor) => {
+        this.projectList.forEach((item) => {
+          picActor
+            .getPicture(item.logo_id)
+            .then((logoInfo) => {
+              if (logoInfo && logoInfo.data.buffer) {
+                console.log(logoInfo);
+                item.logo = this.$bufferToImage(logoInfo.data.buffer);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        });
+      });
+    },
     goto(urlIndex) {
       switch (urlIndex) {
         case 1:
@@ -112,9 +124,9 @@ export default {
           break;
       }
     },
-    godetail(id){
-      this.$router.push({ path: "/DAODetail" });
-    }
+    godetail(id) {
+      this.$router.push({ path: "/DAODetail", query:{id: id} });
+    },
   },
 };
 </script>

@@ -1,62 +1,374 @@
 <template>
-  <div class="container">
-    <div class="columns">
-      <div class="column is-9">
-        <div class="project-title">{{ projectName }}</div>
-        <div class="project-descshort">{{ projectDescShort }}</div>
-        <div class="project-img"><img :src="projectPic" :alt="projectName" /></div>
-        <div class="project-desc">{{ projectDesc }}</div>
+  <div class="daoDetail-page container">
+    <div class="pro-name">
+      <div class="img-box">
+        <img :src="projectInfo.logo" :alt="projectInfo.name" />
       </div>
-      <div class="column is-3">
-        <div class="investNum">$192,960</div>
-        <b-progress type="is-success" :value="60"></b-progress>
-        <div class="investorNum">55</div>
-        <div>Reservations & investments</div>
-        <div class="leaveDays">87</div>
-        <div>Left to invest</div>
-      </div>
+      <div class="project-title">{{ projectInfo.name }}</div>
+      <div class="project-desc">{{ projectInfo.description }}</div>
     </div>
+
+    <div class="module">
+      <h1 class="title has-text-centered">Project Detail</h1>
+      <b-field label="Roadmap">
+        <div class="roadmap-box">
+          <img :src="projectInfo.roadmap" alt="roadmap" />
+        </div>
+      </b-field>
+
+      <b-field label="Links">
+        <section>
+          <div
+            class="link-item"
+            v-for="(item, index) in projectInfo.links"
+            :key="index"
+          >
+            {{ item }}
+          </div>
+        </section>
+      </b-field>
+
+      <b-field label="Tokenomics">
+        <!-- {{ projectInfo.tokenomics }} -->
+        <div
+          class="item-info"
+          v-for="(val, key) in projectInfo.tokenomics"
+          :key="key"
+        >
+          <span class="info-title">{{ key }}:</span><span>{{ val }}</span>
+        </div>
+      </b-field>
+      <b-field label="Team">
+        <div
+          class="item-info"
+          v-for="(val, key) in projectInfo.team"
+          :key="key"
+        >
+          <template v-if="key != 'picture' && key != 'picture_id'"
+            ><span class="info-title">{{ key }}:</span
+            ><span>{{ val }}</span></template
+          >
+          <template v-if="key == 'picture'">
+            <span class="info-title">picture:</span>
+            <div class="pciture">
+              <img :src="projectInfo.team.picture" alt="picture" />
+            </div>
+          </template>
+        </div>
+        <!-- {{ projectInfo.team }} -->
+      </b-field>
+      <b-field label="Trusted by">
+        <div
+          class="item-info"
+          v-for="(val, key) in projectInfo.trust_by"
+          :key="key"
+        >
+          <template v-if="key != 'logo' && key != 'logo_id'"
+            ><span class="info-title">{{ key }}:</span
+            ><span>{{ val }}</span></template
+          >
+          <template v-if="key == 'logo'">
+            <span class="info-title">Logo:</span>
+            <div class="pciture">
+              <img :src="projectInfo.trust_by.logo" alt="logo" />
+            </div>
+          </template>
+        </div>
+      </b-field>
+    </div>
+    <div class="module">
+      <h1 class="title has-text-centered">Capital Detail</h1>
+      <h1 class="lable-text">Raise Rule</h1>
+      <b-field
+        custom-class="custormField"
+        v-if="projectInfo.capital_detail.raise"
+        label="Raise:"
+        horizontal
+      >
+        {{ projectInfo.capital_detail.raise.amount
+        }}{{ projectInfo.capital_detail.raise.currency }}
+      </b-field>
+      <!-- <b-field class="split" label="Price:" horizontal>
+        {{ step2Info.tokenPrice }}{{ step2Info.token1Name }}/{{
+          step2Info.token2Name
+        }}
+      </b-field> -->
+
+      <b-field label="Price($):" horizontal>
+        {{ projectInfo.capital_detail.price_per_icp }}
+      </b-field>
+      <!-- 
+      <b-field label="The token amount I will release:" horizontal>
+        {{ step2Info.tokenAmount }}
+      </b-field> -->
+
+      <h1 class="lable-text">Release Rule</h1>
+      <b-field
+        v-if="projectInfo.capital_detail.release"
+        label="Release Method:"
+        horizontal
+      >
+        {{ projectInfo.capital_detail.release.method }}
+      </b-field>
+      <b-field
+        v-if="projectInfo.capital_detail.release"
+        class="split"
+        label="Release amount per day:"
+        horizontal
+      >
+        {{ projectInfo.capital_detail.release.amount_per_day }} / day
+      </b-field>
+      <b-field
+        v-if="projectInfo.capital_detail.release"
+        label="Start Date:"
+        horizontal
+      >
+        {{ projectInfo.capital_detail.release.start_date }}
+      </b-field>
+    </div>
+    <div class="button-container">
+      <b-button class="prev-button" @click="back()" type="is-primary">Back</b-button
+      >
+      <b-button
+        class="next-button"
+        @click.prevent="isInvestModalActive = true"
+        type="is-primary"
+        :disabled="daoInstance ? false : true"
+        >Invest</b-button
+      >
+    </div>
+    <b-modal
+      v-model="isInvestModalActive"
+      has-modal-card
+      trap-focus
+      :destroy-on-hide="false"
+      aria-role="dialog"
+      aria-label="Trusted Modal"
+      close-button-aria-label="Close"
+      aria-modal
+    >
+      <template>
+        <form action="">
+          <div class="modal-card" style="width: 400px">
+            <header class="modal-card-head">
+              <p class="modal-card-title">Invest</p>
+              <button
+                type="button"
+                class="delete"
+                @click="isInvestModalActive = false"
+              />
+            </header>
+            <section class="modal-card-body">
+              <b-field label="Amount(ICP)">
+                <b-input
+                  v-model="investAmount"
+                  placeholder="write amount here"
+                ></b-input>
+              </b-field>
+            </section>
+            <footer class="modal-card-foot">
+              <b-button
+                @click.prevent="invest()"
+                type="is-primary"
+                :loading="isLoading"
+                >Confirm</b-button
+              >
+            </footer>
+          </div>
+        </form>
+      </template>
+    </b-modal>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
-  name: "DaoList",
+  name: "DaoDetail",
   data() {
     return {
-      projectName: "asdf",
-      projectDescShort: "asdfasdfasdfasdfasdf",
-      projectDesc: `Performing arts organizations of all sizes — from 50-seat playhouses to 3,000+ seat performing arts centers — need ticketing, marketing, fundraising, patron management, and reporting tools to help them manage their growing and complex organizations. The issue is that the majority of solutions on the market are outdated, too expensive, and lack ease-of-use due to failure of adapting to the market's needs after years of little innovation.
-As thousands of arts organizations are coming out of a pandemic, they are in need of something that reduces costs, removes complexities in their existing structures, and allows them to rebuild through flexible, easy-to-learn tools.`,
-      projectPic:
-        "https://uploads.republic.com/p/offerings/card_images/default/000/001/323/1323-1640013134-a7fe1c297ba5d1e1458c202c159f6473cc4bcdb1.jpeg",
+      id: null,
+      projectInfo: {
+        capital_detail: {},
+        logoShow: "",
+        team: {},
+        trust_by: {},
+      },
+      isLoading: false,
+      daoInstance: null,
+      isInvestModalActive: false,
+      investAmount: "",
     };
+  },
+  computed: {
+    ...mapState({
+      userInfo: (state) => state.userInfo,
+    }),
+    contractAmount(){
+       return Number(this.investAmount).toFixed(8).replace(".","");
+    }
+  },
+  watch: {
+    userInfo() {
+      this.getProjectInfo();
+    },
+  },
+  mounted(option) {
+    console.log(option);
+    let query = this.$route.query;
+    if (query) {
+      this.id = query.id;
+    }
+    if (this.userInfo) {
+      this.getProjectInfo();
+    }
+  },
+  methods: {
+    getProjectInfo() {
+      this.$daoDao
+        .then((daoDao) => {
+          this.daoInstance = daoDao;
+          return daoDao.getProject(this.id);
+        })
+        .then((project) => {
+          console.log(project);
+          this.projectInfo = project;
+          this.formateInfo();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    formateInfo() {
+      this.$picActor
+        .then((picActor) => {
+          return [
+            picActor.getPicture(this.projectInfo.logo_id),
+            picActor.getPicture(this.projectInfo.roadmap_id),
+            picActor.getPicture(this.projectInfo.team.picture_id),
+            picActor.getPicture(this.projectInfo.trust_by.logo_id),
+          ];
+        })
+        .then((results) => Promise.all(results))
+        .then(([logoInfo, roadmapInfo, pictureInfo, trustLogoInfo]) => {
+          console.log(logoInfo, roadmapInfo, pictureInfo, trustLogoInfo);
+          if (logoInfo && logoInfo.data.buffer) {
+            this.projectInfo.logo = this.$bufferToImage(logoInfo.data.buffer);
+          }
+          if (roadmapInfo && roadmapInfo.data.buffer) {
+            this.projectInfo.roadmap = this.$bufferToImage(
+              roadmapInfo.data.buffer
+            );
+          }
+          if (pictureInfo && pictureInfo.data.buffer) {
+            this.projectInfo.team.picture = this.$bufferToImage(
+              pictureInfo.data.buffer
+            );
+          }
+          if (trustLogoInfo && trustLogoInfo.data.buffer) {
+            this.projectInfo.trust_by.logo = this.$bufferToImage(
+              trustLogoInfo.data.buffer
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    back() {
+      console.log("submit", this.id)
+      this.$router.back();
+    },
+    invest() {
+      if (this.isLoading || !this.investAmount) {
+        return;
+      }
+      this.isLoading = true;
+      this.daoInstance
+        .createTransaction({
+          project_id: this.id,
+          amount: this.contractAmount,
+          memo: this.userInfo.memo,
+          from: this.userInfo.owner,
+          to: "bm2lt-lwmbq-b2tca-2fddw-ffzvi-iggyh-djtwy-lfiko-gnfmz-3b2yn-eqe",
+        })
+        .then((result) => {
+          this.isLoading = false;
+          console.log(result);
+          this.isInvestModalActive = false;
+          this.$buefy.dialog.alert("Invest success!");
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          console.log(err);
+        });
+    },
   },
 };
 </script>
 
-<style>
-.project-title {
-  font-size: 3rem;
-  margin: 0 0 1rem 0;
-}
-.project-descshort{
-    margin: 0 0 1rem 0;
-}
-.project-img{
-    margin-bottom: 3rem;
-}
-.project-img img{
-    width:100%
-}
-.investNum {
-  font-size: 3rem;
-  color: #19c157;
-}
-.investorNum{
+<style lang="scss" scoped>
+.daoDetail-page {
+  .img-box {
+    width: 100%;
+    height: 300px;
+    overflow-y: hidden;
+    img {
+      width: 100%;
+    }
+  }
+  .roadmap-box {
+    width: 100%;
+    img {
+      width: 100%;
+    }
+  }
+  .project-title {
     font-size: 3rem;
-}
-.leaveDays{
-    font-size: 2rem;
+    text-align: center;
+  }
+  .project-desc {
+    font-size: 15px;
+    text-align: center;
+    color: #999;
+  }
+  margin: 40px 40px 30px 40px;
+  .module {
+    border: 2px solid #eee;
+    background-color: #f1f1f1;
+    padding: 30px;
+    border-radius: 8px;
+    margin-top: 30px;
+  }
+
+  .item-info {
+    .info-title {
+      font-weight: 600;
+      margin-right: 10px;
+    }
+  }
+
+  .pciture {
+    width: 200px;
+    height: auto;
+  }
+  .button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+    margin-top: 40px;
+    .next-button,
+    .prev-button {
+      width: 200px;
+    }
+    .prev-button {
+      margin-right: 20px;
+    }
+  }
+  .dialog-content {
+    width: 600px;
+    height: 400px;
+    background-color: #fff;
+  }
 }
 </style>
