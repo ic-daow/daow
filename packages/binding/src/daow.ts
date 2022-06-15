@@ -8,6 +8,7 @@ import {
   ClaimProposal,
   ClaimProposalPage,
   idlFactory,
+  PageQuery,
   ProgressStage,
   ProjectCreateCommand,
   ProjectCreatedResult,
@@ -46,7 +47,6 @@ import {
   ICPrincipal,
   toOption,
 } from './utils'
-import { ProjectPageQuery } from '../../../.dfx/local/canisters/daow/daow.did'
 
 /**
  *******************************************************************************
@@ -751,7 +751,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
    * get paged project
    */
   public async getPagedProject(arg: IGetPagedProjectArg): Promise<IPagedProjectResult> {
-    const result = await this.getActor().page_projects(this.toProjectPageQuery(arg))
+    const result = await this.getActor().page_projects(this.toPageQuery(arg))
     return this.fromProjectPageResult(result)
   }
 
@@ -1105,7 +1105,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
     )
   }
 
-  private toProjectPageQuery(from: IGetPagedProjectArg): ProjectPageQuery {
+  private toPageQuery(from: IGetPagedProjectArg): PageQuery {
     return {
       page_num: BigInt(from.page),
       page_size: BigInt(from.size),

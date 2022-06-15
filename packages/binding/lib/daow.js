@@ -314,7 +314,7 @@ class DaowActor extends actor_1.BaseActor {
      * get paged project
      */
     async getPagedProject(arg) {
-        const result = await this.getActor().page_projects(this.toProjectPageQuery(arg));
+        const result = await this.getActor().page_projects(this.toPageQuery(arg));
         return this.fromProjectPageResult(result);
     }
     /**
@@ -576,7 +576,7 @@ class DaowActor extends actor_1.BaseActor {
     fromProjectCreatedResult(from) {
         return (0, utils_1.fromResult)(from, (result) => ({ id: Number(result) }), (err) => fromProjectError(err));
     }
-    toProjectPageQuery(from) {
+    toPageQuery(from) {
         return {
             page_num: BigInt(from.page),
             page_size: BigInt(from.size),

@@ -561,7 +561,7 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      */
     private toCreateProjectCommand;
     private fromProjectCreatedResult;
-    private toProjectPageQuery;
+    private toPageQuery;
     private toProjectListQuery;
     private toProjectEditCommand;
     private fromProjectProfile;
