@@ -1,6 +1,9 @@
 {
   "name": "daow",
   "private": true,
+  "scripts": {
+    "build": "echo 0"
+  },
   "workspaces": [
     "packages/*"
   ]
