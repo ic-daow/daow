@@ -367,9 +367,9 @@ type ClaimProposal = record {
 };
 
 type ProposalPayload = record {
-    canister_id: principal;
-    method: text;
-    message: blob;
+    project_id: nat64;
+    pamount_e8s: nat64;
+    recipient_principal: text;
 };
 
 type Vote = variant {
