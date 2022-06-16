@@ -143,9 +143,9 @@ export const idlFactory = ({ IDL }) => {
     'Accepted' : IDL.Null,
   });
   const ProposalPayload = IDL.Record({
-    'method' : IDL.Text,
-    'canister_id' : IDL.Principal,
-    'message' : IDL.Vec(IDL.Nat8),
+    'recipient_principal' : IDL.Text,
+    'project_id' : IDL.Nat64,
+    'pamount_e8s' : IDL.Nat64,
   });
   const ClaimProposal = IDL.Record({
     'id' : IDL.Nat64,

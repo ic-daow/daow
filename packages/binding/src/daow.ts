@@ -351,18 +351,18 @@ interface IProposalWeight {
 }
 
 interface IProposalPayload {
-  canister_id: string
-  method: string
-  message: number[]
+  recipient_principal: string
+  project_id: number
+  pamount_e8s: number
 }
 
 /**
  * create claim proposal
  */
 interface ICreateClaimProposalArg {
-  canister_id: string
-  method: string
-  message: number[]
+  recipient_principal: string
+  project_id: number
+  pamount_e8s: number
 }
 
 interface ICreateClaimProposalResult {
@@ -845,7 +845,8 @@ export class DaowActor extends BaseActor<_SERVICE> {
   ): Promise<ICreateClaimProposalResult> {
     const result = await this.getActor().submit_claim_proposal({
       ...arg,
-      canister_id: castToPrincipal(arg.canister_id),
+      project_id: BigInt(arg.project_id),
+      pamount_e8s: BigInt(arg.pamount_e8s),
     })
     return fromResult<bigint, ClaimError, ICreateClaimProposalResult, ProposalClaimErrors>(
       result,
@@ -1333,7 +1334,8 @@ export class DaowActor extends BaseActor<_SERVICE> {
       failed_reason: extractProposalFailedReason(from.state),
       payload: {
         ...from.payload,
-        canister_id: castPrincipalToString(from.payload.canister_id),
+        project_id: Number(from.payload.project_id),
+        pamount_e8s: Number(from.payload.pamount_e8s),
       },
       votes_yes: {
         amount_e8s: Number(from.votes_yes.amount_e8s),

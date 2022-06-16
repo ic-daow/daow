@@ -393,7 +393,8 @@ class DaowActor extends actor_1.BaseActor {
     async createClaimProposal(arg) {
         const result = await this.getActor().submit_claim_proposal({
             ...arg,
-            canister_id: (0, utils_1.castToPrincipal)(arg.canister_id),
+            project_id: BigInt(arg.project_id),
+            pamount_e8s: BigInt(arg.pamount_e8s),
         });
         return (0, utils_1.fromResult)(result, (result) => ({ id: Number(result) }), (err) => fromClaimError(err));
     }
@@ -758,7 +759,8 @@ class DaowActor extends actor_1.BaseActor {
             failed_reason: extractProposalFailedReason(from.state),
             payload: {
                 ...from.payload,
-                canister_id: (0, utils_1.castPrincipalToString)(from.payload.canister_id),
+                project_id: Number(from.payload.project_id),
+                pamount_e8s: Number(from.payload.pamount_e8s),
             },
             votes_yes: {
                 amount_e8s: Number(from.votes_yes.amount_e8s),

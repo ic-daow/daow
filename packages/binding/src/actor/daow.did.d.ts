@@ -145,9 +145,9 @@ export type ProjectStatus = { 'Enable' : null } |
   { 'Disable' : null } |
   { 'Pending' : null };
 export interface ProposalPayload {
-  'method' : string,
-  'canister_id' : Principal,
-  'message' : Array<number>,
+  'recipient_principal' : string,
+  'project_id' : bigint,
+  'pamount_e8s' : bigint,
 }
 export type ProposalState = { 'Failed' : string } |
   { 'Open' : null } |

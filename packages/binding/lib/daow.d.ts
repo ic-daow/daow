@@ -213,17 +213,17 @@ interface IProposalWeight {
     amount_e8s: number;
 }
 interface IProposalPayload {
-    canister_id: string;
-    method: string;
-    message: number[];
+    recipient_principal: string;
+    project_id: number;
+    pamount_e8s: number;
 }
 /**
  * create claim proposal
  */
 interface ICreateClaimProposalArg {
-    canister_id: string;
-    method: string;
-    message: number[];
+    recipient_principal: string;
+    project_id: number;
+    pamount_e8s: number;
 }
 interface ICreateClaimProposalResult {
     id: number;
