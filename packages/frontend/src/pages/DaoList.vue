@@ -69,7 +69,8 @@
 		aria-current-label="Current page"
 		:page-input="hasInput"
 		:page-input-position="inputPosition"
-		:debounce-page-input="inputDebounce">
+		:debounce-page-input="inputDebounce"
+		@change="change">
 	</b-pagination>	
 </div>
 </template>
@@ -106,19 +107,26 @@
 			gotoProject(id){
 				console.log("gotoProject:", id)
 				this.$router.push({ path: `/daodetail?id=${id}` });
+			},
+			async fectchData(){
+				const dao = await this.$daoDao;
+				console.log("dao:", dao);
+				const res = await dao.getPagedProject({
+					page: this.current-1,
+					size: 10,
+					query: '',
+				});
+				console.log("res:", res)
+				this.total = res.total;
+				this.data = res.data				
+			},
+			change(){
+				this.fectchData();
 			}
 		},
+
 		async created(){
-			const dao = await this.$daoDao;
-			console.log("dao:", dao);
-			const res = await dao.getPagedProject({
-				page: this.current-1,
-				size: 10,
-				query: '',
-			});
-			console.log("res:", res)
-			this.total = res.total;
-			this.data = res.data
+			this.fectchData();
 		}
     }
 </script>
