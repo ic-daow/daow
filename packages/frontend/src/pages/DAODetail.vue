@@ -1,18 +1,30 @@
 <template>
   <div class="daoDetail-page container">
-    <div class="pro-name">
-      <div class="img-box">
-        <img :src="projectInfo.logo" :alt="projectInfo.name" />
-      </div>
-      <div class="project-title">{{ projectInfo.name }}</div>
-      <div class="project-desc">{{ projectInfo.description }}</div>
-    </div>
+
+
+    <section>
+        <article class="media">
+            <figure class="media-left">
+                <p class="image is-64x64">      
+                    <img :src="projectInfo.logo" :alt="projectInfo.name" />    
+                    <b-skeleton circle width="64px" height="64px" :active="detailLoading"></b-skeleton>                         
+                </p>
+            </figure>
+            <div class="media-content">
+                <div>
+                  <div class="title">{{ projectInfo.name }}</div>
+                  {{ projectInfo.description }}
+                </div>
+              <b-skeleton height="120px" :active="detailLoading"></b-skeleton>            
+            </div>
+        </article>
+    </section>
 
     <div class="module">
       <h1 class="title has-text-centered">Project Detail</h1>
       <b-field label="Roadmap">
         <div class="roadmap-box">
-          <img :src="projectInfo.roadmap" alt="roadmap" />
+          <img :src="projectInfo.roadmap" alt="roadmap" />           
         </div>
       </b-field>
 
@@ -51,7 +63,9 @@
           <template v-if="key == 'picture'">
             <span class="info-title">picture:</span>
             <div class="pciture">
-              <img :src="projectInfo.team.picture" alt="picture" />
+              <p class="image is-64x64">      
+                  <img :src="projectInfo.team.picture" alt="team" />                        
+              </p>                 
             </div>
           </template>
         </div>
@@ -70,7 +84,9 @@
           <template v-if="key == 'logo'">
             <span class="info-title">Logo:</span>
             <div class="pciture">
-              <img :src="projectInfo.trust_by.logo" alt="logo" />
+              <p class="image is-64x64">      
+                  <img :src="projectInfo.trust_by.logo" alt="trust_by" />                        
+              </p>              
             </div>
           </template>
         </div>
@@ -198,6 +214,7 @@ export default {
       daoInstance: null,
       isInvestModalActive: false,
       investAmount: "",
+      detailLoading: true,
     };
   },
   computed: {
@@ -225,6 +242,7 @@ export default {
   },
   methods: {
     getProjectInfo() {
+      this.detailLoading = true;
       this.$daoDao
         .then((daoDao) => {
           this.daoInstance = daoDao;
@@ -234,10 +252,13 @@ export default {
           console.log(project);
           this.projectInfo = project;
           this.formateInfo();
+          this.detailLoading = false;
         })
         .catch((err) => {
           console.log(err);
+          this.detailLoading = false;
         });
+        
     },
     formateInfo() {
       this.$picActor
@@ -321,6 +342,8 @@ export default {
     width: 100%;
     img {
       width: 100%;
+      max-height: 640px;
+      
     }
   }
   .project-title {
