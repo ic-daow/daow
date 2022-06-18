@@ -77,9 +77,9 @@ export interface IProject {
   trust_by: ITrustBy
   capital_detail: ICapitalDetail
   claimed: number
-  latest_claim_at?: number
-  created_at: number
-  updated_at: number
+  latest_claim_at?: bigint
+  created_at: bigint
+  updated_at: bigint
 }
 
 export interface IProjectResult {
@@ -126,7 +126,7 @@ export interface ITrustBy {
 }
 
 export interface IReleaseRule {
-  start_date: number
+  start_date: bigint
   amount_per_day: number
   method: ReleaseMethods
 }
@@ -343,7 +343,7 @@ interface IClaimProposal {
   payload: IProposalPayload
   votes_yes: IProposalWeight
   votes_no: IProposalWeight
-  created_at: number
+  created_at: bigint
 }
 
 interface IProposalWeight {
@@ -500,7 +500,7 @@ interface ITransaction {
   memo: number
   is_finalize: boolean
   block_height: number
-  created_at: number
+  created_at: bigint
 }
 
 /**
@@ -598,7 +598,7 @@ export interface IUser {
   biography: string
   interests: string[]
   memo: string
-  created_at: number
+  created_at: bigint
 }
 
 export interface IUserResult {
@@ -1150,9 +1150,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
       team: this.fromTeam(from.team),
       capital_detail: this.fromCapitalDetail(from.capital_detail),
       claimed: Number(from.claimed),
-      latest_claim_at: latestClaimAt ? Number(latestClaimAt) : undefined,
-      created_at: Number(from.created_at),
-      updated_at: Number(from.updated_at),
+      latest_claim_at: fromOption(from.latest_claim_at),
     }
   }
 
@@ -1207,7 +1205,6 @@ export class DaowActor extends BaseActor<_SERVICE> {
       release: {
         ...from.release,
         method: fromReleaseMethod(from.release.method),
-        start_date: Number(from.release.start_date),
         amount_per_day: Number(from.release.amount_per_day),
       },
       raise: {
@@ -1276,7 +1273,6 @@ export class DaowActor extends BaseActor<_SERVICE> {
       amount: Number(from.amount),
       block_height: Number(from.block_height),
       memo: Number(from.memo),
-      created_at: Number(from.created_at),
     }
   }
 
@@ -1318,7 +1314,6 @@ export class DaowActor extends BaseActor<_SERVICE> {
         owner: castPrincipalToString(result.owner),
         status: fromUserStatus(result.status),
         avatar_id: Number(result.avatar_id),
-        created_at: Number(result.created_at),
       }),
       (err) => fromUserError(err),
     )
@@ -1343,7 +1338,6 @@ export class DaowActor extends BaseActor<_SERVICE> {
       votes_no: {
         amount_e8s: Number(from.votes_no.amount_e8s),
       },
-      created_at: Number(from.created_at),
     }
   }
 }

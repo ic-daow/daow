@@ -618,9 +618,7 @@ class DaowActor extends actor_1.BaseActor {
             team: this.fromTeam(from.team),
             capital_detail: this.fromCapitalDetail(from.capital_detail),
             claimed: Number(from.claimed),
-            latest_claim_at: latestClaimAt ? Number(latestClaimAt) : undefined,
-            created_at: Number(from.created_at),
-            updated_at: Number(from.updated_at),
+            latest_claim_at: (0, utils_1.fromOption)(from.latest_claim_at),
         };
     }
     fromTrustBy(from) {
@@ -668,7 +666,6 @@ class DaowActor extends actor_1.BaseActor {
             release: {
                 ...from.release,
                 method: fromReleaseMethod(from.release.method),
-                start_date: Number(from.release.start_date),
                 amount_per_day: Number(from.release.amount_per_day),
             },
             raise: {
@@ -719,7 +716,6 @@ class DaowActor extends actor_1.BaseActor {
             amount: Number(from.amount),
             block_height: Number(from.block_height),
             memo: Number(from.memo),
-            created_at: Number(from.created_at),
         };
     }
     toUserRegisterCommand(from) {
@@ -746,7 +742,6 @@ class DaowActor extends actor_1.BaseActor {
             owner: (0, utils_1.castPrincipalToString)(result.owner),
             status: fromUserStatus(result.status),
             avatar_id: Number(result.avatar_id),
-            created_at: Number(result.created_at),
         }), (err) => fromUserError(err));
     }
     fromClaimProposal(from) {
@@ -768,7 +763,6 @@ class DaowActor extends actor_1.BaseActor {
             votes_no: {
                 amount_e8s: Number(from.votes_no.amount_e8s),
             },
-            created_at: Number(from.created_at),
         };
     }
 }

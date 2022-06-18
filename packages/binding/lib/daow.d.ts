@@ -29,9 +29,9 @@ export interface IProject {
     trust_by: ITrustBy;
     capital_detail: ICapitalDetail;
     claimed: number;
-    latest_claim_at?: number;
-    created_at: number;
-    updated_at: number;
+    latest_claim_at?: bigint;
+    created_at: bigint;
+    updated_at: bigint;
 }
 export interface IProjectResult {
     success: boolean;
@@ -70,7 +70,7 @@ export interface ITrustBy {
     logo: number[];
 }
 export interface IReleaseRule {
-    start_date: number;
+    start_date: bigint;
     amount_per_day: number;
     method: ReleaseMethods;
 }
@@ -207,7 +207,7 @@ interface IClaimProposal {
     payload: IProposalPayload;
     votes_yes: IProposalWeight;
     votes_no: IProposalWeight;
-    created_at: number;
+    created_at: bigint;
 }
 interface IProposalWeight {
     amount_e8s: number;
@@ -293,7 +293,7 @@ interface ITransaction {
     memo: number;
     is_finalize: boolean;
     block_height: number;
-    created_at: number;
+    created_at: bigint;
 }
 /**
  * create transaction
@@ -365,7 +365,7 @@ export interface IUser {
     biography: string;
     interests: string[];
     memo: string;
-    created_at: number;
+    created_at: bigint;
 }
 export interface IUserResult {
     success: boolean;
