@@ -712,7 +712,7 @@ class DaowActor extends actor_1.BaseActor {
             ...from,
             tx_id: Number(from.id),
             project_id: Number(from.project_id),
-            from_principal: (0, utils_1.castPrincipalToString)(from.from_princiapl),
+            from_principal: (0, utils_1.castPrincipalToString)(from.from_principal),
             amount: Number(from.amount),
             block_height: Number(from.block_height),
             memo: Number(from.memo),
