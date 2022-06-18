@@ -236,7 +236,7 @@ const idlFactory = ({ IDL }) => {
         'from': IDL.Text,
         'memo': IDL.Nat64,
         'created_at': IDL.Nat64,
-        'from_princiapl': IDL.Principal,
+        'from_principal': IDL.Principal,
         'is_finalize': IDL.Bool,
         'project_id': IDL.Nat64,
         'amount': IDL.Nat64,

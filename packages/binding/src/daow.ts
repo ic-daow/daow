@@ -1269,7 +1269,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
       ...from,
       tx_id: Number(from.id),
       project_id: Number(from.project_id),
-      from_principal: castPrincipalToString(from.from_princiapl),
+      from_principal: castPrincipalToString(from.from_principal),
       amount: Number(from.amount),
       block_height: Number(from.block_height),
       memo: Number(from.memo),

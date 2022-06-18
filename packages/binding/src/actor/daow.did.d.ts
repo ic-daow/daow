@@ -210,7 +210,7 @@ export interface TransactionProfile {
   'from' : string,
   'memo' : bigint,
   'created_at' : bigint,
-  'from_princiapl' : Principal,
+  'from_principal' : Principal,
   'is_finalize' : boolean,
   'project_id' : bigint,
   'amount' : bigint,
