@@ -260,7 +260,7 @@ type ProjectListResult = variant {
 
 type TransactionProfile = record {
     id: nat64;
-    from_princiapl: principal;
+    from_principal: principal;
     from: text;
     to: text;
     amount: nat64;

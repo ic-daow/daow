@@ -26,8 +26,8 @@
 		flex-grow: unset !important;
 	}
 	.icon{
-		height: 1rem !important;
-    	width: 1rem !important;
+		height: 0.5rem !important;
+    	width: 0.5rem !important;
 	}
 	.tag {
 

@@ -72,9 +72,9 @@ fn edit_project(cmd: ProjectEditCommand) -> Result<bool, ProjectError> {
 #[update]
 fn submit_project(cmd: ProjectIdCommand) -> Result<bool, ProjectError> {
     CONTEXT.with(|c| {
-        let ctx = c.borrow_mut();
+        let mut ctx = c.borrow_mut();
         let submit_time = ctx.env.now();
-        c.borrow_mut().project_service.submit(&cmd.id, submit_time)
+        ctx.project_service.submit(&cmd.id, submit_time)
     })
 }
 
