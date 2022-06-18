@@ -63,7 +63,7 @@
           <template v-if="key == 'picture'">
             <span class="info-title">picture:</span>
             <div class="pciture">
-              <p class="image is-64x64">      
+              <p class="image">      
                   <img :src="projectInfo.team.picture" alt="team" />                        
               </p>                 
             </div>
@@ -249,7 +249,7 @@ export default {
           return daoDao.getProject(this.id);
         })
         .then((project) => {
-          console.log(project);
+          console.log("project:", project);
           this.projectInfo = project;
           this.formateInfo();
           this.detailLoading = false;
@@ -305,14 +305,16 @@ export default {
         return;
       }
       this.isLoading = true;
-      this.daoInstance
-        .createTransaction({
+      const txParas= {
           project_id: this.id,
           amount: this.contractAmount,
           memo: this.userInfo.memo,
           from: this.userInfo.owner,
-          to: "bm2lt-lwmbq-b2tca-2fddw-ffzvi-iggyh-djtwy-lfiko-gnfmz-3b2yn-eqe",
-        })
+          to: this.$config.cid,
+      }
+      console.log("txParas:", txParas)
+      this.daoInstance
+        .createTransaction(txParas)
         .then((result) => {
           this.isLoading = false;
           console.log(result);
@@ -372,7 +374,7 @@ export default {
   }
 
   .pciture {
-    width: 200px;
+    width: 480px;
     height: auto;
   }
   .button-container {
