@@ -325,6 +325,20 @@ class DaowActor extends actor_1.BaseActor {
         return (0, utils_1.fromResult)(result, (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }), (err) => fromProjectError(err));
     }
     /**
+     * get my project
+     */
+    async getMyProject() {
+        const result = await this.getActor().my_projects();
+        return (0, utils_1.fromResult)(result, (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }), (err) => fromProjectError(err));
+    }
+    /**
+     * get my invest project
+     */
+    async getMyInvestProject() {
+        const result = await this.getActor().my_invest_projects();
+        return (0, utils_1.fromResult)(result, (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }), (err) => fromProjectError(err));
+    }
+    /**
      * apply project capital
      */
     async applyProjectCapital(arg) {
@@ -394,7 +408,7 @@ class DaowActor extends actor_1.BaseActor {
         const result = await this.getActor().submit_claim_proposal({
             ...arg,
             project_id: BigInt(arg.project_id),
-            pamount_e8s: BigInt(arg.pamount_e8s),
+            amount_e8s: BigInt(arg.amount_e8s),
         });
         return (0, utils_1.fromResult)(result, (result) => ({ id: Number(result) }), (err) => fromClaimError(err));
     }
@@ -755,7 +769,7 @@ class DaowActor extends actor_1.BaseActor {
             payload: {
                 ...from.payload,
                 project_id: Number(from.payload.project_id),
-                pamount_e8s: Number(from.payload.pamount_e8s),
+                amount_e8s: Number(from.payload.amount_e8s),
             },
             votes_yes: {
                 amount_e8s: Number(from.votes_yes.amount_e8s),

@@ -353,7 +353,7 @@ interface IProposalWeight {
 interface IProposalPayload {
   recipient_principal: string
   project_id: number
-  pamount_e8s: number
+  amount_e8s: number
 }
 
 /**
@@ -362,7 +362,7 @@ interface IProposalPayload {
 interface ICreateClaimProposalArg {
   recipient_principal: string
   project_id: number
-  pamount_e8s: number
+  amount_e8s: number
 }
 
 interface ICreateClaimProposalResult {
@@ -768,6 +768,30 @@ export class DaowActor extends BaseActor<_SERVICE> {
   }
 
   /**
+   * get my project
+   */
+  public async getMyProject(): Promise<IGetListProjectResult> {
+    const result = await this.getActor().my_projects()
+    return fromResult<ProjectProfiles, ProjectError, IGetListProjectResult, ProjectErrors>(
+      result,
+      (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }),
+      (err) => fromProjectError(err),
+    )
+  }
+
+  /**
+   * get my invest project
+   */
+  public async getMyInvestProject(): Promise<IGetListProjectResult> {
+    const result = await this.getActor().my_invest_projects()
+    return fromResult<ProjectProfiles, ProjectError, IGetListProjectResult, ProjectErrors>(
+      result,
+      (result) => ({ data: result.map((res) => this.fromProjectProfile(res)) }),
+      (err) => fromProjectError(err),
+    )
+  }
+
+  /**
    * apply project capital
    */
   public async applyProjectCapital(arg: IApplyProjectCapitalArg): Promise<IProjectResult> {
@@ -846,7 +870,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
     const result = await this.getActor().submit_claim_proposal({
       ...arg,
       project_id: BigInt(arg.project_id),
-      pamount_e8s: BigInt(arg.pamount_e8s),
+      amount_e8s: BigInt(arg.amount_e8s),
     })
     return fromResult<bigint, ClaimError, ICreateClaimProposalResult, ProposalClaimErrors>(
       result,
@@ -1330,7 +1354,7 @@ export class DaowActor extends BaseActor<_SERVICE> {
       payload: {
         ...from.payload,
         project_id: Number(from.payload.project_id),
-        pamount_e8s: Number(from.payload.pamount_e8s),
+        amount_e8s: Number(from.payload.amount_e8s),
       },
       votes_yes: {
         amount_e8s: Number(from.votes_yes.amount_e8s),

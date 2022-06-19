@@ -144,8 +144,8 @@ export const idlFactory = ({ IDL }) => {
   });
   const ProposalPayload = IDL.Record({
     'recipient_principal' : IDL.Text,
+    'amount_e8s' : IDL.Nat64,
     'project_id' : IDL.Nat64,
-    'pamount_e8s' : IDL.Nat64,
   });
   const ClaimProposal = IDL.Record({
     'id' : IDL.Nat64,
@@ -377,6 +377,8 @@ export const idlFactory = ({ IDL }) => {
     'get_user' : IDL.Func([IDL.Text], [BoolUserResult], []),
     'greet' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
     'list_projects' : IDL.Func([ProjectListQuery], [ProjectListResult], []),
+    'my_invest_projects' : IDL.Func([], [ProjectListResult], []),
+    'my_projects' : IDL.Func([], [ProjectListResult], []),
     'page_claim_proposals' : IDL.Func(
         [PageQuery],
         [ClaimProposalPageResult],

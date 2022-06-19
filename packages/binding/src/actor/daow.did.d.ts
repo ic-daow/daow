@@ -146,8 +146,8 @@ export type ProjectStatus = { 'Enable' : null } |
   { 'Pending' : null };
 export interface ProposalPayload {
   'recipient_principal' : string,
+  'amount_e8s' : bigint,
   'project_id' : bigint,
-  'pamount_e8s' : bigint,
 }
 export type ProposalState = { 'Failed' : string } |
   { 'Open' : null } |
@@ -322,6 +322,8 @@ export interface _SERVICE {
   'get_user' : ActorMethod<[string], BoolUserResult>,
   'greet' : ActorMethod<[string], string>,
   'list_projects' : ActorMethod<[ProjectListQuery], ProjectListResult>,
+  'my_invest_projects' : ActorMethod<[], ProjectListResult>,
+  'my_projects' : ActorMethod<[], ProjectListResult>,
   'page_claim_proposals' : ActorMethod<[PageQuery], ClaimProposalPageResult>,
   'page_projects' : ActorMethod<[PageQuery], ProjectPageResult>,
   'page_transactions' : ActorMethod<[PageQuery], TransactionPageResult>,

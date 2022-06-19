@@ -368,7 +368,7 @@ type ClaimProposal = record {
 
 type ProposalPayload = record {
     project_id: nat64;
-    pamount_e8s: nat64;
+    amount_e8s: nat64;
     recipient_principal: text;
 };
 
@@ -453,6 +453,8 @@ service : {
     "get_project" : (ProjectIdCommand) -> (ProjectResult);
     "page_projects" : (PageQuery) -> (ProjectPageResult);
     "list_projects" : (ProjectListQuery) -> (ProjectListResult);
+    "my_projects" : () -> (ProjectListResult);
+    "my_invest_projects" : () -> (ProjectListResult);
 
     "create_transaction": (TransactionCreateCommand) -> (TransactionCreatedResult);
     "update_transaction": (TransactionUpdateCommand) -> (BoolTransactionResult);

@@ -215,7 +215,7 @@ interface IProposalWeight {
 interface IProposalPayload {
     recipient_principal: string;
     project_id: number;
-    pamount_e8s: number;
+    amount_e8s: number;
 }
 /**
  * create claim proposal
@@ -223,7 +223,7 @@ interface IProposalPayload {
 interface ICreateClaimProposalArg {
     recipient_principal: string;
     project_id: number;
-    pamount_e8s: number;
+    amount_e8s: number;
 }
 interface ICreateClaimProposalResult {
     id: number;
@@ -452,6 +452,14 @@ export declare class DaowActor extends BaseActor<_SERVICE> {
      * get list project
      */
     getListProject(arg: IGetListProjectArg): Promise<IGetListProjectResult>;
+    /**
+     * get my project
+     */
+    getMyProject(): Promise<IGetListProjectResult>;
+    /**
+     * get my invest project
+     */
+    getMyInvestProject(): Promise<IGetListProjectResult>;
     /**
      * apply project capital
      */
