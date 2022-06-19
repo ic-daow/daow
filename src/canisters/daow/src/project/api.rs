@@ -103,3 +103,22 @@ fn page_projects(query_args: ProjectPageQuery) -> Result<ProjectPage, ProjectErr
 fn list_projects(q: ProjectListQuery) -> Result<Vec<ProjectProfile>, ProjectError> {
     CONTEXT.with(|c| Ok(c.borrow().project_service.list_projects(q)))
 }
+
+#[query]
+fn my_projects() -> Result<Vec<ProjectProfile>, ProjectError> {
+    CONTEXT.with(|c| {
+        let ctx = c.borrow();
+        let caller = ctx.env.caller();
+        Ok(ctx.project_service.find_projects_by_owner(&caller))
+    })
+}
+
+#[query]
+fn my_invest_projects() -> Result<Vec<ProjectProfile>, ProjectError> {
+    CONTEXT.with(|c| {
+        let ctx = c.borrow();
+        let caller = ctx.env.caller();
+        let project_ids = ctx.transaction_service.find_projects_by_investor(&caller);
+        Ok(ctx.project_service.find_projects_by_ids(&project_ids))
+    })
+}

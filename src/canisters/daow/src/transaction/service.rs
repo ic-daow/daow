@@ -83,4 +83,13 @@ impl TransactionService {
             .sum()
     }
 
+    // 按投资者查询 project id
+    pub fn find_projects_by_investor(&self, investor: &Principal) -> Vec<u64> {
+        self.transactions
+            .values()
+            .filter(|tx| tx.from_principal == *investor)
+            .map(|tx| tx.project_id)
+            .collect()
+    }
+
 }

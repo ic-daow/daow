@@ -140,6 +140,22 @@ impl ProjectService {
             .map(|(_k, v)| v.clone())
             .collect()
     }
+
+    pub fn find_projects_by_owner(&self, owner: &Principal) -> Vec<ProjectProfile> {
+        self.projects
+            .values()
+            .filter(|p| p.is_owner(owner))
+            .map(|p| p.clone())
+            .collect()
+    }
+
+    pub fn find_projects_by_ids(&self, project_ids: &[u64]) -> Vec<ProjectProfile> {
+        self.projects
+            .iter()
+            .filter(|(id, p)| project_ids.contains(id))
+            .map(|(_, p)| p.clone())
+            .collect()
+    }
 }
 
 #[cfg(test)]
