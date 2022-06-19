@@ -1,100 +1,106 @@
 <template>
   <div class="daoDetail-page container">
 
-
-    <section>
-        <article class="media">
-            <figure class="media-left">
-                <p class="image is-64x64">      
-                    <img :src="projectInfo.logo" :alt="projectInfo.name" />    
-                    <b-skeleton circle width="64px" height="64px" :active="detailLoading"></b-skeleton>                         
-                </p>
-            </figure>
-            <div class="media-content">
-                <div>
-                  <div class="title">{{ projectInfo.name }}</div>
-                  {{ projectInfo.description }}
-                </div>
-              <b-skeleton height="120px" :active="detailLoading"></b-skeleton>            
-            </div>
-        </article>
-    </section>
-
-    <div class="module">
-      <h1 class="title has-text-centered">Project Detail</h1>
-      <b-field label="Roadmap">
-        <div class="roadmap-box">
-          <img :src="projectInfo.roadmap" alt="roadmap" />           
+<div class="left-bar">
+  <div class="card">
+    <div class="card-content">
+      <div class="media">
+        <div class="media-left">
+          <figure class="image is-48x48">
+            <img :src="projectInfo.logo" :alt="projectInfo.name" />    
+            <b-skeleton circle width="48px" height="48px" :active="detailLoading"></b-skeleton>        
+          </figure>
         </div>
-      </b-field>
+        <div class="media-content">
+          <p class="title is-4">{{ projectInfo.name }}</p>
+          <p class="subtitle is-6">@{{projectInfo.team.name}}</p>
+        </div>
+      </div>
 
-      <b-field label="Links">
-        <section>
-          <div
+      <div class="content">
+        {{ projectInfo.description }}<br/>
+        <div v-for="(item, index) in projectInfo.links" :key="index">
+          <a
             class="link-item"
-            v-for="(item, index) in projectInfo.links"
-            :key="index"
+            :href="item"
           >
             {{ item }}
-          </div>
-        </section>
-      </b-field>
+          </a>    
+          <br>  
+        </div>      
 
-      <b-field label="Tokenomics">
-        <!-- {{ projectInfo.tokenomics }} -->
+      </div>
+    </div>
+  </div>
+  <div style="height:5px"></div>
+  <div class="card">
+    <header class="card-header">
+      <p class="card-header-title">
+        Team: {{projectInfo.team.name}}
+      </p>
+    </header>  
+    <div class="card-content">
+      <div class="content">
+        <div class="pciture">
+          <img :src="projectInfo.team.picture" alt="team" style="width: 100%" />                                     
+        </div>
+        <div>
+          Twitter: <a class="link-item" :href="projectInfo.team.twitter">
+           {{projectInfo.team.twitter}}
+          </a>    
+          <br>  
+        </div>      
+      </div>
+    </div>
+  </div>  
+  <div style="height:5px"></div>
+  <div class="card">
+    <header class="card-header">
+      <p class="card-header-title">
+        Tokenomics
+      </p>
+    </header>  
+    <div class="card-content">
+      <div class="content">
         <div
           class="item-info"
           v-for="(val, key) in projectInfo.tokenomics"
           :key="key"
         >
           <span class="info-title">{{ key }}:</span><span>{{ val }}</span>
+        </div>  
+      </div>
+    </div>
+  </div>    
+  <div style="height:5px"></div>
+  <div class="card">
+    <div class="card-content">
+      <div class="media">
+        <div class="media-left">
+          <figure class="image is-48x48">
+            <img :src="projectInfo.trust_by.logo" :alt="projectInfo.trust_by.name" />    
+            <b-skeleton circle width="48px" height="48px" :active="detailLoading"></b-skeleton>        
+          </figure>
         </div>
-      </b-field>
-      <b-field label="Team">
-        <div
-          class="item-info"
-          v-for="(val, key) in projectInfo.team"
-          :key="key"
-        >
-          <template v-if="key != 'picture' && key != 'picture_id'"
-            ><span class="info-title">{{ key }}:</span
-            ><span>{{ val }}</span></template
-          >
-          <template v-if="key == 'picture'">
-            <span class="info-title">picture:</span>
-            <div class="pciture">
-              <p class="image">      
-                  <img :src="projectInfo.team.picture" alt="team" />                        
-              </p>                 
-            </div>
-          </template>
+        <div class="media-content">
+          <p class="title is-4">{{ projectInfo.trust_by.name }}</p>
+          <p class="subtitle is-6">@{{projectInfo.trust_by.link}}</p>
         </div>
-        <!-- {{ projectInfo.team }} -->
-      </b-field>
-      <b-field label="Trusted by">
-        <div
-          class="item-info"
-          v-for="(val, key) in projectInfo.trust_by"
-          :key="key"
-        >
-          <template v-if="key != 'logo' && key != 'logo_id'"
-            ><span class="info-title">{{ key }}:</span
-            ><span>{{ val }}</span></template
-          >
-          <template v-if="key == 'logo'">
-            <span class="info-title">Logo:</span>
-            <div class="pciture">
-              <p class="image is-64x64">      
-                  <img :src="projectInfo.trust_by.logo" alt="trust_by" />                        
-              </p>              
-            </div>
-          </template>
+      </div>    
+    </div>
+  </div>  
+
+</div>
+<div class="dao-detail">
+    <div class="module">
+      <b-field label="Roadmap">
+        <div class="roadmap-box">
+          <img :src="projectInfo.roadmap" alt="roadmap" />           
         </div>
       </b-field>
     </div>
     <div class="module">
       <h1 class="title has-text-centered">Capital Detail</h1>
-      <h1 class="lable-text">Raise Rule</h1>
       <b-field
         custom-class="custormField"
         v-if="projectInfo.capital_detail.raise"
@@ -141,18 +147,42 @@
       >
         {{ projectInfo.capital_detail.release.start_date }}
       </b-field>
+      <div class="button-container">
+        <!--b-button class="prev-button" @click="back()" type="is-primary">Back</b-button-->
+        <b-button
+          class="next-button"
+          @click.prevent="isInvestModalActive = true"
+          type="is-primary"
+          :disabled="daoInstance ? false : true"
+          >Invest</b-button
+        >
+      </div>      
     </div>
-    <div class="button-container">
-      <b-button class="prev-button" @click="back()" type="is-primary">Back</b-button
-      >
-      <b-button
-        class="next-button"
-        @click.prevent="isInvestModalActive = true"
-        type="is-primary"
-        :disabled="daoInstance ? false : true"
-        >Invest</b-button
-      >
+
+    <div class="module">
+      <h1 class="title has-text-centered">Claim</h1>
+      <div>
+        Congratulations! You have raised  <b>120</b> ICP.
+      </div>
+      <div>
+        You can withdraw  <b>120</b> ICP.
+      </div>
+      <div>
+        <b-field label="Withdraw" horizontal>
+            <b-input v-model="amount"></b-input>
+        </b-field>      
+      </div>            
+      <div class="button-container">
+        <!--b-button class="prev-button" @click="back()" type="is-primary">Back</b-button-->
+        <b-button
+          class="next-button"
+          @click="withdraw"
+          type="is-primary"
+          >Withdraw</b-button
+        >
+      </div>      
     </div>
+
     <b-modal
       v-model="isInvestModalActive"
       has-modal-card
@@ -194,6 +224,7 @@
         </form>
       </template>
     </b-modal>
+    </div>
   </div>
 </template>
 
@@ -208,13 +239,14 @@ export default {
         capital_detail: {},
         logoShow: "",
         team: {},
-        trust_by: {},
+        trust_by: {},        
       },
       isLoading: false,
       daoInstance: null,
       isInvestModalActive: false,
       investAmount: "",
       detailLoading: true,
+      amount: 0,
     };
   },
   computed: {
@@ -241,6 +273,22 @@ export default {
     }
   },
   methods: {
+    async withdraw(){
+      const dao = await this.$daoDao;
+      const params = {
+        project_id: parseInt(this.id),
+        amount_e8s: this.amount * 100000000,
+        recipient_principal: this.projectInfo.owner,
+      };
+      try{
+        console.log("createClaimProposal:", params)
+        const res = await dao.createClaimProposal(params);
+        console.log("createClaimProposal res:", res)
+      }catch(e){
+        console.error("withdraw:",e)
+      }
+
+    },
     getProjectInfo() {
       this.detailLoading = true;
       this.$daoDao
@@ -300,37 +348,49 @@ export default {
       console.log("submit", this.id)
       this.$router.back();
     },
-    invest() {
+    async invest() {
       if (this.isLoading || !this.investAmount) {
         return;
       }
       this.isLoading = true;
       const txParas= {
-          project_id: this.id,
+          project_id: parseInt(this.id),
           amount: this.contractAmount,
           memo: this.userInfo.memo,
           from: this.userInfo.owner,
           to: this.$config.cid,
       }
       console.log("txParas:", txParas)
-      this.daoInstance
-        .createTransaction(txParas)
-        .then((result) => {
-          this.isLoading = false;
-          console.log(result);
-          this.isInvestModalActive = false;
-          this.$buefy.dialog.alert("Invest success!");
-        })
-        .catch((err) => {
+      try {
+        const result = await this.daoInstance.createTransaction(txParas)
+        this.isLoading = false;
+        console.log("createTransaction res",result);
+        this.isInvestModalActive = false;
+        this.$buefy.dialog.alert("Invest success!");
+        const tx = await this.daoInstance.getTransaction(result.id); 
+        console.log("tx res", tx);
+      } catch(err) {
           this.isLoading = false;
           console.log(err);
-        });
+      }
+
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.container{
+  display: flex;
+
+  .left-bar{
+    width: 300px;
+  }
+
+  .dao-detail{
+    flex: 1;
+  }
+}
 .daoDetail-page {
   .img-box {
     width: 100%;
@@ -348,22 +408,15 @@ export default {
       
     }
   }
-  .project-title {
-    font-size: 3rem;
-    text-align: center;
-  }
-  .project-desc {
-    font-size: 15px;
-    text-align: center;
-    color: #999;
-  }
+
+
   margin: 40px 40px 30px 40px;
   .module {
     border: 2px solid #eee;
     background-color: #f1f1f1;
     padding: 30px;
     border-radius: 8px;
-    margin-top: 30px;
+    margin: 0 0 10px 10px;
   }
 
   .item-info {
@@ -374,7 +427,7 @@ export default {
   }
 
   .pciture {
-    width: 480px;
+    width: 100%;
     height: auto;
   }
   .button-container {

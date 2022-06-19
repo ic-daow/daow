@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-	<dao-menu class="dao-menu" path="/daoList"></dao-menu>
+	<dao-menu class="dao-menu" path='/proposalList'></dao-menu>
 	<div class="dao-content">
 		<b-table
 			:data="data"
@@ -16,7 +16,7 @@
 			</b-table-column>
 
 			<b-table-column field="name" label="Name" sortable v-slot="props">
-				<a @click="gotoProject(props.row.id)"> {{ props.row.name }} </a>
+				<a @click="gotoProposal(props.row.id)"> {{ props.row.name }} </a>
 			</b-table-column>
 
 			<b-table-column field="status" label="Status" sortable v-slot="props">
@@ -105,23 +105,23 @@
         },
 		methods: {
 			ts2Date(mts){
-				return dateFormat(Number(mts / 1000000n), 'YYYY-mm-dd HH:MM');
+				return dateFormat(Number(mts / 1000000n),  'YYYY-mm-dd HH:MM');
 			},
-			gotoProject(id){
-				console.log("gotoProject:", id)
-				this.$router.push({ path: `/daodetail?id=${id}` });
+			gotoProposal(id){
+				console.log("gotoProposal:", id)
+				this.$router.push({ path: `/proposalDetail?id=${id}` });
 			},
 			async fectchData(){
 				const dao = await this.$daoDao;
 				console.log("dao:", dao);
-				const res = await dao.getPagedProject({
+				const res = await dao.getPagedClaimProposal({
 					page: this.current-1,
 					size: 10,
 					query: '',
 				});
 				console.log("res:", res)
 				this.total = res.total;
-				this.data = res.data;				
+				this.data = res.data				
 			},
 			change(){
 				this.fectchData();

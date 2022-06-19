@@ -85,7 +85,7 @@ export default {
       price_per_icp: "", //
       release: {
         method: "",
-        start_date: new Date().getTime(),
+        start_date: BigInt(new Date().getTime()) * 1000000n,
         amount_per_day: "",
       },
       raise: {
@@ -108,7 +108,7 @@ export default {
   mounted: function () {},
   watch: {
     startDate() {
-      this.release.start_date = new Date(this.startDate).getTime();
+      this.release.start_date = BigInt(new Date().getTime()) * 1000000n
     },
   },
   methods: {

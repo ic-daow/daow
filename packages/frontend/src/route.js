@@ -29,7 +29,32 @@ const router = new Router({
 		path: "/daoList",
 		name: "daoList",
 		component: () => import("@/pages/DaoList.vue")
-	}
+	},
+	{
+		path: "/myDao",
+		name: "MyDao",
+		component: () => import("@/pages/MyDao.vue")
+	},	
+	{
+		path: "/myInvest",
+		name: "MyInvest",
+		component: () => import("@/pages/MyInvest.vue")
+	},		
+	{
+		path: "/proposalList",
+		name: "ProposalList",
+		component: () => import("@/pages/ProposalList.vue")
+	},	
+	{
+		path: "/createProposal",
+		name: "CreateProposal",
+		component: () => import("@/pages/CreateProposal.vue")
+	},		
+	// {
+	// 	path: "/test",
+	// 	name: "test",
+	// 	component: () => import("@/pages/Test.vue")
+	// }	
 	]
 	// scrollBehavior (to, from, savedPosition) {
 	//   return { x: 0, y: 0 }

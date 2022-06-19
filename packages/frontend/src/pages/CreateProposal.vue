@@ -167,7 +167,7 @@ export default {
         this.loading = true;
         this.$daoDao
           .then((daoDao) => {
-            console.log("applyInfo:", applyInfo, applyInfo.capital_detail);
+            console.log(applyInfo);
             daoDao.modifyProject(applyInfo).then((res) => {
               console.log(res);
               this.loading = false;

@@ -1,6 +1,6 @@
 <template>
 <div class="container">
-	<dao-menu class="dao-menu" path="/daoList"></dao-menu>
+	<dao-menu class="dao-menu" path="/myInvest"></dao-menu>
 	<div class="dao-content">
 		<b-table
 			:data="data"
@@ -49,27 +49,7 @@
 				</article>
 			</template>
 		</b-table>
-		<b-pagination
-			:total="total"
-			v-model="current"
-			:range-before="rangeBefore"
-			:range-after="rangeAfter"
-			:order="order"
-			:size="size"
-			:simple="isSimple"
-			:rounded="isRounded"
-			:per-page="perPage"
-			:icon-prev="prevIcon"
-			:icon-next="nextIcon"
-			aria-next-label="Next page"
-			aria-previous-label="Previous page"
-			aria-page-label="Page"
-			aria-current-label="Current page"
-			:page-input="hasInput"
-			:page-input-position="inputPosition"
-			:debounce-page-input="inputDebounce"
-			@change="change">
-		</b-pagination>	
+	
 	</div>
 </div>
 </template>
@@ -114,10 +94,7 @@
 			async fectchData(){
 				const dao = await this.$daoDao;
 				console.log("dao:", dao);
-				const res = await dao.getPagedProject({
-					page: this.current-1,
-					size: 10,
-					query: '',
+				const res = await dao.getMyInvestProject({
 				});
 				console.log("res:", res)
 				this.total = res.total;

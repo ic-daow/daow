@@ -7,7 +7,7 @@
     </template>
     <template #start>
       <b-navbar-item tag="router-link" :to="{ path: '/' }"> Home </b-navbar-item>
-      <b-navbar-item tag="router-link" :to="{ path: '/daoList' }">
+      <b-navbar-item tag="router-link" :to="{ path: '/myInvest' }">
         IDO
       </b-navbar-item>
       <b-navbar-dropdown label="DAO">

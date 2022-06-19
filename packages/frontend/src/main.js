@@ -8,15 +8,17 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 // internal icons
 import {
 	faCheck, faCheckCircle, faInfoCircle, faExclamationTriangle, faExclamationCircle,
-	faArrowUp, faAngleRight, faAngleLeft, faAngleDown,faTruckLoading,
-	faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload
+	faArrowUp, faAngleRight, faAngleLeft, faAngleDown,faTruckLoading, faBell,faGlasses,
+	faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload, fas, faHome, faAdd, faCode
 } from "@fortawesome/free-solid-svg-icons";
+
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(faCheck, faCheckCircle, faInfoCircle, faExclamationTriangle, faExclamationCircle,
-	faArrowUp, faAngleRight, faAngleLeft, faAngleDown,faTruckLoading,
-	faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload);
+	faArrowUp, faAngleRight, faAngleLeft, faAngleDown,faTruckLoading, faBell,faGlasses,
+	faEye, faEyeSlash, faCaretDown, faCaretUp, faUpload, fas, faHome, faAdd,faCode );
 Vue.component('vue-fontawesome', FontAwesomeIcon);
+
 
 Vue.use(Buefy, {
 	defaultIconComponent: 'vue-fontawesome',
