@@ -77,9 +77,9 @@ impl ProjectService {
         match self.projects.get_mut(id) {
             Some(p) => {
                 // 如果 提交 项目的时间比 提款 时间晚，返回错误
-                if submit_time > p.capital_detail.release.start_date {
-                    return Err(ProjectError::ProjectReleaseTimeTooEarly);
-                }
+                // if submit_time > p.capital_detail.release.start_date {
+                //     return Err(ProjectError::ProjectReleaseTimeTooEarly);
+                // }
                 
                 p.change_status(ProjectStatus::Enable);
                 p.change_progress(ProgressStage::InProgress);
