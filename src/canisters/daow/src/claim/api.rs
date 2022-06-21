@@ -16,7 +16,7 @@ fn submit_claim_proposal(payload: ProposalPayload) -> Result<u64, ClaimError> {
         let now = ctx.env.now();
 
         match ctx.project_service.get_project(payload.project_id) {
-            Some(p) if p.can_claiming(caller) => {
+            Some(p) if p.can_claiming(&caller) => {
 
                 let claim_duration_nanos = if p.latest_claim_at.is_some() {
                     (now - p.latest_claim_at.unwrap()) / 864000 

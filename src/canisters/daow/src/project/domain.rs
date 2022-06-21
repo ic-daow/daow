@@ -102,15 +102,15 @@ impl ProjectProfile {
         self.progress == ProgressStage::InProgress
     }
 
-    pub fn can_claiming(&self, owner: Principal) -> bool {
+    pub fn can_claiming(&self, owner: &Principal) -> bool {
         self.valid_status() && 
             (self.progress == ProgressStage::ToClaim || self.progress == ProgressStage::Claimed) &&
             self.is_owner(owner)
 
     }
 
-    pub fn is_owner(&self, owner: Principal) -> bool {
-        self.owner == owner
+    pub fn is_owner(&self, owner: &Principal) -> bool {
+        self.owner == *owner
     }
     
     pub fn add_actual_raised(&mut self, amount: u64) {

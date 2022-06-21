@@ -13,6 +13,9 @@ use crate::transaction::domain::TransactionProfile;
 use crate::user::UserService;
 use crate::user::domain::UserProfile;
 
+/// DFT Standard WASM 
+pub const DFT_STANDARD_WASM : &[u8] = std::include_bytes!("../../dft_all_features/dft_all_features.wasm");
+
 #[derive(Debug, Clone, CandidType, Deserialize)]
 pub struct DaoDataStorage {
     pub id: u64,

@@ -14,6 +14,8 @@ pub mod claim;
 
 pub mod context;
 
+// pub mod canister_management;
+
 pub mod storage;
 
 pub mod transaction;

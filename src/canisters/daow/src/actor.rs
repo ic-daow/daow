@@ -14,7 +14,7 @@ use crate::context::{DaoContext, DaoDataStorage, DFT_STANDARD_WASM};
 
 use crate::CONTEXT;
 use crate::env::CanisterEnvironment;
-use crate::canister_management::management::{CreateCanisterArgs, CanisterSettings, ICManagementAPI, IICManagementAPI};
+// use crate::canister_management::management::{CreateCanisterArgs, CanisterSettings, ICManagementAPI, IICManagementAPI};
 
 #[query]
 fn next_id() -> u64 {
