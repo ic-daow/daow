@@ -312,6 +312,7 @@ export interface _SERVICE {
   'edit_project' : ActorMethod<[ProjectEditCommand], BoolProjectResult>,
   'edit_user' : ActorMethod<[UserEditCommand], BoolUserResult>,
   'enable_user' : ActorMethod<[Principal], BoolUserResult>,
+  'get_account_id' : ActorMethod<[], string>,
   'get_claim_proposal' : ActorMethod<
     [ClaimProposalGetQuery],
     ClaimProposalResult,

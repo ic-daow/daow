@@ -276,7 +276,8 @@ export declare enum ProposalClaimErrors {
     AlreadyExists = "AlreadyExists",
     Invalid = "Invalid",
     AlreadyVoted = "AlreadyVoted",
-    NotOpen = "NotOpen"
+    NotOpen = "NotOpen",
+    ClaimAmountExceedUpperLimit = "ClaimAmountExceedUpperLimit"
 }
 /**
  *******************************************************************************

@@ -432,6 +432,7 @@ service : {
 
     // query this canister ICP balance, only for mainnet(ic)
     "cansiter_balance" : () -> (Tokens);
+    "get_account_id" : () -> (text);
 
     "register_user": (UserRegisterCommand) -> (RegisterUserResult);
     "edit_user" : (UserEditCommand) -> (BoolUserResult);

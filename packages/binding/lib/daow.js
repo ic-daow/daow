@@ -162,6 +162,7 @@ var ProposalClaimErrors;
     ProposalClaimErrors["Invalid"] = "Invalid";
     ProposalClaimErrors["AlreadyVoted"] = "AlreadyVoted";
     ProposalClaimErrors["NotOpen"] = "NotOpen";
+    ProposalClaimErrors["ClaimAmountExceedUpperLimit"] = "ClaimAmountExceedUpperLimit";
 })(ProposalClaimErrors = exports.ProposalClaimErrors || (exports.ProposalClaimErrors = {}));
 function fromClaimError(error) {
     if ('ProposalNotFound' in error) {
@@ -179,8 +180,11 @@ function fromClaimError(error) {
     else if ('ProposalStateNotOpen' in error) {
         return ProposalClaimErrors.NotOpen;
     }
+    else if ('ClaimAmountExceedUpperLimit' in error) {
+        return ProposalClaimErrors.ClaimAmountExceedUpperLimit;
+    }
     else {
-        throw new Error('unimplemented');
+        throw new Error(`unimplemented ${error}`);
     }
 }
 var TransactionErrors;

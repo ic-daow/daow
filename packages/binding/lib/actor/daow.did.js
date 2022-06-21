@@ -333,6 +333,7 @@ const idlFactory = ({ IDL }) => {
         'edit_project': IDL.Func([ProjectEditCommand], [BoolProjectResult], []),
         'edit_user': IDL.Func([UserEditCommand], [BoolUserResult], []),
         'enable_user': IDL.Func([IDL.Principal], [BoolUserResult], []),
+        'get_account_id': IDL.Func([], [IDL.Text], []),
         'get_claim_proposal': IDL.Func([ClaimProposalGetQuery], [ClaimProposalResult], []),
         'get_project': IDL.Func([ProjectIdCommand], [ProjectResult], []),
         'get_self': IDL.Func([], [UserResult], []),

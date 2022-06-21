@@ -466,6 +466,7 @@ export enum ProposalClaimErrors {
   Invalid = 'Invalid',
   AlreadyVoted = 'AlreadyVoted',
   NotOpen = 'NotOpen',
+  ClaimAmountExceedUpperLimit = 'ClaimAmountExceedUpperLimit',
 }
 
 function fromClaimError(error: ClaimError): ProposalClaimErrors {
@@ -479,8 +480,10 @@ function fromClaimError(error: ClaimError): ProposalClaimErrors {
     return ProposalClaimErrors.AlreadyVoted
   } else if ('ProposalStateNotOpen' in error) {
     return ProposalClaimErrors.NotOpen
+  } else if ('ClaimAmountExceedUpperLimit' in error) {
+    return ProposalClaimErrors.ClaimAmountExceedUpperLimit
   } else {
-    throw new Error('unimplemented')
+    throw new Error(`unimplemented ${error}`)
   }
 }
 
