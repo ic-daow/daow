@@ -10,7 +10,7 @@ use log::{debug, error, info};
 use serde::Serialize;
 
 use crate::common::constant::CYCLES_PER_DFT_CANISTER;
-use crate::context::{DaoContext, DaoDataStorage, DFT_STANDARD_WASM};
+use crate::context::{DaoContext, DaoDataStorage};
 
 use crate::CONTEXT;
 use crate::env::CanisterEnvironment;
