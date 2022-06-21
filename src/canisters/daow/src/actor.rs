@@ -120,3 +120,125 @@ ic_cdk::export::candid::export_service!();
 fn export_candid() -> String {
     __export_service()
 }
+
+// #[derive(Debug, Clone, CandidType, Deserialize)]
+// pub struct DFTDeployArgs {
+//     sub_account: Option<Subaccount>,
+//     logo: Option<Vec<u8>>,
+//     name: String,
+//     symbol: String,
+//     decimals: u8,
+//     total_supply: Nat,
+//     fee: TokenFee,
+//     caller: Option<Principal>,
+//     archive_option: Option<ArchiveOptions>,
+// }
+
+// pub type Subaccount = [u8; 32];
+
+// #[derive(CandidType, Default, Debug, Hash, Clone, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+// pub struct TokenFee {
+//     pub minimum: Nat,
+//     pub rate: u32,
+//     #[serde(rename = "rateDecimals")]
+//     pub rate_decimals: u8,
+// }
+
+
+// #[derive(Serialize, Deserialize, CandidType, Clone, Debug, PartialEq, Eq)]
+// pub struct ArchiveOptions {
+//     /// The number of blocks which, when exceeded, will trigger an archiving
+//     /// operation
+//     pub trigger_threshold: u32,
+//     /// The number of blocks to archive when trigger threshold is exceeded
+//     pub num_blocks_to_archive: u32,
+//     pub node_max_memory_size_bytes: Option<u32>,
+//     pub max_message_size_bytes: Option<u32>,
+//     pub cycles_for_archive_creation: Option<u64>,
+// }
+
+// /// 为 dft canister 创建canister id
+// /// 然后把 dft wasm 部署到 刚创建的 canister id
+// // #[update] 
+// async fn create_and_install_dft(args: DFTDeployArgs) -> Result<Principal, String> {
+
+//     // create dft canister id 
+//     // project_id, token args,
+//     let controller = ic_cdk::api::caller();
+//     let dft_canister_id = create_new_dft_canister(controller).await?;  
+
+//     // install dft wasm code 
+//     // need args: sub_account: Option<Subaccount, logo: Option<Vec<u8>>, name: String, decimals: u8, total_supply: Nat, 
+//     // fee: TokenFee, caller: Option<Principal>, archive_option: Option<ArchiveOptions>
+//     let _ = install_dft_canister_code(&dft_canister_id, args).await?;
+    
+//     Ok(dft_canister_id)
+// }
+
+// async fn create_new_dft_canister(
+//     controller: Principal,
+// ) -> Result<Principal, String> {
+//     let daow_canister = ic_cdk::api::id();
+//     let create_args = CreateCanisterArgs {
+//         cycles: CYCLES_PER_DFT_CANISTER,
+//         settings: CanisterSettings {
+//             controllers: Some(vec![controller, daow_canister]),
+//             compute_allocation: None,
+//             memory_allocation: None,
+//             freezing_threshold: None,
+//         },
+//     };
+//     debug!("creating dft token ...");
+//     let ic_management: Box<dyn IICManagementAPI> = Box::new(ICManagementAPI::default());
+//     let create_result = ic_management.create_canister(create_args).await;
+
+//     match create_result {
+//         Ok(cdr) => {         
+//             // let _ = install_dft_canister_code().await?;
+//             Ok(cdr.canister_id)
+//         }
+//         Err(msg) => {
+//             let msg = format!("create new dft canister failed {}", msg);
+//             error!("{}", msg);
+//             Err(msg)
+//         }
+//     }
+    
+// }
+
+// async fn install_dft_canister_code(
+//     canister_id: &Principal,
+//     args: DFTDeployArgs
+// ) -> Result<(), String> {
+//     let ic_management: Box<dyn IICManagementAPI> = Box::new(ICManagementAPI::default());
+//     match encode_args((args.sub_account, args.logo, args.name, args.symbol, args.decimals, args.total_supply, args.fee, args.caller, args.archive_option)) {
+//         Ok(install_args) => {
+//             match ic_management.canister_install(
+//                     canister_id,
+//                     DFT_STANDARD_WASM.to_vec(),
+//                     install_args,
+//                 )
+//                 .await
+//             {
+//                 Ok(_) => {
+//                     info!("install dft canister success");
+//                     Ok(())
+//                 }
+//                 Err(msg) => {
+//                     let msg = format!(
+//                         "install dft canister {:?} failed. details:{}",
+//                         canister_id,
+//                         msg
+//                     );
+//                     error!("{}", msg);
+//                     Err(msg)
+//                 }
+//             }
+//         }
+//         Err(msg) => {
+//             let msg = format!("encode_args failed. details:{:?}", msg);
+//             error!("{}", msg);
+//             Err(msg)
+//         }
+//     }
+// }

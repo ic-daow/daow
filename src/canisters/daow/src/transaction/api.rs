@@ -36,7 +36,7 @@ fn create_transaction(cmd: TransactionCreateCommand) -> Result<TransactionId, Tr
 }
 
 #[update]
-fn edit_transaction(cmd: TransactionUpdateCommand) -> Result<bool, TransactionError> {
+fn update_transaction(cmd: TransactionUpdateCommand) -> Result<bool, TransactionError> {
     CONTEXT.with(|c| c.borrow_mut().transaction_service.update_transaction(cmd))
 }
 
