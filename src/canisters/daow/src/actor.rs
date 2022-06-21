@@ -1,22 +1,27 @@
 
 use std::iter::FromIterator;
 
+use candid::{encode_args, Principal, Nat, CandidType, Deserialize};
 use ic_cdk::{caller, id, print};
 use ic_cdk_macros::*;
 use ic_cdk::storage;
 use ic_ledger_types::{MAINNET_LEDGER_CANISTER_ID, AccountBalanceArgs, AccountIdentifier, DEFAULT_SUBACCOUNT, Tokens};
+use log::{debug, error, info};
+use serde::Serialize;
 
-use crate::context::{DaoContext, DaoDataStorage};
+use crate::common::constant::CYCLES_PER_DFT_CANISTER;
+use crate::context::{DaoContext, DaoDataStorage, DFT_STANDARD_WASM};
 
 use crate::CONTEXT;
 use crate::env::CanisterEnvironment;
+use crate::canister_management::management::{CreateCanisterArgs, CanisterSettings, ICManagementAPI, IICManagementAPI};
 
 #[query]
 fn next_id() -> u64 {
     CONTEXT.with(|s| s.borrow().id)
 }
 
-#[ic_cdk_macros::query]
+#[query]
 fn greet(name: String) -> String {
     format!("Hello, {}!", name)
 }
@@ -24,6 +29,11 @@ fn greet(name: String) -> String {
 #[query]
 fn get_caller() -> String {
     caller().to_string()
+}
+
+#[query] 
+fn get_account_id() -> String {
+    CONTEXT.with(|c| ic_ledger_types::AccountIdentifier::new(&c.borrow().env.canister_id(), &DEFAULT_SUBACCOUNT).to_string())
 }
 
 #[init]
@@ -50,6 +60,7 @@ async fn canister_balance() -> Tokens {
         _ => Tokens::from_e8s(0)
     }    
 }
+
 
 #[pre_upgrade]
 fn pre_upgrade() {
