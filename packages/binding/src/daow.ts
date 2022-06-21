@@ -432,7 +432,7 @@ function fromProposalState(state: ProposalState): ProposalStates {
   } else if ('Accepted' in state) {
     return ProposalStates.Accepted
   } else {
-    throw new Error('unimplemented')
+    throw new Error(`unimplemented ${state}`)
   }
 }
 
