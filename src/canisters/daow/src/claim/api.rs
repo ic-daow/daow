@@ -18,17 +18,17 @@ fn submit_claim_proposal(payload: ProposalPayload) -> Result<u64, ClaimError> {
         match ctx.project_service.get_project(payload.project_id) {
             Some(p) if p.can_claiming(&caller) => {
 
-                let claim_duration_nanos = if p.latest_claim_at.is_some() {
-                    (now - p.latest_claim_at.unwrap()) / 864000 
-                } else {
-                    p.capital_detail.release.start_date
-                };
+                // let claim_duration_nanos = if p.latest_claim_at.is_some() {
+                //     (now - p.latest_claim_at.unwrap()) / 864000 
+                // } else {
+                //     p.capital_detail.release.start_date
+                // };
 
-                let claim_max_amount = claim_duration_nanos / TIME_NANOS_PER_DAY * p.capital_detail.release.amount_per_day;
+                // let claim_max_amount = claim_duration_nanos / TIME_NANOS_PER_DAY * p.capital_detail.release.amount_per_day;
 
-                if payload.amount_e8s > claim_max_amount  {
-                    return Err(ClaimError::ClaimAmountExceedUpperLimit);
-                }
+                // if payload.amount_e8s > claim_max_amount  {
+                //     return Err(ClaimError::ClaimAmountExceedUpperLimit);
+                // }
 
                 let actual_raised = p.actual_raised;
                 // 投票通过阀值超过半数

@@ -59,7 +59,7 @@ pub struct TransactionUpdateCommand {
 
 impl TransactionUpdateCommand {
     pub fn merge_profile(self, profile: &mut TransactionProfile) -> Result<bool, TransactionError> {
-        if self.transaction_id == profile.id && profile.memo == self.memo && self.amount == profile.amount && self.project_id == profile.project_id {
+        if self.transaction_id == profile.id && self.amount == profile.amount && self.project_id == profile.project_id {
             profile.block_height = self.block_height;
             
             Ok(true)
