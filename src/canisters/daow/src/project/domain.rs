@@ -104,7 +104,7 @@ impl ProjectProfile {
 
     pub fn can_claiming(&self, owner: &Principal) -> bool {
         self.valid_status() && 
-            (self.progress == ProgressStage::ToClaim || self.progress == ProgressStage::Claimed) &&
+            (self.progress == ProgressStage::InProgress || self.progress == ProgressStage::ToClaim || self.progress == ProgressStage::Claimed) &&
             self.is_owner(owner)
 
     }

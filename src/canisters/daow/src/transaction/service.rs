@@ -46,12 +46,12 @@ impl TransactionService {
         self.transactions
             .iter_mut()
             .find(|(_, tx)| { 
-                tx.block_height == block_height && tx.memo == memo && tx.project_id == project_id
+                tx.block_height == block_height && tx.project_id == project_id
             })
             .map(|(_, tx)| -> u64 { 
                 tx.is_finalize = true; tx.amount 
             })
-            .ok_or_else(|| TransactionError::TransactionBlockHeightNotValid)
+            .ok_or(TransactionError::TransactionBlockHeightNotValid)
     }
 
     // 按 付款地址和收款地址模糊查询

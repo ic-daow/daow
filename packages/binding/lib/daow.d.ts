@@ -267,7 +267,7 @@ export declare enum ProposalStates {
     Rejected = "Rejected",
     Failed = "Failed"
 }
-declare enum Votes {
+export declare enum Votes {
     Yes = "Yes",
     No = "No"
 }
