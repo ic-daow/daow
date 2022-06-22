@@ -4,7 +4,7 @@
       <div class="banner-button-box">
         <div class="banner-info">Invest in the future you believe in</div>
         <b-button class="banner-button-button" @click="goto(1)" type="is-link"
-          >一键发DAO</b-button
+          >Create DAO</b-button
         >
         <b-button class="banner-button-button" @click="goto(2)" type="is-light"
           >IDO.DAO</b-button

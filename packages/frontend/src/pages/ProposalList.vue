@@ -43,7 +43,7 @@
 			<template #detail="props">
 				<article class="media">
 					<div class="media-content">
-						<div class="content">
+						<div class="content" v-if="props.row.voters.indexOf(userInfo.owner)==-1">
           
                             <b-button
                             class="next-button"
@@ -89,6 +89,7 @@
 </template>
 
 <script>
+    import { mapState, mapMutations } from "vuex";
 	import { dateFormat } from '../lib/util';
 	import DaoMenu from "@/components/Menu.vue";
 
@@ -117,7 +118,13 @@
 				data: [],
             }
         },
+        computed: {
+            ...mapState({
+                userInfo: (state) => state.userInfo,
+            }),
+        },        
 		methods: {
+            ...mapMutations(['setIsLoading']),	
             async vote(id, option) {
                 const dao = await this.$daoDao;
                 this.$buefy.dialog.confirm({
@@ -128,12 +135,15 @@
                             vote: option,
                         };
                         try {
+                            this.setIsLoading(true)
                             console.log("voteClaimProposal:", params)
                             const res = await dao.voteClaimProposal(params);
                             console.log("voteClaimProposal res:", res)
-                            this.fectchData();
+                            await this.fectchData();
                         } catch(e) {
                             console.error("vote:",e)
+                        } finally {
+                            this.setIsLoading(false);
                         }
                     }
                 })   
@@ -158,13 +168,15 @@
 				this.total = res.total;
 				this.data = res.data				
 			},
-			change(){
-				this.fectchData();
+			async change(){
+                this.setIsLoading(true)
+				await this.fectchData();
+                this.setIsLoading(false);
 			}
 		},
 
 		async created(){
-			this.fectchData();
+			this.change();
 		}
     }
 </script>

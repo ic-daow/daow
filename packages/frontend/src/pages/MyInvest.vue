@@ -56,6 +56,7 @@
 
 <script>
 	import { dateFormat } from '../lib/util';
+	import { mapState, mapMutations } from "vuex";
 	import DaoMenu from "@/components/Menu.vue";
 
     export default {
@@ -84,6 +85,7 @@
             }
         },
 		methods: {
+			...mapMutations(['setIsLoading']),	
 			ts2Date(mts){
 				return dateFormat(Number(mts / 1000000n), 'YYYY-mm-dd HH:MM');
 			},
@@ -92,13 +94,15 @@
 				this.$router.push({ path: `/daodetail?id=${id}` });
 			},
 			async fectchData(){
+				this.setIsLoading(true)
 				const dao = await this.$daoDao;
 				console.log("dao:", dao);
 				const res = await dao.getMyInvestProject({
 				});
 				console.log("res:", res)
 				this.total = res.total;
-				this.data = res.data;				
+				this.data = res.data;	
+				this.setIsLoading(false);			
 			},
 			change(){
 				this.fectchData();

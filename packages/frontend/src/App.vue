@@ -1,18 +1,27 @@
 <template>
 	<div id="app">
-		<Header msg="test111"></Header>
+		<Header msg=""></Header>
 		<router-view />
+        <b-notification :closable="false">
+            <b-loading is-full-page v-model="isLoading" :can-cancel="true"></b-loading>
+        </b-notification>
 	</div>
 </template>
 
 <script>
-	import Header from './components/Header.vue'
-	export default {
-		name: 'app',
-		components: {
-			Header
-		}
-	}
+import { mapState } from "vuex";
+import Header from './components/Header.vue'
+export default {
+	name: 'app',
+	computed: {
+    	...mapState(['isLoading']),
+  	},
+	components: {
+		Header
+	},
+	methods:{	
+	},
+}
 </script>
 
 <style>

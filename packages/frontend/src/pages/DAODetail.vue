@@ -229,7 +229,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import {Principal} from "@dfinity/principal";
 
 export default {
@@ -277,6 +277,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setIsLoading']),	
     async withdraw(){
       const dao = await this.$daoDao;
       const params = {
@@ -284,17 +285,25 @@ export default {
         amount_e8s: this.amount * 100000000,
         recipient_principal: this.projectInfo.owner,
       };
-      try{
-        console.log("createClaimProposal:", params)
-        const res = await dao.createClaimProposal(params);
-        console.log("createClaimProposal res:", res)
-      }catch(e){
-        console.error("withdraw:",e)
-      }
-
+      this.$buefy.dialog.confirm({
+          message: 'confirm your claim proposal?',
+          onConfirm: async () => {
+              try {
+                this.setIsLoading(true)
+                console.log("createClaimProposal:", params)
+                const res = await dao.createClaimProposal(params);
+                console.log("createClaimProposal res:", res)
+              } catch(e) {
+                console.error("withdraw:",e)
+              } finally {
+                this.setIsLoading(false);
+              }
+          }
+      })
     },
     getProjectInfo() {
       this.detailLoading = true;
+      this.setIsLoading(true)
       this.$daoDao
         .then((daoDao) => {
           this.daoInstance = daoDao;
@@ -305,10 +314,12 @@ export default {
           this.projectInfo = project;
           this.formateInfo();
           this.detailLoading = false;
+          this.setIsLoading(false);
         })
         .catch((err) => {
           console.log(err);
           this.detailLoading = false;
+          this.setIsLoading(false);
         });
         
     },
@@ -368,6 +379,7 @@ export default {
       }
       console.log("txParas:", txParas)
       try {
+        this.setIsLoading(true)
         const result = await this.daoInstance.createTransaction(txParas)
         console.log("createTransaction result:", result);
         let params = {
@@ -404,9 +416,6 @@ export default {
           console.log("vResult:", vResult);    
           loop = ! vResult
         }
-  
-
-
         this.isLoading = false;
         console.log("createTransaction res",result);
         this.isInvestModalActive = false;
@@ -417,6 +426,8 @@ export default {
       } catch(err) {
           this.isLoading = false;
           console.log(err);
+      } finally {
+        this.setIsLoading(false);
       }
 
     },
