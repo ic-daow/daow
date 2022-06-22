@@ -444,7 +444,7 @@ function extractProposalFailedReason(state: ProposalState): string | null {
   }
 }
 
-enum Votes {
+export enum Votes {
   Yes = 'Yes',
   No = 'No',
 }
@@ -456,7 +456,7 @@ function toVote(vote: Votes): Vote {
     case Votes.No:
       return { No: null }
     default:
-      throw new Error('unimplemented')
+      throw new Error(`unimplemented ${vote}`)
   }
 }
 

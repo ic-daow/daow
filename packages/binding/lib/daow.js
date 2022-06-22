@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DaowActor = exports.UserErrors = exports.UserStatus = exports.TransactionErrors = exports.ProposalClaimErrors = exports.ProposalStates = exports.ProjectErrors = exports.ProjectStatus = exports.ProgressStages = exports.ReleaseMethods = void 0;
+exports.DaowActor = exports.UserErrors = exports.UserStatus = exports.TransactionErrors = exports.ProposalClaimErrors = exports.Votes = exports.ProposalStates = exports.ProjectErrors = exports.ProjectStatus = exports.ProgressStages = exports.ReleaseMethods = void 0;
 const actor_1 = require("./actor");
 const daow_did_1 = require("./actor/daow.did");
 const utils_1 = require("./utils");
@@ -144,7 +144,7 @@ var Votes;
 (function (Votes) {
     Votes["Yes"] = "Yes";
     Votes["No"] = "No";
-})(Votes || (Votes = {}));
+})(Votes = exports.Votes || (exports.Votes = {}));
 function toVote(vote) {
     switch (vote) {
         case Votes.Yes:
@@ -152,7 +152,7 @@ function toVote(vote) {
         case Votes.No:
             return { No: null };
         default:
-            throw new Error('unimplemented');
+            throw new Error(`unimplemented ${vote}`);
     }
 }
 var ProposalClaimErrors;
