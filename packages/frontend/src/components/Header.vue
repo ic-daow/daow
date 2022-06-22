@@ -14,8 +14,8 @@
         <b-navbar-item href="#"> 托管DAO </b-navbar-item>
         <b-navbar-item href="#"> 自治DAO </b-navbar-item>
       </b-navbar-dropdown>
-      <b-navbar-item href="#"> 白皮书 </b-navbar-item>
-      <b-navbar-item href="#"> 审计 </b-navbar-item>
+<!--      <b-navbar-item href="#"> 白皮书 </b-navbar-item>-->
+<!--      <b-navbar-item href="#"> 审计 </b-navbar-item>-->
     </template>
 
     <template #end>
