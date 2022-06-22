@@ -12,15 +12,26 @@
 			>
 
 			<b-table-column field="id" label="ID" width="40" numeric v-slot="props">
-				{{ props.row.id }}
+				 {{ props.row.id }} <!--a @click="gotoProposal(props.row.id)"> </a-->
 			</b-table-column>
 
-			<b-table-column field="name" label="Name" sortable v-slot="props">
-				<a @click="gotoProposal(props.row.id)"> {{ props.row.name }} </a>
+			<b-table-column field="project_id" label="Project" sortable v-slot="props">
+				{{ props.row.payload.project_id }}
 			</b-table-column>
 
-			<b-table-column field="status" label="Status" sortable v-slot="props">
-				{{ props.row.status }}
+			<b-table-column field="votes_yes" label="votes_yes" sortable v-slot="props">
+				{{ props.row.votes_yes.amount_e8s /100000000 }}
+			</b-table-column>
+
+			<b-table-column field="votes_no" label="votes_no" sortable v-slot="props">
+				{{ props.row.votes_no.amount_e8s /100000000 }}
+			</b-table-column>
+			<b-table-column field="amount_e8s" label="Claim Amount" sortable v-slot="props">
+				{{ props.row.payload.amount_e8s / 100000000 }}
+			</b-table-column>
+
+			<b-table-column field="state" label="State" sortable v-slot="props">
+				{{ props.row.state }}
 			</b-table-column>
 
 			<b-table-column field="created_at" label="Create At" sortable centered v-slot="props">
@@ -31,19 +42,22 @@
 
 			<template #detail="props">
 				<article class="media">
-					<figure class="media-left">
-						<p class="image is-64x64">
-							<img :src="`${$config.host}?canisterId=${$config.pid}&picId=${props.row.logo_id}`">
-						</p>
-					</figure>
 					<div class="media-content">
 						<div class="content">
-							<p>
-								<strong>{{ props.row.name }}</strong>
-								<small>@{{ props.row.team.name }}</small>
-								<br>
-								{{ props.row.description }}
-							</p>
+          
+                            <b-button
+                            class="next-button"
+                            @click="vote(props.row.id, 'Yes')"
+                            type="is-primary"
+                            >Yes</b-button                            
+                            >
+                            <b-button
+                            class="next-button"
+                            @click="vote(props.row.id, 'No')"
+                            type="is-primary"
+                            >No</b-button
+                            >
+
 						</div>
 					</div>
 				</article>
@@ -104,6 +118,27 @@
             }
         },
 		methods: {
+            async vote(id, option) {
+                const dao = await this.$daoDao;
+                this.$buefy.dialog.confirm({
+                    message: 'confirm your vote?',
+                    onConfirm: async () => {
+                        const params = {
+                            proposal_id: id,
+                            vote: option,
+                        };
+                        try {
+                            console.log("voteClaimProposal:", params)
+                            const res = await dao.voteClaimProposal(params);
+                            console.log("voteClaimProposal res:", res)
+                            this.fectchData();
+                        } catch(e) {
+                            console.error("vote:",e)
+                        }
+                    }
+                })   
+            },
+
 			ts2Date(mts){
 				return dateFormat(Number(mts / 1000000n),  'YYYY-mm-dd HH:MM');
 			},
@@ -145,5 +180,8 @@
 }
 .dao-content{
 	flex: 1;
+}
+.next-button{
+    margin-left: 50px;
 }
 </style>

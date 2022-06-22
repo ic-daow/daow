@@ -2,7 +2,6 @@
   <b-menu>
     <b-menu-list label="Projects">
       <b-menu-item icon="usd" label="My investment" tag="router-link" to="/myInvest" :active="path=='/myInvest'"></b-menu-item>
-      <b-menu-item icon="glasses" label="Available projects" tag="router-link" to="/daoList" :active="path=='/daoList'"></b-menu-item>
       <b-menu-item icon="bell" expanded>
         <template #label="props">
           My projects
@@ -10,6 +9,7 @@
         <b-menu-item icon="bell" label="Projects" tag="router-link" to="/myDao" :active="path=='/myDao'"></b-menu-item>
         <b-menu-item icon="add" label="Add project"  tag="router-link" to="/createDao"></b-menu-item>
       </b-menu-item>
+      <b-menu-item icon="glasses" label="Available projects" tag="router-link" to="/daoList" :active="path=='/daoList'"></b-menu-item>
     </b-menu-list>
     <b-menu-list label="Governance">
       

@@ -159,13 +159,13 @@
       </div>      
     </div>
 
-    <div class="module">
-      <h1 class="title has-text-centered">Claim</h1>
+    <div class="module" v-if="projectInfo.actual_raised >= projectInfo.capital_detail.raise.amount * 100000000">
+      <h1 class="title has-text-centered">Claim Proposal</h1>
       <div>
-        Congratulations! You have raised  <b>120</b> ICP.
+        You have raised  <b>{{projectInfo.actual_raised / 100000000 || '0'}}</b> ICP.
       </div>
       <div>
-        You can withdraw  <b>120</b> ICP.
+        You can withdraw  <b> {{(projectInfo.actual_raised - projectInfo.claimed) / 100000000}} </b>. ( {{projectInfo.claimed / 100000000}} has been claimed)
       </div>
       <div>
         <b-field label="Withdraw" horizontal>
@@ -178,7 +178,7 @@
           class="next-button"
           @click="withdraw"
           type="is-primary"
-          >Withdraw</b-button
+          >Submit</b-button
         >
       </div>      
     </div>
@@ -230,13 +230,17 @@
 
 <script>
 import { mapState } from "vuex";
+import {Principal} from "@dfinity/principal";
+
 export default {
   name: "DaoDetail",
   data() {
     return {
       id: null,
       projectInfo: {
-        capital_detail: {},
+        capital_detail: {
+          raise: 0,
+        },
         logoShow: "",
         team: {},
         trust_by: {},        
@@ -254,7 +258,7 @@ export default {
       userInfo: (state) => state.userInfo,
     }),
     contractAmount(){
-       return Number(this.investAmount).toFixed(8).replace(".","");
+       return Math.ceil(this.investAmount * 100000000)
     }
   },
   watch: {
@@ -297,7 +301,7 @@ export default {
           return daoDao.getProject(this.id);
         })
         .then((project) => {
-          console.log("project:", project);
+          console.log("this.projectInfo:", project);
           this.projectInfo = project;
           this.formateInfo();
           this.detailLoading = false;
@@ -353,22 +357,63 @@ export default {
         return;
       }
       this.isLoading = true;
+      const accountId = "ae5b8fade010d8e66619ae9031be11c827eba80fc60d1e73b001138e9ce78882";
+
       const txParas= {
           project_id: parseInt(this.id),
           amount: this.contractAmount,
-          memo: this.userInfo.memo,
+          memo: 0,
           from: this.userInfo.owner,
-          to: this.$config.cid,
+          to: accountId,
       }
       console.log("txParas:", txParas)
       try {
         const result = await this.daoInstance.createTransaction(txParas)
+        console.log("createTransaction result:", result);
+        let params = {
+          to: accountId,
+          amount: this.contractAmount,
+          memo: 0,
+        };
+        console.log("requestTransfer:", params);
+        const tx_res = await window.ic.plug.requestTransfer(params);
+        console.log("tx_res:", tx_res);
+        params = {
+            project_id: parseInt(this.id),
+            tx_id: result.id,
+            amount: this.contractAmount,
+            block_height: Number(tx_res.height),
+            memo:  0,
+        }
+        console.log("modifyTransaction:", params);
+        const mResult = await this.daoInstance.modifyTransaction(params)
+        console.log("mResult:", mResult);
+
+        const sleep = async (time) =>{
+          return new Promise(function(resolve){
+            setTimeout(resolve, time);
+          });
+        }
+        let loop = true;
+        while(loop) {
+          await sleep(1);
+          const vResult = await this.daoInstance.verifyTransaction({
+              project_id: parseInt(this.id),
+              block_height:Number(tx_res.height),
+          })          
+          console.log("vResult:", vResult);    
+          loop = ! vResult
+        }
+  
+
+
         this.isLoading = false;
         console.log("createTransaction res",result);
         this.isInvestModalActive = false;
+        this.getProjectInfo();
         this.$buefy.dialog.alert("Invest success!");
-        const tx = await this.daoInstance.getTransaction(result.id); 
-        console.log("tx res", tx);
+        // const tx = await this.daoInstance.getTransaction(result.id); 
+        // console.log("tx res", tx);
       } catch(err) {
           this.isLoading = false;
           console.log(err);

@@ -164,6 +164,10 @@ export default {
           owner: this.userInfo.owner,
           actual_raised: 100000,
         };
+        applyInfo.logo = [];
+        applyInfo.trust_by.logo =[]; 
+        applyInfo.roadmap = [];
+        applyInfo.team.picture =[];        
         this.loading = true;
         this.$daoDao
           .then((daoDao) => {
