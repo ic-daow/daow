@@ -15,7 +15,6 @@
       "type": "motoko"
     },
     "frontend": {
-      "dependencies": ["daow", "photo"],
       "frontend": {
         "entrypoint": "packages/frontend/dist/index.html"
       },
