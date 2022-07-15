@@ -1,6 +1,6 @@
 let config = {
-    cid: "oda5s-kqaaa-aaaah-qc23q-cai",
-    pid: "eizsz-uqaaa-aaaah-qajtq-cai",
-    host: "https://raw.ic0.app/"
+  host: process.env.VUE_APP_IC_HOST,
+  cid: process.env.VUE_APP_DAOW_CID,
+  pid: process.env.VUE_APP_PHOTO_CID,
 };
 export default config;
