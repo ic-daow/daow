@@ -7,4 +7,4 @@ rm -rf dist
 npm run build
 popd
 
-dfx deploy --network ic frontend
+dfx deploy --network ic frontend --no-wallet
