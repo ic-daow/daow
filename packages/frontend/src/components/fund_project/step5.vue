@@ -5,6 +5,13 @@
         <b-icon class="icon2" icon="fa-check" size="is-large"> </b-icon>
       </div>
       <div class="success-text">Submit Successfully!</div>
+      <p class="has-text-centered">
+        <countdown :time="5 * 1000" @end="handleCountdownEnd">
+          <template slot-scope="props"
+            >{{ props.seconds }}S 后返回主页</template
+          >
+        </countdown>
+      </p>
     </div>
 
     <div class="button-container" v-if="!isComplete">
@@ -48,6 +55,9 @@ export default {
           this.isLoading = false;
           console.log(err);
         });
+    },
+    handleCountdownEnd() {
+      location.href = "/";
     },
   },
 };

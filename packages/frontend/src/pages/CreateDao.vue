@@ -165,9 +165,9 @@ export default {
           actual_raised: 100000,
         };
         applyInfo.logo = [];
-        applyInfo.trust_by.logo =[]; 
+        applyInfo.trust_by.logo =[];
         applyInfo.roadmap = [];
-        applyInfo.team.picture =[];        
+        applyInfo.team.picture =[];
         this.loading = true;
         this.$daoDao
           .then((daoDao) => {
