@@ -2,28 +2,12 @@
   <b-navbar class="index-navbar">
     <template #brand>
       <b-navbar-item tag="router-link" :to="{ path: '/' }">
-       <span class="logo">DAOWORLD</span>
+        <span class="logo">DAOWORLD</span>
       </b-navbar-item>
     </template>
-    <template #start>
-      <b-navbar-item tag="router-link" :to="{ path: '/' }"> Home </b-navbar-item>
-      <b-navbar-item tag="router-link" :to="{ path: '/myInvest' }">
-        IDO
-      </b-navbar-item>
-      <b-navbar-dropdown label="DAO">
-        <b-navbar-item href="#"> DAO </b-navbar-item>
-        <b-navbar-item href="#"> DAO Delegation </b-navbar-item>
-      </b-navbar-dropdown>
-    </template>
-
     <template #end>
       <b-navbar-item tag="div">
         <b-button type="is-primary" :loading="loading">{{ userText }}</b-button>
-        <!-- <div class="buttons">
-          <a class="button is-primary">
-            <strong>{{ userText }}</strong>
-          </a>
-        </div> -->
       </b-navbar-item>
     </template>
   </b-navbar>
@@ -75,8 +59,8 @@ export default {
       this.$daoDao
         .then((daoDao) => {
           return daoDao.createUser({
-            name: "张三",
-            email: "zhangsan@dao.com",
+            name: "Default User",
+            email: "default@daow.com",
             memo: "",
           });
         })
@@ -97,7 +81,7 @@ export default {
 <style lang="scss" scoped>
 .index-navbar {
   margin-bottom: 2rem;
-  .logo{
+  .logo {
     font-weight: 600;
     color: #7957d5;
     font-size: 20px;

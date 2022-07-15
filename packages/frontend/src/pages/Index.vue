@@ -6,9 +6,6 @@
         <b-button class="banner-button-button" @click="goto(1)" type="is-link"
           >Create DAO</b-button
         >
-        <b-button class="banner-button-button" @click="goto(2)" type="is-light"
-          >IDO.DAO</b-button
-        >
       </div>
     </div>
     <div class="container is-fluid">
