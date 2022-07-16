@@ -7,9 +7,9 @@
       <div class="success-text">Submit Successfully!</div>
       <p class="has-text-centered">
         <countdown :time="5 * 1000" @end="handleCountdownEnd">
-          <template slot-scope="props"
-            >{{ props.seconds }}S 后返回主页</template
-          >
+          <template slot-scope="props">
+            Return to home page after {{ props.seconds }}S
+          </template>
         </countdown>
       </p>
     </div>

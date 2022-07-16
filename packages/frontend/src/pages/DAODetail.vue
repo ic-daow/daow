@@ -6,9 +6,9 @@
     <div class="card-content">
       <div class="media">
         <div class="media-left">
-          <figure class="image is-48x48">
-            <img :src="projectInfo.logo" :alt="projectInfo.name" />    
-            <b-skeleton circle width="48px" height="48px" :active="detailLoading"></b-skeleton>        
+          <figure class="image is-48x48 b-image-wrapper">
+            <img :src="projectInfo.logo" :alt="projectInfo.name" />
+            <b-skeleton circle width="48px" height="48px" :active="detailLoading"></b-skeleton>
           </figure>
         </div>
         <div class="media-content">
@@ -25,9 +25,9 @@
             :href="item"
           >
             {{ item }}
-          </a>    
-          <br>  
-        </div>      
+          </a>
+          <br>
+        </div>
 
       </div>
     </div>
@@ -38,28 +38,28 @@
       <p class="card-header-title">
         Team: {{projectInfo.team.name}}
       </p>
-    </header>  
+    </header>
     <div class="card-content">
       <div class="content">
-        <div class="pciture">
-          <img :src="projectInfo.team.picture" alt="team" style="width: 100%" />                                     
+        <div class="pciture b-image-wrapper">
+          <img :src="projectInfo.team.picture" alt="team" style="width: 100%" />
         </div>
         <div>
           Twitter: <a class="link-item" :href="projectInfo.team.twitter">
            {{projectInfo.team.twitter}}
-          </a>    
-          <br>  
-        </div>      
+          </a>
+          <br>
+        </div>
       </div>
     </div>
-  </div>  
+  </div>
   <div style="height:5px"></div>
   <div class="card">
     <header class="card-header">
       <p class="card-header-title">
         Tokenomics
       </p>
-    </header>  
+    </header>
     <div class="card-content">
       <div class="content">
         <div
@@ -68,34 +68,34 @@
           :key="key"
         >
           <span class="info-title">{{ key }}:</span><span>{{ val }}</span>
-        </div>  
+        </div>
       </div>
     </div>
-  </div>    
+  </div>
   <div style="height:5px"></div>
   <div class="card">
     <div class="card-content">
       <div class="media">
         <div class="media-left">
-          <figure class="image is-48x48">
-            <img :src="projectInfo.trust_by.logo" :alt="projectInfo.trust_by.name" />    
-            <b-skeleton circle width="48px" height="48px" :active="detailLoading"></b-skeleton>        
+          <figure class="image is-48x48 b-image-wrapper">
+            <img :src="projectInfo.trust_by.logo" :alt="projectInfo.trust_by.name" />
+            <b-skeleton circle width="48px" height="48px" :active="detailLoading"></b-skeleton>
           </figure>
         </div>
         <div class="media-content">
           <p class="title is-4">{{ projectInfo.trust_by.name }}</p>
           <p class="subtitle is-6">@{{projectInfo.trust_by.link}}</p>
         </div>
-      </div>    
+      </div>
     </div>
-  </div>  
+  </div>
 
 </div>
 <div class="dao-detail">
     <div class="module">
       <b-field label="Roadmap">
-        <div class="roadmap-box">
-          <img :src="projectInfo.roadmap" alt="roadmap" />           
+        <div class="roadmap-box b-image-wrapper">
+          <img :src="projectInfo.roadmap" alt="roadmap" />
         </div>
       </b-field>
     </div>
@@ -119,7 +119,7 @@
       <b-field label="Price($):" horizontal>
         {{ projectInfo.capital_detail.price_per_icp }}
       </b-field>
-      <!-- 
+      <!--
       <b-field label="The token amount I will release:" horizontal>
         {{ step2Info.tokenAmount }}
       </b-field> -->
@@ -156,7 +156,7 @@
           :disabled="daoInstance ? false : true"
           >Invest</b-button
         >
-      </div>      
+      </div>
     </div>
 
     <div class="module" v-if="projectInfo.actual_raised >= projectInfo.capital_detail.raise.amount * 100000000">
@@ -170,8 +170,8 @@
       <div>
         <b-field label="Withdraw" horizontal>
             <b-input v-model="amount"></b-input>
-        </b-field>      
-      </div>            
+        </b-field>
+      </div>
       <div class="button-container">
         <!--b-button class="prev-button" @click="back()" type="is-primary">Back</b-button-->
         <b-button
@@ -180,7 +180,7 @@
           type="is-primary"
           >Submit</b-button
         >
-      </div>      
+      </div>
     </div>
 
     <b-modal
@@ -243,7 +243,7 @@ export default {
         },
         logoShow: "",
         team: {},
-        trust_by: {},        
+        trust_by: {},
       },
       isLoading: false,
       daoInstance: null,
@@ -277,7 +277,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setIsLoading']),	
+    ...mapMutations(['setIsLoading']),
     async withdraw(){
       const dao = await this.$daoDao;
       const params = {
@@ -321,7 +321,7 @@ export default {
           this.detailLoading = false;
           this.setIsLoading(false);
         });
-        
+
     },
     formateInfo() {
       this.$picActor
@@ -380,6 +380,7 @@ export default {
       console.log("txParas:", txParas)
       try {
         this.setIsLoading(true)
+        console.log('before createTransaction')
         const result = await this.daoInstance.createTransaction(txParas)
         console.log("createTransaction result:", result);
         let params = {
@@ -412,8 +413,8 @@ export default {
           const vResult = await this.daoInstance.verifyTransaction({
               project_id: parseInt(this.id),
               block_height:Number(tx_res.height),
-          })          
-          console.log("vResult:", vResult);    
+          })
+          console.log("vResult:", vResult);
           loop = ! vResult
         }
         this.isLoading = false;
@@ -421,7 +422,7 @@ export default {
         this.isInvestModalActive = false;
         this.getProjectInfo();
         this.$buefy.dialog.alert("Invest success!");
-        // const tx = await this.daoInstance.getTransaction(result.id); 
+        // const tx = await this.daoInstance.getTransaction(result.id);
         // console.log("tx res", tx);
       } catch(err) {
           this.isLoading = false;
@@ -461,7 +462,7 @@ export default {
     img {
       width: 100%;
       max-height: 640px;
-      
+
     }
   }
 

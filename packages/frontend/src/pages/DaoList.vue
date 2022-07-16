@@ -32,7 +32,7 @@
 			<template #detail="props">
 				<article class="media">
 					<figure class="media-left">
-						<p class="image is-64x64">
+						<p class="image is-64x64 b-image-wrapper">
 							<img :src="`${$config.host}?canisterId=${$config.pid}&picId=${props.row.logo_id}`">
 						</p>
 					</figure>
@@ -69,7 +69,7 @@
 			:page-input-position="inputPosition"
 			:debounce-page-input="inputDebounce"
 			@change="change">
-		</b-pagination>	
+		</b-pagination>
 	</div>
 </div>
 </template>
@@ -100,12 +100,12 @@
                 nextIcon: 'chevron-right',
                 inputPosition: '',
                 inputDebounce: '',
-                
+
 				data: [],
             }
         },
 		methods: {
-			...mapMutations(['setIsLoading']),	
+			...mapMutations(['setIsLoading']),
 			ts2Date(mts){
 				return dateFormat(Number(mts / 1000000n), 'YYYY-mm-dd HH:MM');
 			},
@@ -124,8 +124,8 @@
 				});
 				console.log("res:", res)
 				this.total = res.total;
-				this.data = res.data;	
-				this.setIsLoading(false);			
+				this.data = res.data;
+				this.setIsLoading(false);
 			},
 			change(){
 				this.fectchData();

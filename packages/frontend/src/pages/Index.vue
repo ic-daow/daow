@@ -6,6 +6,9 @@
         <b-button class="banner-button-button" @click="goto(1)" type="is-link"
           >Create DAO</b-button
         >
+        <b-button class="banner-button-button" type="is-link" :disabled="true"
+          >DAOW</b-button
+        >
       </div>
     </div>
     <div class="container is-fluid">
@@ -17,7 +20,7 @@
         >
           <div class="card" @click="godetail(item.id)">
             <div class="card-image">
-              <figure class="image is-4by3">
+              <figure class="image is-4by3 b-image-wrapper">
                 <img :src="item.logo" :alt="item.name" />
               </figure>
             </div>

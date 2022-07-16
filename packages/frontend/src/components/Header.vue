@@ -2,7 +2,7 @@
   <b-navbar class="index-navbar">
     <template #brand>
       <b-navbar-item tag="router-link" :to="{ path: '/' }">
-        <span class="logo">DAOWORLD</span>
+        <span class="logo">Dworld</span>
       </b-navbar-item>
     </template>
     <template #end>
@@ -10,6 +10,9 @@
       <b-navbar-item href="#" @click="stayTune">Governance</b-navbar-item>
       <b-navbar-item href="#" @click="stayTune">Loan</b-navbar-item>
       <b-navbar-item href="#" @click="stayTune">Hosting</b-navbar-item>
+      <b-navbar-item>
+        <b-button type="is-primary" :disabled="true">Launch App</b-button>
+      </b-navbar-item>
       <b-navbar-item tag="div">
         <b-button type="is-primary" :loading="loading" @click="connect">{{
           userInfo.name || "Connect"
