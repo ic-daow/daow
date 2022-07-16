@@ -49,11 +49,14 @@
         :can-cancel="true"
       ></b-loading>
     </b-notification>
+    <create-user />
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import CreateUser from "@/components/CreateUser";
+
 export default {
   name: "Index",
   data() {
@@ -62,7 +65,9 @@ export default {
       isLoading: true,
     };
   },
-  components: {},
+  components: {
+    CreateUser
+  },
   mounted() {
     if(this.userInfo){
       this.getListProject();

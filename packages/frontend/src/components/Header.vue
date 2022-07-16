@@ -6,14 +6,23 @@
       </b-navbar-item>
     </template>
     <template #end>
+      <b-navbar-item href="#" @click="stayTune">Community</b-navbar-item>
+      <b-navbar-item href="#" @click="stayTune">Governance</b-navbar-item>
+      <b-navbar-item href="#" @click="stayTune">Loan</b-navbar-item>
+      <b-navbar-item href="#" @click="stayTune">Hosting</b-navbar-item>
       <b-navbar-item tag="div">
-        <b-button type="is-primary" :loading="loading">{{ userText }}</b-button>
+        <b-button type="is-primary" :loading="loading" @click="connect">{{
+          userInfo.name || "Connect"
+        }}</b-button>
       </b-navbar-item>
     </template>
   </b-navbar>
 </template>
 
 <script>
+import { mapState } from "vuex";
+import { UserErrors } from "@daow/binding";
+
 export default {
   name: "Header",
   props: {
@@ -21,59 +30,42 @@ export default {
   },
   data() {
     return {
-      userText: "Connect",
       loading: false,
     };
   },
+  computed: {
+    ...mapState({
+      userInfo: (state) => state.userInfo,
+    }),
+  },
   mounted() {
-    this.initUser();
+    if (localStorage.getItem("connected") === "1") {
+      this.connect();
+    }
   },
   methods: {
-    async initUser() {
+    async connect() {
+      if (this.loading) return;
+      this.loading = true;
       try {
-        this.loading = true;
-        this.$daoDao
-          .then((daoDao) => {
-            return daoDao.getSelf();
-          })
-          .then((userDao) => {
-            this.loading = false;
-            console.log("get user info", userDao);
-            this.userText = userDao.name;
-            this.$store.commit("setUserInfo", userDao);
-          })
-          .catch((err) => {
-            this.loading = false;
-            if (err == "NotFound") {
-              this.createUser();
-            }
-          });
-      } catch (err) {
-        console.log("get err info", err);
-        if (err == "NotFound") {
-          this.createUser();
+        const dao = await this.$daoDao;
+        const self = await dao.getSelf();
+        console.log("get user info", self);
+        this.$store.commit("setUserInfo", self);
+        localStorage.setItem("connected", "1");
+      } catch (e) {
+        if (e === UserErrors.NotFound) {
+          this.$store.commit("setIsCreateUserActive", true);
         }
+        console.log("connect error", e);
+      } finally {
+        this.loading = false;
       }
     },
-    createUser() {
-      this.$daoDao
-        .then((daoDao) => {
-          return daoDao.createUser({
-            name: "Default User",
-            email: "default@daow.com",
-            memo: "",
-          });
-        })
-        .then((_userDao) => {
-          return _userDao.getSelf();
-        })
-        .then((userDao) => {
-          console.log("get user info", userDao);
-          this.$store.commit("setUserInfo", userDao);
-          this.userText = userDao.name;
-        });
-    },
     goto(urlIndex) {},
+    stayTune() {
+      this.$buefy.toast.open("Stay tuned");
+    },
   },
 };
 </script>
