@@ -70,11 +70,12 @@ Vue.component(VueCountdown.name, VueCountdown)
 
 let initDao = async function () {
   const production = process.env.NODE_ENV === "production";
+  const whitelist = [$config.cid, $config.pid]
   let daoDao = new DaowActor().create($config.cid, {
     agentOptions: {
-      production: production,
+      production,
       host: $config.host,
-      whitelist: [$config.cid],
+      whitelist,
     },
     agentType: production ? "plug" : "anonymous",
   });
@@ -84,9 +85,9 @@ let initDao = async function () {
 
   let picActor = new PictureActor().create($config.pid, {
     agentOptions: {
-      production: production,
+      production,
       host: $config.host,
-      whitelist: [$config.cid],
+      whitelist,
     },
     agentType: production ? "plug" : "anonymous",
   });
