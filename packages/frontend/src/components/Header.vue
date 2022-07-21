@@ -11,10 +11,10 @@
       <b-navbar-item href="#" @click="stayTune">Loan</b-navbar-item>
       <b-navbar-item href="#" @click="stayTune">Hosting</b-navbar-item>
       <b-navbar-item>
-        <b-button type="is-primary" :disabled="true">Launch App</b-button>
+        <b-button class="pink-button" :disabled="true">Launch App</b-button>
       </b-navbar-item>
       <b-navbar-item tag="div">
-        <b-button type="is-primary" :loading="loading" @click="connect">{{
+        <b-button class="pink-button" :loading="loading" @click="connect">{{
           userInfo.name || "Connect"
         }}</b-button>
       </b-navbar-item>
@@ -76,10 +76,23 @@ export default {
 <style lang="scss" scoped>
 .index-navbar {
   margin-bottom: 2rem;
+
+  .navbar-item, .navbar-link{
+    color: #fff !important;
+  }
+  .navbar-item, .navbar-link:hover{
+    background-color: transparent !important;
+  }
   .logo {
     font-weight: 600;
-    color: #7957d5;
+    color: #fff;
     font-size: 20px;
+    letter-spacing: 2px;
+    margin-left: 40px;
+  }
+  .pink-button{
+    color: white;
+    background-color: rgb(240, 10, 148);
   }
 }
 </style>

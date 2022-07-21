@@ -19,26 +19,41 @@ export default {
 	components: {
 		Header
 	},
-	methods:{	
+	methods:{
 	},
 }
 </script>
 
 <style>
-	#app {
-		font-family: 'Avenir', Helvetica, Arial, sans-serif;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-		color: #2c3e50;
-	}
-	.field-body > .field{
-		flex-grow: unset !important;
-	}
-	.icon{
-		height: 0.5rem !important;
-    	width: 0.5rem !important;
-	}
-	.tag {
-
-    }
+html {
+  background-color: #000 !important;
+}
+.notification {
+  background-color: transparent !important;
+}
+.navbar {
+  background-color: transparent !important;
+}
+.loading-overlay .loading-background {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #fff;
+  background-color: #000;
+}
+.field-body > .field {
+  flex-grow: unset !important;
+}
+.icon {
+  height: 1rem !important;
+  width: 1rem !important;
+}
+.tag {
+}
+.b-steps .steps .step-items .step-item .step-link {
+  color: #fff !important;
+}
 </style>

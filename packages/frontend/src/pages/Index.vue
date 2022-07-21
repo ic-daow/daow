@@ -2,11 +2,11 @@
   <div class="container">
     <div class="is-primary index-banner">
       <div class="banner-button-box">
-        <div class="banner-info">Invest in the future you believe in</div>
-        <b-button class="banner-button-button" @click="goto(1)" type="is-link"
+        <div class="banner-title">Invest in the future you believe in</div>
+        <b-button class="banner-button-button pink-button" @click="goto(1)" type="is-link"
           >Create DAO</b-button
         >
-        <b-button class="banner-button-button" type="is-link" :disabled="true"
+        <b-button class="banner-button-button pink-button" :disabled="true"
           >DAOW</b-button
         >
       </div>
@@ -140,29 +140,46 @@ export default {
 .banner-button-box {
   position: absolute;
   left: 4rem;
-  top: 4rem;
+  padding-top: 4rem;
+  /* top: 4rem; */
   text-align: left;
+  background-color: rgba(0,0,0,0.5);
+  width: 100%;
+  height: 100%;
 }
 
 .banner-button-button {
   margin-left: 0.5rem;
 }
+.pink-button{
+  color: white;
+  background-color: rgb(240, 10, 148);
+}
 
 .banner-button-box .index-list {
   margin: 0 2rem;
 }
+.banner-title {
+  font-weight: bold;
+  text-align: left;
+  font-size: 2rem;
+  line-height: 4rem;
+  margin-bottom: 1rem;
+}
 .banner-info {
   font-weight: bold;
   text-align: left;
-  font-size: 4rem;
+  font-size: 1rem;
   line-height: 4rem;
   margin-bottom: 1rem;
   width: 40rem;
+  margin-top: 1rem;
 }
 .index-banner {
-  height: 34rem;
+  height: 30rem;
   position: relative;
   background: url(https://assets.republic.com/assets/index/header/default/header-background-325ecafcd1d310a91d9280a0443a45527c0a83d68fe6b8cba46023e1c02b0d75.svg)
     no-repeat;
+    background-position: 80% 100%;
 }
 </style>
