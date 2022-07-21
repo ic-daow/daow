@@ -170,7 +170,11 @@
           label="Start Date:"
         >
           <span class="has-text-black">
-            {{ projectInfo.capital_detail.release.start_date }}
+            {{
+              new Date(
+                projectInfo.capital_detail.release.start_date.toString() / 10e5
+              ).toUTCString()
+            }}
           </span>
         </b-field>
         <div class="button-container">

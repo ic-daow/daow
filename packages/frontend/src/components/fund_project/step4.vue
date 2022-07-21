@@ -137,7 +137,11 @@
       </b-field>
       <b-field v-if="step3Info.release" horizontal label="Start Date:">
         <span class="has-text-black">
-          {{ step3Info.release.start_date }}
+          {{
+            new Date(
+              step3Info.release.start_date.toString() / 10e5
+            ).toUTCString()
+          }}
         </span>
       </b-field>
     </div>
@@ -160,13 +164,13 @@
 export default {
   name: "step4",
   props: {
-    checkInfo: Object
+    checkInfo: Object,
   },
   data() {
     return {
       step1Info: {},
       step2Info: {},
-      step3Info: {}
+      step3Info: {},
     };
   },
   watch: {
@@ -174,11 +178,10 @@ export default {
       this.step1Info = info.step1Info;
       this.step2Info = info.step2Info;
       this.step3Info = info.step3Info;
-    }
+    },
   },
-  mounted: function() {
-  },
-  methods: {}
+  mounted: function () {},
+  methods: {},
 };
 </script>
 
