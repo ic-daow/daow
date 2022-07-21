@@ -2,7 +2,7 @@
   <div class="step2Page">
     <h1 class="title has-text-centered">Capital Detail</h1>
     <section>
-      <h1 class="lable-text">Raise Rule</h1>
+      <h1 class="lable-text has-text-black">Raise Rule</h1>
       <b-field custom-class="custormField" label="Raise:" horizontal>
         <b-input
           type="number"
@@ -45,7 +45,7 @@
         ></b-input>
       </b-field> -->
 
-      <h1 class="lable-text">Release Rule</h1>
+      <h1 class="lable-text has-text-black">Release Rule</h1>
       <b-field label="Release Method:" horizontal>
         <b-select v-model="release.method">
           <option value="Linear">Linear</option>
