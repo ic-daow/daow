@@ -36,6 +36,7 @@
     "@vue/cli-service": "^5.0.4",
     "babel-loader": "^8.2.5",
     "node-sass": "^7.0.1",
+    "prettier": "^2.7.1",
     "sass": "^1.52.3",
     "sass-loader": "^13.0.0",
     "terser-webpack-plugin": "2.2.2",

@@ -3,29 +3,37 @@
     <div class="modal-card" style="width: 700px">
       <header class="modal-card-head">
         <p class="modal-card-title">Team</p>
-        <button type="button" class="delete" @click="$emit('close')" />
+        <button class="delete" type="button" @click="$emit('close')" />
       </header>
       <section class="modal-card-body">
-        <b-field label="Name" horizontal>
-          <b-input type="text" v-model="name" placeholder="write here" required>
+        <b-field horizontal label="Name">
+          <b-input v-model="name" placeholder="write here" required type="text">
           </b-input>
         </b-field>
-        <b-field label="Position" horizontal>
-          <b-select v-model="position">
-            <option value="DIP">DIP</option>
-          </b-select>
-        </b-field>
-        <b-field label="Twitter" horizontal>
+        <b-field horizontal label="Position">
           <b-input
+            v-model="position"
+            placeholder="write here"
+            required
             type="text"
+          />
+        </b-field>
+        <b-field horizontal label="Twitter">
+          <b-input
             v-model="twitter"
             placeholder="write here"
             required
+            type="text"
           >
           </b-input>
         </b-field>
-        <b-field label="Pictures" horizontal>
-          <b-upload v-model="pictureFile" drag-drop expanded :disabled="isUpload">
+        <b-field horizontal label="Pictures">
+          <b-upload
+            v-model="pictureFile"
+            :disabled="isUpload"
+            drag-drop
+            expanded
+          >
             <section class="section">
               <div class="content has-text-centered">
                 <p>
@@ -44,7 +52,7 @@
         </b-field>
 
         <div class="tags">
-          <span class="tag is-primary" v-if="picture_id">
+          <span v-if="picture_id" class="tag is-primary">
             {{ pictureFile ? pictureFile.name : "" }}
             <button
               class="delete is-small"
@@ -104,7 +112,7 @@ export default {
       this.name = val.name || "";
       this.position = val.position || "";
       this.twitter = val.twitter || "";
-	  this.pictureFile = val.pictureFile || null;
+      this.pictureFile = val.pictureFile || null;
       this.picture_id = val.picture_id || "";
     },
     pictureFile(file) {
@@ -152,8 +160,8 @@ export default {
         position: this.position,
         twitter: this.twitter,
         picture_id: this.picture_id,
-		pictureFile: this.pictureFile,
-		picture:[]
+        pictureFile: this.pictureFile,
+        picture: [],
       };
       if (this.name == "" || this.position == "" || this.picture_id == "") {
         return;
@@ -176,5 +184,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
